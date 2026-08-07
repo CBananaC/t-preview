@@ -791,9 +791,11 @@
 #part-3-paddleocr {
   /* 只改 --paddleocr-photo-width，即可調整右側圖片寬度；高度會按原圖比例自動變化。
      --paddleocr-photo-max-width 設定畫廊不可超過的 Part 3 寬度百分比。
-     --paddleocr-card-width 固定文字卡欄位，避免圖片寬度變更時文字卡跟著變。 */
-  --paddleocr-card-width: 75ch;
-  --paddleocr-photo-width: 50%;
+     --paddleocr-card-width 固定文字卡欄位，避免圖片寬度變更時文字卡跟著變。
+     圖片比文字寬，改成 60%／40% 的比例（原本文字卡用固定 ch 寬度會比圖片寬，
+     改用百分比才能穩定維持這個比例）。 */
+  --paddleocr-card-width: 40%;
+  --paddleocr-photo-width: 60%;
   --paddleocr-photo-max-width: 100%;
   --part3-card-width: 100%;
   --part3-card-max-width: 74ch;
@@ -1150,11 +1152,11 @@
   --json-window-max-w: none;     /* 整個視窗（含上方標籤列）的寬度上限 */
   --json-window-w: 100%;         /* VS Code 視窗本身的寬度 */
   --json-labels-gap: 10px;       /* 標籤列與下方視窗的間距 */
-  --json-label-font-size: 19px;  /* 標籤文字字級：視窗本身很寬，15px 相對還是
-                                     偏小，再加大到 19px */
+  --json-label-font-size: 15px;  /* 標籤文字字級：跟 4「運用 Agentic AI 使用
+                                     PaddleOCR」對話框的使用者訊息（--agentic-codex-text-size）同尺寸 */
   --json-file-font-size: 0px;   /* 標題列「硃25.ocr.json」檔名字級 */
   --json-body-h: 600px;          /* JSON 視窗固定高度 */
-  --json-body-font-size: 19px;   /* JSON 文字字級：同上，統一為 19px */
+  --json-body-font-size: 15px;   /* JSON 文字字級：同上，統一為 15px */
   --json-body-line-height: 1.7;  /* JSON 文字行距 */
   --part3-visual-width: 100%;
   --part3-visual-min-height: 400px;
