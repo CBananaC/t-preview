@@ -1150,10 +1150,11 @@
   --json-window-max-w: none;     /* 整個視窗（含上方標籤列）的寬度上限 */
   --json-window-w: 100%;         /* VS Code 視窗本身的寬度 */
   --json-labels-gap: 10px;       /* 標籤列與下方視窗的間距 */
-  --json-label-font-size: 12px;  /* 標籤文字字級 */
+  --json-label-font-size: 15px;  /* 標籤文字字級：跟 4「運用 Agentic AI 使用
+                                     PaddleOCR」對話框的使用者訊息（--agentic-codex-text-size）同尺寸 */
   --json-file-font-size: 0px;   /* 標題列「硃25.ocr.json」檔名字級 */
   --json-body-h: 600px;          /* JSON 視窗固定高度 */
-  --json-body-font-size: 12.5px; /* JSON 文字字級 */
+  --json-body-font-size: 15px;   /* JSON 文字字級：同上，統一為 15px */
   --json-body-line-height: 1.7;  /* JSON 文字行距 */
   --part3-visual-width: 100%;
   --part3-visual-min-height: 400px;
