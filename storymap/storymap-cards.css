@@ -1150,10 +1150,10 @@
   --json-window-max-w: none;     /* 整個視窗（含上方標籤列）的寬度上限 */
   --json-window-w: 100%;         /* VS Code 視窗本身的寬度 */
   --json-labels-gap: 10px;       /* 標籤列與下方視窗的間距 */
-  --json-label-font-size: 25px;  /* 標籤文字字級 */
+  --json-label-font-size: 12px;  /* 標籤文字字級 */
   --json-file-font-size: 0px;   /* 標題列「硃25.ocr.json」檔名字級 */
   --json-body-h: 600px;          /* JSON 視窗固定高度 */
-  --json-body-font-size: 20px;   /* JSON 文字字級 */
+  --json-body-font-size: 12.5px; /* JSON 文字字級 */
   --json-body-line-height: 1.7;  /* JSON 文字行距 */
   --part3-visual-width: 100%;
   --part3-visual-min-height: 400px;
@@ -1403,8 +1403,8 @@
   --agentic-codex-height: 84%;
   --agentic-codex-left: 0%;
   --agentic-codex-top: 14%;
-  --agentic-codex-font-size: 20px;
-  --agentic-codex-text-size: 20px;
+  --agentic-codex-font-size: 12px;
+  --agentic-codex-text-size: 15px;
   --agentic-codex-angle: 0deg;
 }
 
@@ -1653,12 +1653,12 @@
   --try-diff-h: 180px;
 
   /* 字級 */
-  --try-switch-font-size: 12.5px;
+  --try-switch-font-size: 13px;
   --try-dot-size: 30px;
   --try-dot-font-size: 14px;
-  --try-rpg-font-size: 13px;
-  --try-bubble-font-size: 13.5px;
-  --try-cmp-font-size: 12px;
+  --try-rpg-font-size: 14.5px;
+  --try-bubble-font-size: 15px;
+  --try-cmp-font-size: 13.5px;
   --try-score-font-size: 30px;
 
   /* 顏色 */

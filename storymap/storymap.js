@@ -1026,10 +1026,10 @@ const initPart3FeatureExplorers = () => {
     const fitCodeFont = (el, html) => {
       const plain = (html || '').replace(/<[^>]+>/g, '');
       const len = plain.length;
-      let px = 11.5;
-      if (len > 720) px = 9;
-      else if (len > 480) px = 9.5;
-      else if (len > 300) px = 10.5;
+      let px = 13;
+      if (len > 720) px = 10.5;
+      else if (len > 480) px = 11.5;
+      else if (len > 300) px = 12.5;
       el.style.setProperty('--fx-code-font-size', px + 'px');
     };
 
@@ -2670,9 +2670,10 @@ activateFromLocation();
    - 分頁只保留「平台簡介」與「運用平台研究其他問題」可以點擊，其餘（主頁、
      平台介面、平台運作流程）維持看得見但不能點。
    - 一進入頁面就直接跳到第三部分「步驟二 · OCR 並結構化原始史料」。
-   - 步驟二之前（適合的研究問題／所需的工具與資源／重用平台的基本流程）與
-     步驟八之後（後續功能：LLM Wiki）的內容維持在畫面上，但變淡、不能點擊，
-     並標示「尚在開發中」。
+   - 只留步驟二・OCR並結構化原始史料完全開放；步驟二之前（適合的研究問題／
+     所需的工具與資源／重用平台的基本流程）、步驟三至五・運用AI抽取資訊、
+     以及步驟八之後（後續功能：LLM Wiki）的內容維持在畫面上，但變淡、
+     不能點擊，並標示「尚在開發中」。
    分享給老師的連結範例：storymap-example.html?preview=ocr */
 (() => {
   const params = new URLSearchParams(window.location.search);
@@ -2680,19 +2681,29 @@ activateFromLocation();
 
   document.documentElement.classList.add('is-ocr-preview');
 
+  /* 鎖住分頁：用 cloneNode 把整個節點換掉，藉此清掉原本 tabs.forEach
+     （在檔案最前面）已經掛在這個節點上的 click 監聽器——同一個節點上的
+     監聽器是照註冊順序依序觸發，不分 capture／bubble，光是在這裡另外
+     addEventListener 沒辦法搶在原本的監聽器之前執行 preventDefault，
+     所以單純呼叫 preventDefault 攔不住原本那個監聽器已經呼叫的
+     setActiveTab()，分頁還是會切換過去。換成全新節點就不會有這個問題。 */
   const lockLink = (el, label) => {
-    if (!el) return;
-    el.classList.add('is-preview-locked-tab');
-    el.setAttribute('aria-disabled', 'true');
-    el.title = label;
-    el.addEventListener('click', (event) => { event.preventDefault(); });
+    if (!el) return null;
+    const clone = el.cloneNode(true);
+    el.replaceWith(clone);
+    clone.classList.add('is-preview-locked-tab');
+    clone.setAttribute('aria-disabled', 'true');
+    clone.title = label;
+    clone.addEventListener('click', (event) => { event.preventDefault(); });
+    return clone;
   };
   const lockLabel = '這個草稿預覽只開放「平台簡介」與「運用平台研究其他問題」兩個部分';
   lockLink(document.querySelector('.brand'), lockLabel);
   const LOCKED_TAB_TARGETS = ['cover', 'part-1', 'part-2'];
   tabs.forEach((tab) => {
-    if (LOCKED_TAB_TARGETS.includes(tab.dataset.navTarget)) lockLink(tab, lockLabel);
-    if (tab.dataset.navTarget === 'part-3') {
+    if (LOCKED_TAB_TARGETS.includes(tab.dataset.navTarget)) {
+      lockLink(tab, lockLabel);
+    } else if (tab.dataset.navTarget === 'part-3') {
       /* 就算之後再點一次「運用平台研究其他問題」，也固定回到步驟二，
          不要停在步驟二之前那些已變淡鎖住的內容最上面。 */
       tab.addEventListener('click', () => {
@@ -2701,7 +2712,12 @@ activateFromLocation();
     }
   });
 
-  const LOCKED_SECTION_IDS = ['part-3-research-questions', 'part-3-tools', 'part-3-basic-flow', 'part-3-wiki'];
+  /* 只留步驟二完全開放；步驟二之前的三個小節、步驟三至五（#part-3-ai）、
+     以及步驟八之後（#part-3-wiki）都變淡鎖住。 */
+  const LOCKED_SECTION_IDS = [
+    'part-3-research-questions', 'part-3-tools', 'part-3-basic-flow',
+    'part-3-ai', 'part-3-wiki'
+  ];
   LOCKED_SECTION_IDS.forEach((id) => {
     const el = document.getElementById(id);
     if (!el) return;

@@ -63,14 +63,15 @@ a { color: inherit; }
 img { max-width: 100%; }
 
 /* ============================================================================
-   0 · 螢幕尺寸／方向守門（草稿階段：還沒有手機直向版面）
+   0 · 螢幕尺寸／方向守門（草稿階段：還沒有手機版面）
    兩片守門畫面預設都是 display:none，各自只在對應的 media query 下顯示，
    兩個條件互斥，純 CSS 判斷、不需要 JavaScript：
    - pointer:fine（滑鼠／觸控板，即電腦或筆電）且視窗寬度低於門檻 → 請放寬視窗。
      門檻對齊 .part3-feature-explorer（辨識印刷字／辨識手寫字等）從左右並排
      改為上下堆疊（PDF 在上、資訊面板在下）的斷點，見下方 3466 行附近的
      `.part3-feature-explorer { grid-template-columns: 1fr; }`，兩處要一起改。
-   - pointer:coarse（觸控，即手機或平板）且目前是直向 → 請轉為橫向。
+   - pointer:coarse（觸控，即手機或平板）→ 直接整個擋下，不分直向橫向，
+     請改用電腦瀏覽（手機版還沒做，與其顯示跑版的畫面，不如先擋住）。
    視覺沿用封面／分頁帶（.story.hero／.section-hero）的深色漸層＋
    serif 大標題＋黃色眉標風格，維持全站一致的視覺語言。
    ========================================================================== */
@@ -112,7 +113,7 @@ img { max-width: 100%; }
 @media (pointer: fine) and (max-width: 1040px) {
   .viewport-gate-widen { display: flex; }
 }
-@media (pointer: coarse) and (orientation: portrait) {
+@media (pointer: coarse) {
   .viewport-gate-rotate { display: flex; }
 }
 
@@ -1816,7 +1817,7 @@ img { max-width: 100%; }
 }
 .part3-fx-feat { padding: 16px 22px; background: var(--paper); border: 1px solid var(--line); }
 .part3-fx-feat h3 { margin: 0 0 10px; font: 700 calc(19px * var(--font-scale)) var(--serif); }
-.part3-fx-feat p { margin: 0; color: #31484a; font: 400 calc(13.5px * var(--font-scale))/1.9 var(--serif); }
+.part3-fx-feat p { margin: 0; color: #31484a; font: 400 calc(15px * var(--font-scale))/1.9 var(--serif); }
 
 /* 「AI 生成的 Python 代碼」與「OCR 的輸出結果」平分剩餘高度，各自捲動 */
 .part3-fx-win {
@@ -1862,7 +1863,7 @@ img { max-width: 100%; }
 }
 .part3-fx-chat-text {
   color: var(--ink); white-space: pre-wrap; word-break: break-word;
-  font: 400 calc(13px * var(--font-scale))/1.75 var(--sans);
+  font: 400 calc(14.5px * var(--font-scale))/1.75 var(--sans);
 }
 .part3-fx-chat-row { display: flex; align-items: center; gap: 14px; margin-top: 14px; }
 .part3-fx-chat-ic {
@@ -3229,7 +3230,7 @@ img { max-width: 100%; }
   border: 1.5px dashed var(--yellow); border-radius: 10px; padding: 10px 15px;
   background: rgba(243, 201, 103, .1); color: #fff8e6;
   font-family: var(--sans); font-weight: 700; line-height: 1.7;
-  font-size: calc(12.5px * var(--font-scale));
+  font-size: calc(14px * var(--font-scale));
   transition: background-color .16s, transform .1s;
 }
 .part3-try-chip:hover { background: rgba(243, 201, 103, .22); }
@@ -3241,11 +3242,11 @@ img { max-width: 100%; }
   text-align: left;
 }
 .part3-try-chip--skip:hover { background: rgba(255, 255, 255, .1); border-color: rgba(255, 255, 255, .35); }
-.part3-try-sentence { margin: 0; line-height: 2.4; font-family: var(--sans); font-size: calc(13px * var(--font-scale)); color: #eef4f0; }
+.part3-try-sentence { margin: 0; line-height: 2.4; font-family: var(--sans); font-size: calc(14.5px * var(--font-scale)); color: #eef4f0; }
 .part3-try-blank {
   appearance: none; cursor: pointer; border: none; border-bottom: 2px solid var(--yellow);
   background: rgba(255, 255, 255, .1); color: #fff; padding: 4px 26px 4px 10px; border-radius: 5px 5px 0 0;
-  font-family: var(--sans); font-weight: 700; font-size: calc(13px * var(--font-scale));
+  font-family: var(--sans); font-weight: 700; font-size: calc(14.5px * var(--font-scale));
   background-image: linear-gradient(45deg, transparent 50%, var(--yellow) 50%),
                     linear-gradient(135deg, var(--yellow) 50%, transparent 50%);
   background-position: calc(100% - 14px) 55%, calc(100% - 9px) 55%;
@@ -3268,7 +3269,7 @@ img { max-width: 100%; }
   margin: 2px 1px; padding: 3px 10px 3px 8px; border-radius: 0;
   border: 1.5px solid rgba(255, 255, 255, .3); background: rgba(255, 255, 255, .09);
   font-family: var(--sans); font-weight: 700; color: #fff8e6;
-  font-size: calc(12.5px * var(--font-scale)); line-height: 1.4;
+  font-size: calc(13.5px * var(--font-scale)); line-height: 1.4;
   transition: background-color .14s, border-color .14s, box-shadow .14s;
 }
 .part3-try-check:hover { border-color: rgba(243, 201, 103, .6); background: rgba(255, 255, 255, .15); }
@@ -3329,7 +3330,7 @@ img { max-width: 100%; }
   appearance: none; cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
   padding: 5px 12px; border-radius: 0; border: 1.5px solid rgba(255, 255, 255, .2);
   background: rgba(255, 255, 255, .06); color: #fff;
-  font-family: var(--sans); font-weight: 600; font-size: calc(12.5px * var(--font-scale));
+  font-family: var(--sans); font-weight: 600; font-size: calc(13.5px * var(--font-scale));
   line-height: 1.4;
   transition: background-color .14s, border-color .14s;
 }
