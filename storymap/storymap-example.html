@@ -1,0 +1,1956 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Serif+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="storymap.css?v=20260807-part3-handwritten-try-assets-01">
+  <link rel="stylesheet" href="storymap-cards.css?v=20260807-part3-handwritten-try-assets-01">
+  <link rel="stylesheet" href="part-1-interface.css">
+  <link rel="stylesheet" href="part-3-question-gallery.css">
+  <script src="storymap.js?v=20260807-part3-handwritten-try-assets-01" defer></script>
+  <!-- 第一部分的介面複本：資料模組先載入，行為模組再依它組裝畫面。 -->
+  <script src="part-1-interface-data.js" defer></script>
+  <script src="part-1-interface.js" defer></script>
+  <!-- 第三部分「適合的研究問題」互動圖庫：同樣先載資料，再載行為。 -->
+  <script src="part-3-question-gallery-data.js" defer></script>
+  <script src="part-3-question-gallery.js" defer></script>
+  <title>清代奏摺與上諭分析平台</title>
+</head>
+<body>
+  <!-- 螢幕尺寸／方向守門：這個網站的排版目前只為「較寬的視窗」和「橫向手機」
+       設計，還沒有做真正的手機直向版面。以下兩個守門畫面純粹靠 CSS media
+       query 判斷，不需要 JavaScript：
+       1. 用滑鼠／觸控板的裝置（電腦、筆電）視窗太窄 → 請求放寬視窗；門檻對齊
+          「辨識印刷字」等 .part3-feature-explorer 版面改為上下堆疊的寬度（1040px）。
+       2. 用觸控的裝置（手機、平板）且目前是直向 → 請求轉為橫向。
+       兩個判斷條件互斥，不會同時出現；視覺沿用封面／分頁帶的深色漸層＋
+       serif 大標題風格，門檻與文案可在 storymap.css 的
+       「螢幕尺寸／方向守門」區塊調整。 -->
+  <div class="viewport-gate viewport-gate-widen" aria-hidden="true">
+    <div class="viewport-gate-backdrop"></div>
+    <div class="viewport-gate-card">
+      <span class="viewport-gate-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+        </svg>
+      </span>
+      <p class="viewport-gate-eyebrow">視窗提示</p>
+      <h2 class="viewport-gate-title">請放大瀏覽器視窗</h2>
+      <p class="viewport-gate-note">為獲得最佳瀏覽效果，請將瀏覽器視窗放大，或改用較大螢幕的裝置。</p>
+    </div>
+  </div>
+  <div class="viewport-gate viewport-gate-rotate" aria-hidden="true">
+    <div class="viewport-gate-backdrop"></div>
+    <div class="viewport-gate-card">
+      <span class="viewport-gate-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="7" y="2" width="10" height="20" rx="2"/>
+          <path d="M11 18h2"/>
+          <path d="M20 8a6 6 0 0 0-6-6" stroke-dasharray="2.5 2.5"/>
+          <path d="M20 8l-2.4-.6M20 8l.6-2.4"/>
+        </svg>
+      </span>
+      <p class="viewport-gate-eyebrow">畫面提示</p>
+      <h2 class="viewport-gate-title">請將手機轉為橫向</h2>
+      <p class="viewport-gate-note">請將手機轉為橫向，以獲得最佳瀏覽效果。</p>
+    </div>
+  </div>
+  <header class="topbar">
+    <a class="brand" href="#cover">清代奏摺與上諭分析平台</a>
+    <nav class="tabs" aria-label="網站章節">
+      <a class="main-nav-link" href="#cover" data-nav-target="cover">主頁</a>
+      <div class="nav-dropdown">
+        <a class="main-nav-link nav-dropdown-trigger" href="#intro" data-nav-target="intro" aria-haspopup="true" aria-expanded="false">平台簡介<span class="nav-dropdown-chevron" aria-hidden="true">⌄</span></a>
+        <div class="nav-dropdown-menu" role="menu" aria-label="平台簡介章節">
+          <div class="nav-dropdown-inner">
+            <div class="workflow-chain">
+              <a class="workflow-node" href="#intro-1-1" data-workflow-target="#intro-1-1" role="menuitem">清代奏折制度<small>01</small></a>
+              <span class="workflow-link" aria-hidden="true"></span>
+              <a class="workflow-node" href="#intro-1-2" data-workflow-target="#intro-1-2" role="menuitem">研究價值<small>02</small></a>
+              <span class="workflow-link" aria-hidden="true"></span>
+              <a class="workflow-node" href="#intro-1-3-a" data-workflow-target="#intro-1-3-a" role="menuitem">研究困難<small>03</small></a>
+              <span class="workflow-link" aria-hidden="true"></span>
+              <a class="workflow-node" href="#intro-1-4" data-workflow-target="#intro-1-4" role="menuitem">數位方法<small>04</small></a>
+              <span class="workflow-link" aria-hidden="true"></span>
+              <a class="workflow-node" href="#intro-1-5" data-workflow-target="#intro-1-5" role="menuitem">研究成果<small>05</small></a>
+              <span class="workflow-link" aria-hidden="true"></span>
+              <a class="workflow-node" href="#intro-1-6-a-source" data-workflow-target="#intro-1-6-a-source" role="menuitem">示範案例<small>06</small></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <a class="main-nav-link" href="#part-1" data-nav-target="part-1">平台介面</a>
+      <a class="main-nav-link" href="#part-2" data-nav-target="part-2">平台運作流程</a>
+      <a class="main-nav-link" href="#part-3" data-nav-target="part-3">運用平台研究其他問題</a>
+    </nav>
+    <div class="settings-wrap">
+      <button class="settings-button" id="settings-button" type="button" aria-expanded="false" aria-controls="site-settings-panel" aria-label="開啟網站設定" title="網站設定">
+        <svg class="settings-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+      <div class="settings-panel" id="site-settings-panel" role="dialog" aria-label="網站設定" hidden>
+        <div class="settings-panel-title">網站設定</div>
+        <div class="settings-row">
+          <span>字體</span>
+          <div class="font-size-controls" role="group" aria-label="調整字體">
+            <button class="font-size-button" id="font-size-decrease" type="button" aria-label="縮小字體" title="縮小字體">A−</button>
+            <output id="font-size-value" for="font-size-decrease font-size-increase">100%</output>
+            <button class="font-size-button" id="font-size-increase" type="button" aria-label="放大字體" title="放大字體">A＋</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="tab-panel" id="cover-panel" data-tab-panel="cover" aria-labelledby="cover-title">
+      <section class="story hero" id="cover">
+        <div class="hero-backdrop"></div>
+        <div class="hero-content">
+          <p class="cover-kicker">2026 理大人工智能 X 數位人文獎・工具型作品示例</p>
+          <h1 id="cover-title">清代奏摺與上諭分析平台</h1>
+          <p class="hero-note">結合人工智能與視覺化工具，協助分析清代奏摺和上諭，自動抽取重要資訊，並重建皇帝與官員間的通信網絡和資訊流向。</p>
+          <div class="cover-actions" aria-label="作品連結">
+            <a class="cover-button" href="https://aidhtech.github.io/CHC/" target="_blank" rel="noopener noreferrer">比賽網站</a>
+            <a class="cover-button" href="https://github.com/CBananaC/llm-wiki-teammate-package" target="_blank" rel="noopener noreferrer">下載工具代碼</a>
+            <a class="cover-button" href="#intro" data-cover-target="intro">開始閱讀</a>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="tab-panel" id="intro-panel" data-tab-panel="intro" aria-label="引言" hidden>
+      <div id="intro-content">
+        <section class="story surface-a" id="intro-1-1" data-tab="1.1" data-nav="#intro-1-1">
+          <div class="story-inner">
+            <div class="lay-split text-left">
+              <div class="lay-copy lay-copy-stack">
+                <article class="copybox blk" id="intro-1-1-card" data-intro-card data-tab="1.1" data-nav="#intro-1-1">
+                  <div class="title-row"><span class="option-number">1</span><h2>清代奏折制度</h2></div>
+                  <div class="body">
+                    <p>奏摺是清代上行官方文書之一。有別於題本及奏本，奏摺送抵中央後，無需經內閣票擬，便可直送御前，由皇帝親自審閱及硃批。雍正朝設立軍機處後，批閱完成的奏摺會交由軍機處處理。如需另行頒旨，則由軍機大臣擬寫上諭，經皇帝閱定後，再由內閣明發或軍機處廷寄地方。<a class="inline-reference" href="../references.html#ref-zhuang-1979">(莊吉發，《清代奏摺制度》，1979年)</a></p>
+                    <p>學界普遍認為，奏摺制度省去內閣票擬等中間程序，使皇帝能夠直接與地方官員溝通，強化了中央集權，可以說是清代最重要的官方文書制度。</p>
+                  </div>
+                </article>
+                <article class="copybox blk" id="intro-1-2" data-intro-card data-tab="1.2" data-nav="#intro-1-2" style="margin-top: clamp(24px, 2.2vw, 40px);">
+                  <div class="title-row"><span class="option-number">2</span><h2>清代奏折的研究價值</h2></div>
+                  <div class="body">
+                    <p>在清史研究中，奏摺、硃批和上諭都是極為重要的第一手史料，是中央與地方在政治決策過程中的原始通信記錄，有助研究者重構特定議題的決策過程。</p>
+                  </div>
+                </article>
+              </div>
+              <div class="lay-visual">
+                <div class="photo-gallery visual-frame" data-photo-gallery>
+                  <div class="photo-gallery-stage"></div>
+                  <div class="photo-gallery-body"></div>
+                  <script type="application/json" data-photo-gallery-data>
+                  [
+                    {
+                      "image": "../Visual Material/Done/intro_1.png",
+                      "alt": "常青奏摺影像，乾隆五十一年十二月十一日",
+                      "title": "使用奏摺的官員",
+                      "paragraphs": [
+                        "奏摺主要由皇帝親信及地方大員使用，並由官員親自撰寫，密封後直送至御前。圖中作者常青時任閩浙總督，是能夠直接向皇帝遞摺的地方大員。"
+                      ],
+                      "source": { "text": "常青，〈奏聞彰化縣被陷及臣星馳調撥進剿緣由〉，《宮中檔奏摺—乾隆朝》，乾隆51年12月12日，故宮075579號，頁1。國立故宮博物院，《清代檔案檢索系統》。", "href": "https://qingarchives.npm.edu.tw/index.php?act=Display/image/8758148ws1oxIg/jpg#4aJ" }
+                    },
+                    {
+                      "image": "done-intro-2.png",
+                      "alt": "乾隆朝軍報傳遞路線圖",
+                      "title": "遞送奏摺",
+                      "paragraphs": [
+                        "奏摺完成繕寫後，須置於摺匣內遞送。奏摺一般由專差或官員家人遞送，遇有緊急軍情，則可使用驛遞加快傳遞。圖中是乾隆帝「十全武功」期間奏摺的傳遞路線。"
+                      ],
+                      "source": { "text": "賴福順，《乾隆重要戰爭之軍需研究》。臺北：國立故宮博物院，1984年。", "href": "../Visual Material/情報路線/2乾隆重要戰爭之軍需硏究. 賴福順. 國立故宮博物院, 1984 (dragged).pdf" }
+                    },
+                    {
+                      "image": "done-intro-3.png",
+                      "alt": "乾隆朝軍機處隨手登記檔影像",
+                      "title": "軍機處處理奏摺",
+                      "paragraphs": [
+                        "批閱完成的奏摺會交由軍機處登記、謄抄，並按皇帝旨意擬寫及廷寄上諭。圖中的《軍機處隨手登記檔》記錄了軍機處每日經手的奏摺和擬寫的上諭。"
+                      ],
+                      "source": { "text": "中國第一歷史檔案館，《清代軍機處隨手登記檔》，第39卷。國家圖書館出版社，2013年。", "href": "../Visual Material/乾隆朝軍機處隨手登記檔_39 (dragged).pdf" }
+                    }
+                  ]
+                  </script>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="story surface-c" id="intro-1-3-a" data-tab="1.3" data-nav="#intro-1-3">
+          <div class="story-inner">
+          <div class="blk" style="margin-bottom:var(--head-gap)">
+            <div class="title-row"><span class="option-number">3</span><h2>研究清代奏折的主要困難</h2></div>
+          </div>
+          <div class="lay-acc" data-acc>
+            <div class="acc-visual" aria-label="研究困難固定示範面板">
+              <div class="acc-panels visual-frame" aria-live="polite">
+                <figure class="acc-panel is-active" data-acc-panel="difficulty-quantity">
+                  <div class="photo-gallery" data-photo-gallery data-photo-gallery-id="difficulty-quantity">
+                    <div class="photo-gallery-stage"></div>
+                    <div class="photo-gallery-body"></div>
+                    <script type="application/json" data-photo-gallery-data>
+                    [{
+                      "image": "done-intro-4.jpg",
+                      "alt": "清代軍事文獻冊頁示意",
+                      "title": "《欽定剿平三省邪匪方略》封面",
+                      "paragraphs": [],
+                      "source": { "text": "國立故宮博物院，〈《欽定剿平三省邪匪方略》〉，《勤修無逸——嘉慶皇帝文物特展：治國政績》，2017年。網址。", "href": "https://theme.npm.edu.tw/exh106/qingemperorjiaqing/ch/page-3.html#main" }
+                    }]
+                    </script>
+                  </div>
+                </figure>
+                <div class="acc-panel source-flow-panel" data-acc-panel="difficulty-relations" hidden>
+                  <div class="source-flow-visual" data-source-flow="zhu113">
+                    <div class="source-callouts source-callouts-left" aria-label="硃113通信來源（左側）">
+                      <div class="source-callout source-callout-1" data-source-bubble="source-1" title="收發時間｜發出：乾隆五十二年正月十四日｜收批：乾隆五十二年正月二十七日">
+                        <span class="source-callout-label">收發時間</span>
+                        <span class="source-callout-detail">發出：乾隆五十二年正月十四日；收批：乾隆五十二年正月二十七日。</span>
+                      </div>
+                      <div class="source-callout source-callout-3" data-source-bubble="source-3" title="諭24｜諭閩浙總督常青等總須鎮定持重並俟兵丁到齊約期夾攻｜發出：乾隆五十二年一月二日">
+                        <span class="source-callout-label">回覆先前上諭2</span>
+                        <span class="source-callout-detail">諭24｜諭閩浙總督常青等總須鎮定持重並俟兵丁到齊約期夾攻<br>發出：乾隆五十二年一月二日</span>
+                      </div>
+                    </div>
+                    <div class="source-callouts source-callouts-right" aria-label="硃113通信來源（右側）">
+                      <div class="source-callout source-callout-2" data-source-bubble="source-2" title="諭20｜諭閩浙總督常青等鎮定妥辦不必紛紛赴臺｜發出：乾隆五十一年十二月二十九日">
+                        <span class="source-callout-label">回覆先前上諭1</span>
+                        <span class="source-callout-detail">諭20｜諭閩浙總督常青等鎮定妥辦不必紛紛赴臺<br>發出：乾隆五十一年十二月二十九日</span>
+                      </div>
+                      <div class="source-callout source-callout-4" data-source-bubble="source-4" title="諭28｜諭閩浙總督常青等務須同心協力俟大兵到齊夾攻｜發出：乾隆五十二年一月三日">
+                        <span class="source-callout-label">回覆先前上諭3</span>
+                        <span class="source-callout-detail">諭28｜諭閩浙總督常青等務須同心協力俟大兵到齊夾攻<br>發出：乾隆五十二年一月三日</span>
+                      </div>
+                    </div>
+                    <svg class="source-connector-layer" aria-hidden="true" focusable="false"></svg>
+                    <div class="source-flow-document ip" aria-label="硃113原文文件面板">
+                      <div class="ip-head">
+                        <div class="ip-titles">
+                          <div class="m1"><span class="badge b-zhu">硃</span> <b>為奏聞提臣等赴臺並飭沿海官員嚴密巡查事</b></div>
+                          <table class="meta-table">
+                            <tbody>
+                              <tr><td>福建巡撫徐嗣曾</td></tr>
+                              <tr><td>乾隆52年1月14日發出、乾隆52年1月27日硃批。</td></tr>
+                              <tr><td>明清台檔30, 244, 硃113</td></tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <div class="ip-btns">
+                          <button class="ip-move" type="button" title="按住拖曳：移動" aria-label="移動"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg></button>
+                          <button class="ip-min" type="button" title="收合 / 展開" aria-label="收合 / 展開"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+                          <button class="ip-close" type="button" title="關閉" aria-label="關閉"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+                        </div>
+                        <div class="ip-head-resize" title="拖曳調整標頭高度"></div>
+                      </div>
+                      <div class="ip-body">
+                        <div class="ip-filterdock">
+                          <button class="ip-filterbtn" type="button" title="篩選" aria-label="篩選"><span class="filter-icon" aria-hidden="true"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="21 4 3 4 10 12.5 10 19 14 21 14 12.5 21 4"/></svg></span></button>
+                          <button class="ip-settingsbtn" type="button" title="顯示設定" aria-label="顯示設定"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82V9a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 1 1.82.33H9a1.65 1.65 0 0 0 1.51-1V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l.06.06a1.65 1.65 0 0 0 1.82.33V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09A1.65 1.65 0 0 0 19.4 15z"/></svg></button>
+                        </div>
+                        <div class="ip-scroll">
+                          <div class="ip-pane ix active">
+                            <div class="ix-cols">
+                              <div class="ix-text">
+                                <div class="blk">
+                                  <span class="blk-label">原文</span>
+                                  <div class="source-flow-body-text" data-source-body>
+                                    福建巡撫臣徐嗣曾跪奏，為欽奉諭旨，恭摺覆奏事。<mark class="source-highlight source-highlight-2" data-source-highlight="source-2">正月十一日承准廷寄，十二月二十九日奉上諭</mark>：「著傳諭徐嗣曾，務宜不動聲色，彈壓坐鎮，並飭沿海口岸文武員弁，嚴密巡查。遇有竄逸偷渡匪犯，即擒拿究辦。」等因。欽此。正在繕摺覆奏，<mark class="source-highlight source-highlight-3" data-source-highlight="source-3">又於十三日亥刻，承准廷寄，正月初二日奉上諭</mark>：「常青摺內稱：逆首林爽文係漳州人，其附從之徒率皆籍隸漳屬，其中難保無內外勾連情事。」等因。欽此。<mark class="source-highlight source-highlight-4" data-source-highlight="source-4">又於十四日子刻承准廷寄，正月初三日奉上諭</mark>：「從前康熙年間奸民朱一貴聚眾滋事，至於全臺失陷。官兵剿捕不及一月，即已收復葳功。今此等么麼賊匪，不過佔據縣城，較之從前更易辦理。」等因。欽此。⋯⋯<br><br><mark class="source-highlight source-highlight-1" data-source-highlight="source-1">乾隆五十二年正月十四日</mark><br><mark class="source-highlight source-highlight-1" data-source-highlight="source-1">乾隆五十二年正月二十七日奉硃批</mark>：爾等未免過於張皇矣。欽此。【本文原收錄於軍錄】
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="ix-margin" aria-hidden="true"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="acc-panel source-flow-panel" data-acc-panel="difficulty-network" hidden>
+                  <div class="source-flow-visual" data-source-flow>
+                    <div class="source-callouts source-callouts-left" aria-label="硃119消息來源（左側）">
+                      <div class="source-callout source-callout-1" data-source-bubble="source-1">
+                        <span class="source-callout-label">情報來源1</span>
+                        <span class="source-callout-detail">奏報清軍已抵達臺灣。</span>
+                      </div>
+                      <div class="source-callout source-callout-3" data-source-bubble="source-3">
+                        <span class="source-callout-label">情報來源3</span>
+                        <span class="source-callout-detail">奏報彰化起事民眾據點已被焚毀，並擒獲六名起事民眾。</span>
+                      </div>
+                      <div class="source-callout source-callout-5" data-source-bubble="source-5">
+                        <span class="source-callout-label">情報來源5</span>
+                        <span class="source-callout-detail">奏報起事民眾得知清軍將至後，已紛紛潰散。</span>
+                      </div>
+                    </div>
+                    <div class="source-callouts source-callouts-right" aria-label="硃119消息來源（右側）">
+                      <div class="source-callout source-callout-2" data-source-bubble="source-2">
+                        <span class="source-callout-label">情報來源2</span>
+                        <span class="source-callout-detail">奏報清軍已抵達臺灣。</span>
+                      </div>
+                      <div class="source-callout source-callout-4" data-source-bubble="source-4">
+                        <span class="source-callout-label">情報來源4</span>
+                        <span class="source-callout-detail">奏報招集義民攻擊起事民眾，並已派軍前往收復竹塹。</span>
+                      </div>
+                    </div>
+                    <svg class="source-connector-layer" aria-hidden="true" focusable="false"></svg>
+                    <div class="source-flow-document ip" aria-label="硃119原文文件面板">
+                      <div class="ip-head">
+                        <div class="ip-titles">
+                          <div class="m1"><span class="badge b-zhu">硃</span> <b>為奏聞官兵抵臺日期及近日戰況事</b></div>
+                          <table class="meta-table">
+                            <tbody>
+                              <tr><td>常青</td></tr>
+                              <tr><td>乾隆52年1月15日發出、乾隆52年1月28日硃批。</td></tr>
+                              <tr><td>明清台檔30, 257, 硃119</td></tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <div class="ip-btns">
+                          <button class="ip-move" type="button" title="按住拖曳：移動" aria-label="移動"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg></button>
+                          <button class="ip-min" type="button" title="收合 / 展開" aria-label="收合 / 展開"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+                          <button class="ip-close" type="button" title="關閉" aria-label="關閉"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+                        </div>
+                        <div class="ip-head-resize" title="拖曳調整標頭高度"></div>
+                      </div>
+                      <div class="ip-body">
+                        <div class="ip-filterdock">
+                          <button class="ip-filterbtn" type="button" title="篩選" aria-label="篩選"><span class="filter-icon" aria-hidden="true"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="21 4 3 4 10 12.5 10 19 14 21 14 12.5 21 4"/></svg></span></button>
+                          <button class="ip-settingsbtn" type="button" title="顯示設定" aria-label="顯示設定"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82V9a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1.51-1V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09A1.65 1.65 0 0 0 19.4 15z"/></svg></button>
+                        </div>
+                        <div class="ip-scroll">
+                          <div class="ip-pane ix active">
+                            <div class="ix-cols">
+                              <div class="ix-text">
+                                <div class="blk">
+                                  <span class="blk-label">原文</span>
+                                  <div class="source-flow-body-text" data-source-body>
+                                    閩浙總督臣常青跪奏，為據報官兵抵臺日期，恭摺奏聞事。竊照水、陸提臣黃仕簡、任承恩等，統領官兵渡臺剿匪，<mark class="source-highlight source-highlight-1" data-source-highlight="source-1">前據各口岸探明</mark>，黃仕簡於十二十九日已抵澎湖，任承恩於正月初四日在崇武澳得風開洋，均經臣節次具奏在案。嗣因連日颶風大作，船隻不能往來，正切盼望。
+                                    茲於十五日<mark class="source-highlight source-highlight-2" data-source-highlight="source-2">據廈門蚶江員弁稟到</mark>，探明提臣黃仕簡、總兵郝壯猷、副將丁朝雄等所帶兵船，俱於初三日自澎湖開駕，初四日進鹿耳門登岸。提臣任承恩統領各營官兵船隻，於初六日齊抵鹿仔港。
+                                    各等情前來。伏查臺灣郡城，前經差探，固守無虞。其鹿港一路，又於正月十四日
+                                    接據<mark class="source-highlight source-highlight-3" data-source-highlight="source-3">署守備陳邦光稟稱</mark>：率同兵、義民，在於彰化境內，四處搜捕，焚毀賊巢。復擒獲賊夥簡鳩、劉實、張文、林天球、林耽、朱開六名，陸續解送。
+                                    並<mark class="source-highlight source-highlight-4" data-source-highlight="source-4">據北淡水署都司易連、新莊巡檢王增錞來稟</mark>：統領兵弁，招集義民屢次殺賊。惟訪聞淡水同知程峻、竹塹巡檢張芝馨均已被害。現今新莊之艋舺一帶，協力保護，並令守備董得魁等，帶領兵丁鄉勇，前往收復竹塹。
+                                    又<mark class="source-highlight source-highlight-5" data-source-highlight="source-5">據廈門同知劉嘉會稟稱</mark>：差丁往探，聞賊人已知大兵將到，紛紛散去。各等語。伏思賊匪本屬么麼烏合，今兩提臣俱經到臺，南、北兩路會合搜剿，定可克期殲滅。臣惟嚴飭內地沿海各口岸，加緊巡查，以防竄逸，並飛提獲解匪犯到泉，究審辦理。仍俟提臣等報到殲賊情形，再行馳奏外，所有現在官兵抵臺日期，合先恭摺奏聞，伏祈皇上睿鑒。謹奏。
+
+                                    乾隆五十二年正月十五日
+                                    乾隆五十二年正月二十八日奉硃批：已有旨了。欽此。【本文原收錄於軍錄】
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="ix-margin" aria-hidden="true"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="acc-track" tabindex="0" aria-label="研究困難閱讀卡片">
+              <article class="acc-card" id="difficulty-quantity" data-acc-card="difficulty-quantity">
+                <button class="acc-heading" type="button" aria-expanded="false" data-acc-target="difficulty-quantity"><span class="acc-index">01</span><strong>史料數量龐大</strong><span class="acc-arrow" aria-hidden="true">▾</span></button>
+                <div class="acc-body"><p>部分議題的史料數量可以非常龐大。以白蓮教戰爭為例，學者戴英從指出，該戰爭的重要史料《欽定剿平三省邪匪方略》共有六十九冊，超過二萬七千頁，收錄了四千多份奏摺和上諭，篇幅之大令人望而卻步，當代學者對白蓮教戰爭的研究因此相當有限。<a class="inline-reference" href="../references.html#ref-dai-2019">(戴英從，《The White Lotus War: Rebellion and Suppression in Late Imperial China》，2019年)</a></p></div>
+              </article>
+              <article class="acc-card" id="difficulty-relations" data-acc-card="difficulty-relations">
+                <button class="acc-heading" type="button" aria-expanded="false" data-acc-target="difficulty-relations"><span class="acc-index">02</span><strong>通信關係複雜</strong><span class="acc-arrow" aria-hidden="true">▾</span></button>
+                <div class="acc-body"><p>奏摺與上諭之間涉及複雜的通信關係。最基本的一層，是地方官員奏報，皇帝再透過硃批或上諭作出回覆。</p><p>然而，研究者不僅需要掌握每份奏摺和上諭的收發時間，也要釐清：</p><ul class="acc-point-list"><li>奏摺是否回應先前的硃批或上諭？</li><li>皇帝發布的命令在何時、由哪些官員在奏摺中作出了回應？</li></ul></div>
+              </article>
+              <article class="acc-card" id="difficulty-network" data-acc-card="difficulty-network">
+                <button class="acc-heading" type="button" aria-expanded="false" data-acc-target="difficulty-network"><span class="acc-index">03</span><strong>資訊流向複雜</strong><span class="acc-arrow" aria-hidden="true">▾</span></button>
+                <div class="acc-body"><p>除了文書之間的通信關係外，研究者還需要分析奏摺所載的資訊的流向，包括資訊的內容、消息來源及傳遞過程。</p><p>而皇帝往往會同時收到多位官員就同一事件的奏報，各奏摺的描述、消息來源及送達時間亦可能不同，形成錯綜複雜的資訊網絡。</p></div>
+              </article>
+            </div>
+          </div>
+          </div>
+        </section>
+        <section class="story content-story" id="intro-1-3-a-source" data-tab="1.3" data-nav="#intro-1-3" style="--card-x: 9vw; --card-y: 13vh; --card-w: 600px; --story-height: 980px; --card-accent: #a45e4c;">
+          <div class="backdrop paper" data-mark="量"></div>
+          <article class="story-card">
+            <h2>研究清代奏折的主要困難</h2>
+            <div class="part-note">原文補回｜史料數量</div>
+            <p>然而，研究奏折與上諭有不少困難。首先，部分議題的奏摺與上諭數量極為龐大。以研究白蓮教戰爭為例，學者戴英從指出，該戰爭的重要史料《欽定剿平三省邪匪方略》共有六十九冊，超過二萬七千頁<a class="inline-reference" href="../references.html#ref-dai-2019">(戴英從，《The White Lotus War: Rebellion and Suppression in Late Imperial China》，2019年，第一章，頁碼待核)</a>，收錄了四千多份奏摺和上諭，篇幅之大令人望而卻步，當代學者對白蓮教戰爭的研究因此相當有限。</p>
+          </article>
+        </section>
+        <section class="story content-story" id="intro-1-3-b" data-tab="1.3" data-nav="#intro-1-3" style="--card-x: 8vw; --card-y: 74vh; --card-w: 84vw; --story-height: 1450px; --card-accent: #ad7a35;">
+          <div class="backdrop comparison-review-backdrop" data-mark="信">
+            <div class="comparison-review-window" aria-label="諭24與硃110文書比較">
+              <div class="comparison-review-panel">
+                <div class="comparison-review-label">左｜諭24・上諭</div>
+<div class="sample-doc-panel ip" data-sample-doc="諭24">
+  <div class="ip-head">
+    <div class="ip-titles">
+      <div class="m1"><span class="badge b-yu">諭</span> <b>諭閩浙總督常青等總須鎮定持重並俟兵丁到齊約期夾攻</b></div>
+      <table class="meta-table"><tr><td>常青等</td></tr><tr><td>乾隆五十二年正月初二日　上諭</td></tr><tr><td>《天地會》1, 203, 諭24</td></tr></table>
+    </div>
+    <div class="ip-btns"><button class="ip-move" type="button" title="按住拖曳：移動" aria-label="移動"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg></button><button class="ip-min" type="button" title="收合 / 展開" aria-label="收合 / 展開"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></button><button class="ip-close" type="button" title="關閉" aria-label="關閉"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button></div>
+    <div class="ip-head-resize" title="拖曳調整標頭高度"></div>
+  </div>
+  <div class="ip-body">
+    <div class="ip-filterdock"><button class="ip-filterbtn" type="button" title="篩選" aria-label="篩選"><span class="filter-icon" aria-hidden="true"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="21 4 3 4 10 12.5 10 19 14 21 14 12.5 21 4"/></svg></span></button><button class="ip-settingsbtn" type="button" title="顯示設定" aria-label="顯示設定"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82V9a1.65 1.65 0 0 0 1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></div>
+  <div class="sample-doc-body ip-scroll">
+    <div class="sample-doc-pane is-active" data-sample-pane-content="original">
+      <div class="sample-doc-section-label">原文</div>
+      <div class="sample-doc-scroll"><p class="sample-doc-paragraph">大學士公、大學士和，字寄閩浙總督常、福州將軍恆、水路提督公黃、陸路提督任、福建巡撫徐，傳諭柴大紀，乾隆五十二年正月初二日奉上諭：據常青奏，接臺灣鎮道稟報，賊匪於十一月二十九、十二月初六等日，攻破彰化、諸羅。總兵柴大紀帶兵堵住離府城十里之三坎店，召募鄉勇，緊守府城。十一日與賊打仗，大施火炮，賊勢稍退。一面督催臺官兵協力進，務期日蕩平，不使稍留餘孽。又據徐嗣曾奏，淡水、艋舺地方，爲臺灣北路要區。現派副將徐鼎士等，帶兵一千五百名，由閩安出口，直抵淡水，協同守禦，並多帶犒賞，獎勵泉州鄉勇，相機進剿，亦可爲南路聲援各等語。看來常青此次所奏派兵剿捕各事宜，較從前稍有主見，略知鎮定，朕始覺稍紓廑念。但常青折內稱，逆首林爽文系漳州人，其附從之徒，率皆籍隸漳屬，其中難保無內外勾連情事。漳、泉兩郡爲內地根本，惟有預設機宜，倍加嚴重等語。此等匪徒糾衆滋事，無論何處民人，其從賊者即系夥黨，自應按名駢戮。<mark class="sample-doc-highlight">若漳、泉民人鄉勇，果能應募拒賊，出力堵御防守，即系良民，自應加以獎賞</mark>，不應預存岐視，稍露形跡，轉致漳民心生惶懼，別滋事端，於內地大有關係。至此等麼磨，不過一時烏合，乘勢鴟張。現在大兵四路進剿，無難立就撲滅。即如康熙年間，奸民朱一貴聚衆滋擾，全臺被陷，經督提等帶兵進剿，不及一月，即已收復蕆功。此時水陸兩提督先後帶兵渡臺，已有六千餘名。徐嗣曾又經派撥兵丁一千五百名渡臺協剿，兵力不爲不厚。但閩人性本慓輕，若零星打仗，致有挫失，是輕爲嘗試，轉足以張賊匪（勢）而餒官兵之氣，於事尤屬無 益。<mark class="sample-doc-highlight">著傳諭黃仕簡、任承恩，務須各路兵丁到齊，約會日期，同時併力夾攻</mark>，自無難一舉事。該督等總須鎮定持重，不可稍涉張皇。至福建駐防滿兵，本非健說，火器營勁旅可比。且調撥出徵，地方供億，徒滋繁費。況省城爲根本重地，亦不可無多兵駐守彈壓。著傳諭恆瑞，尤宜處以鎮靜，斷不可輕舉妄動，徒勞無益。再，徐嗣曾奏，飛諮廣東、浙江二省督撫、提督，於附近水師營內酌撥戰兵二、三千名，各於交界本境駐紮，如需策應，便於徵發，亦可藉爲聲援等語。<mark class="sample-doc-highlight">此時似可無需鄰省接濟兵力</mark>，然備撥亦可，總宜不動聲色，密爲佈置，不可稍涉矜張，驚動衆聽。<mark class="sample-doc-highlight">此一節並傳諭孫士毅、琅玕一體遵照妥辦</mark>。至柴大紀帶兵，於十一日用槍炮攻擊，賊勢稍退，郡城防守嚴密，全臺根本尚不致有他虞。著常青等傳諭該鎮，務須努力剿捕，倘能得守臺灣等處，收復諸、彰二縣，迅速蕆事，朕必加以獎勵，從優議敘。至臺地會匪系何會？興有幾年？頃刻之間即以聚至數千，蔓延滋擾，劫縣戕官。該地方文武平日所司何事，豈竟漫無覺察？並著常青於事定後，查明嚴參示做，但非目前急務。此時惟當鎮內地，速剿賊匪爲要。將此由六百里加緊各傳諭知之。仍將現在捕情形及有無拿獲匪犯，收復縣城之處，迅速由六百里加緊復奏。欽此。遵旨寄信前來。</p></div>
+    </div>
+    <div class="sample-doc-pane" data-sample-pane-content="ai">
+      <div class="sample-doc-section-label">AI 摘要｜以原文為依據</div>
+      <p class="sample-doc-paragraph">乾隆帝要求各路兵丁到齊後約期夾攻，並要求鎮定持重；同時公平處理漳、泉民人鄉勇，避免鄰省兵力造成不必要的驚擾。</p>
+    </div>
+    <div class="sample-doc-pane" data-sample-pane-content="relation">
+      <div class="sample-doc-section-label">通信關係</div>
+      <p class="sample-doc-paragraph">皇帝上諭 → 閩浙總督常青等地方官員；其中命黃仕簡、任承恩協力夾攻，並傳諭孫士毅、琅玕遵照辦理。</p>
+    </div>
+  </div>
+</div>
+ </div>
+              </div>
+              <div class="comparison-review-panel">
+                <div class="comparison-review-label">右｜硃110・奏摺</div>
+<div class="sample-doc-panel ip" data-sample-doc="硃110">
+  <div class="ip-head">
+    <div class="ip-titles">
+      <div class="m1"><span class="badge b-zhu">硃</span> <b>為遵旨仍駐蚶江廈門一帶調度等事</b></div>
+      <table class="meta-table"><tr><td>常青</td></tr><tr><td>1787/1/13-1/27（14日）</td></tr><tr><td>明清台檔30, 240, 硃110</td></tr></table>
+    </div>
+    <div class="ip-btns"><button class="ip-move" type="button" title="按住拖曳：移動" aria-label="移動"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg></button><button class="ip-min" type="button" title="收合 / 展開" aria-label="收合 / 展開"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></button><button class="ip-close" type="button" title="關閉" aria-label="關閉"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button></div>
+    <div class="ip-head-resize" title="拖曳調整標頭高度"></div>
+  </div>
+  <div class="ip-body">
+    <div class="ip-filterdock"><button class="ip-filterbtn" type="button" title="篩選" aria-label="篩選"><span class="filter-icon" aria-hidden="true"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="21 4 3 4 10 12.5 10 19 14 21 14 12.5 21 4"/></svg></span></button><button class="ip-settingsbtn" type="button" title="顯示設定" aria-label="顯示設定"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0-.33-1.82V9a1.65 1.65 0 0 0 1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></div>
+  <div class="sample-doc-body ip-scroll">
+    <div class="sample-doc-pane is-active" data-sample-pane-content="original">
+      <div class="sample-doc-section-label">原文</div>
+      <div class="sample-doc-scroll"><p class="sample-doc-paragraph">閩浙總督臣常青跪奏，為欽奉諭旨，再行覆奏事。竊臣於正月十二日戌刻，拜發前摺後，旋又奉到十二月十三、十五等日兩摺硃批，並奉到上諭：「據常青、黃仕簡奏，接臺灣鎮道稟報彰化匪徒林爽文等糾眾滋事。等由。看來伊等辦理此事，但不免張皇失措。地方遇此等案件，總應權其輕重，鎮靜妥辦，不當各存預佔地步之見。常青、黃仕簡、任承恩，俱著傳旨申飭。」等因。欽此。臣伏查臺匪林爽文等糾眾不法，攻擾三縣，經臣調派官兵進剿，該水師提臣黃仕簡、陸路提臣任承恩等，於十二月二十八、正月初四等日，先後得有順風放洋，此時自必到臺。逆匪等么麼烏合，定即望風瓦解，克日殄滅。但既有提臣黃仕簡帶兵，而任承恩又復親往，殊失事理之輕重。況從前臺匪朱一貴滋擾一案，辦理迅速，成效可稽。臣罔識遵循，未得肯綮，一經聖明指示周詳，不勝愧悚之至。今任承恩既已渡臺，即遵旨俟其同黃仕簡殲匪蕆事，即行速回，總以內地為緊要。省垣旗兵藉以駐防，必不敢輕動。其黃仕簡發摺傳牌，率填攻城等字樣，容俟查明另行三奏。臣惟恪遵諭旨，<mark class="sample-doc-highlight">仍駐蚶江、廈門一帶，調度策應，務期鎮靜</mark>，不敢少動聲色，致廑聖懷。現在<mark class="sample-doc-highlight">漳、泉等處民情，俱各安輯</mark>。至臺地逆匪，必須盡數殲除。先據鹿港署守備陳邦光擒獲匪黨楊詠等四犯，業經審明解京，具奏在案。茲又據漳浦縣盤獲匪犯陳樵一名，現在飛提嚴究辦理。臣惟時飭沿海文武員弁，慎密巡查，並與撫臣曉諭居民，懸立重賞，遇有賊匪潛逃回籍，捕獲首報，總不使餘孽得以漏網。仍俟提臣等報到殲賊情形，星馳具奏外，所有接奉訓飭遵辦緣由，合再恭摺覆奏，伏祈皇上睿鑒。謹奏。</p><p class="sample-doc-paragraph">乾隆五十二年正月十三日<br>乾隆五十二年正月二十七日奉硃批：此等尋常覆奏，何必用六百里，徒亂人意。欽此。【本文原：於軍錄】</p></div>
+    </div>
+    <div class="sample-doc-pane" data-sample-pane-content="ai">
+      <div class="sample-doc-section-label">AI 摘要｜以原文為依據</div>
+      <p class="sample-doc-paragraph">常青覆奏已奉上諭，表示任承恩既已渡臺，將俟其與黃仕簡殲匪後速回；自己仍駐蚶江、廈門一帶調度策應，並報告漳、泉民情已各安輯。</p>
+    </div>
+    <div class="sample-doc-pane" data-sample-pane-content="relation">
+      <div class="sample-doc-section-label">通信關係</div>
+      <p class="sample-doc-paragraph">閩浙總督常青 → 乾隆帝；本摺明確回應正月初二日上諭，並逐項說明兵力調度與地方安撫。</p>
+    </div>
+  </div>
+</div>
+ </div>
+              </div>
+            </div>
+          </div>
+          <article class="story-card">
+            <h2>研究清代奏折的主要困難</h2>
+            <div class="part-note">通信關係的第二個層次</div>
+          </article>
+        </section>
+        <section class="story content-story" id="intro-1-3-b-source" data-tab="1.3" data-nav="#intro-1-3" style="--card-x: 8vw; --card-y: 15vh; --card-w: 700px; --story-height: 980px; --card-accent: #ad7a35;">
+          <div class="backdrop ink" data-mark="層"></div>
+          <article class="story-card">
+            <h2>研究清代奏折的主要困難</h2>
+            <div class="part-note">原文補回｜通信關係</div>
+            <p>另外，奏摺與上諭之間涉及複雜的通信關係。最基本的一層，是地方官員奏報，皇帝再透過硃批或上諭作出回覆。然而，研究者不僅需要掌握每份奏摺和上諭的收發時間，也要釐清一份奏摺是否回應先前的硃批或上諭，以及皇帝發布的命令又在何時、由哪些官員於後續奏報中作出回應。</p>
+          </article>
+        </section>
+        <section class="story content-story" id="intro-1-3-c" data-tab="1.3" data-nav="#intro-1-3" style="--card-x: 8vw; --card-y: 74vh; --card-w: 84vw; --story-height: 1600px; --card-accent: #4d817c;">
+          <div class="backdrop source-network-review-backdrop" data-mark="流">
+            <div class="source-network-review-window" aria-label="硃119原始文書">
+              <div class="source-network-review-label">同日｜常青亦奏報臺灣軍情與四名消息來源</div>
+<div class="mock-review-document">
+  <div class="mock-toolbar"><div class="mock-toolbar-left"><span class="mock-dot"></span><span class="mock-product">文書研究平台</span><span class="mock-status">／ 示意工作區</span></div><div class="mock-toolbar-right"><span class="mock-status">研究者模式</span><span class="mock-toolbar-icon">⚙</span><span class="mock-toolbar-icon">⌁</span></div></div>
+  <div class="mock-review-head"><div class="mock-review-head-main"><h3>硃119｜為奏聞官兵抵臺日期及近日戰況事</h3><p>乾隆五十二年正月十五日　奏摺　閩浙總督常青</p></div><div class="mock-review-window-buttons" aria-hidden="true"><span>—</span><span>×</span></div></div>
+  <div class="mock-review-togglebar"><span class="is-active">原文</span><span>AI 摘要</span><span>關係</span><em>已標註 4 組消息來源</em></div>
+  <div class="mock-review-scroll"><p class="mock-review-section-label">同日｜常青亦奏報臺灣軍情與消息來源</p><p><mark>茲於十五日據廈門蚶江員弁稟到</mark>，探明提臣黃仕簡等由澎湖抵達鹿耳門，任承恩抵達鹿仔港。</p><p><mark>接據署守備陳邦光稟稱</mark>：率同兵、義民在彰化境內搜捕，焚毀賊巢並擒獲六名賊夥。</p><p><mark>並據北淡水署都司易連、新莊巡檢王增錞來稟</mark>：統領兵弁、招集義民殺賊，並令守備董得魁收復竹塹。</p><p><mark>又據廈門同知劉嘉會稟稱</mark>：聞賊人已知大兵將到，紛紛散去。</p></div>
+</div>
+            </div>
+          </div>
+          <article class="story-card">
+            <h2>研究清代奏折的主要困難</h2>
+            <div class="part-note">事件、消息來源與資訊網絡</div>
+            <p>此外，針對奏摺所載的具體事件，研究者還要關注事件的發生時間及消息來源。而皇帝往往又會同時收到多位官員就同一事件的奏報，各奏報的描述及消息來源都不盡相同，形成了錯綜複雜的消息網絡。</p>
+            <p>因此，研究者既要分析單份文書所載的資訊，也要理解宏觀的資訊傳遞網絡。然而，面對大量文書及複雜的通信關係，研究者難以單憑人力掌握資訊傳遞的整體脈絡，因此需要運用視覺化工具，呈現文書之間的關聯與資訊流向。</p>
+          </article>
+        </section>
+        <section class="story surface-a" id="intro-1-4" data-tab="1.4" data-nav="#intro-1-4">
+          <div class="story-inner">
+          <div class="blk" style="margin-bottom:var(--head-gap)">
+            <div class="title-row"><span class="option-number">4</span><h2>以數位方法研究清代奏折</h2></div>
+            <div class="body">
+              <p>因此，研究奏摺時，研究者不但需要分析單份文書，亦要理解整體的通信關係及資訊傳遞網絡。然而，面對大量文書，單靠人力難以掌握其整體脈絡，因此可以借助人工智能（AI）及視覺化等的數位工具協助分析：</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="method-table">
+              <thead>
+                <tr><th scope="col">研究困難</th><th scope="col">數位工具</th><th scope="col">如何協助研究</th></tr>
+              </thead>
+              <tbody>
+                <tr><td rowspan="2">史料數量龐大</td><td class="method-tool-cell">AI</td><td class="method-help-cell">總結長篇文本，協助研究者迅速掌握文書的主要內容，並判斷其中是否包含值得深入閱讀與分析的資訊。</td></tr>
+                <tr><td class="method-tool-cell">人工智能技能（AI Skills）</td><td class="method-help-cell">按照不同研究問題設計技能，讓AI從文本中提取特定資訊，並由研究者核對、審核及修正。</td></tr>
+                <tr><td rowspan="2">通信關係、資訊流向複雜</td><td class="method-tool-cell">Python 文本搜尋</td><td class="method-help-cell">搜尋文書中的特定字詞，辨識奏摺與上諭之間的回應關係，重構官員與皇帝之間的完整資訊傳遞過程。</td></tr>
+                <tr><td class="method-tool-cell">互動式網站</td><td class="method-help-cell">以時間線和關係網絡等視覺化工具，呈現文書的收發時間及資訊傳遞的流向，協助研究者掌握宏觀的通信網絡。</td></tr>
+              </tbody>
+            </table>
+          </div>
+          </div>
+        </section>
+
+        <section class="story surface-b" id="intro-1-5" data-tab="1.5" data-nav="#intro-1-5">
+          <div class="story-inner">
+            <div class="lay-stack">
+              <article class="blk">
+                <div class="title-row"><span class="option-number">5</span><h2>研究成果：「清代奏摺與上諭分析平台」</h2></div>
+                <div class="body">
+                  <p>為處理以上的研究困難，本平台結合人工智能與視覺化工具，讓研究者既能從微觀層面分析單份文書，亦能重建宏觀的通信關係和資訊傳遞網絡。</p>
+                </div>
+              </article>
+              <!-- GIF 示範＋浮動標註。位置與尺寸一律在 storymap-cards.css 調整。 -->
+              <div class="gif-annotated" data-gif-annotate>
+                <div class="annotation-band">
+                  <div class="annotation-label" data-label="1">
+                    <span class="num">1</span><h4>時間線與關係網絡</h4>
+                    <p>呈現官員上奏、奏報的資訊和與皇帝硃批下旨之間的文書傳遞關係及資訊流向。</p>
+                  </div>
+                  <div class="annotation-label" data-label="2">
+                    <span class="num">2</span><h4>AI 提取資訊</h4>
+                    <p>網站能夠載入大量文書，並運用人工智能提取特定資訊，供研究者逐項核對和分析。</p>
+                  </div>
+                </div>
+                <figure class="review-window visual-frame-wide review-capture-frame">
+                  <img src="zhu40-review-tool-capture.gif" alt="研究成果平台互動示範：游標停留在硃40後開啟文書卡片，向下瀏覽原文，再開啟 AI 證據欄並瀏覽含原文標註的內容。" loading="lazy">
+                  <span class="annotation-dot" data-dot="1"></span>
+                  <span class="annotation-dot" data-dot="2"></span>
+                </figure>
+                <div class="annotation-line-layer" data-line-layer></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="story surface-c" id="intro-1-6-a-source" data-tab="1.6" data-nav="#intro-1-6-a-source">
+          <div class="story-inner">
+          <div class="blk" style="margin-bottom:var(--head-gap)">
+            <div class="title-row"><span class="option-number">6</span><h2>示範案例：林爽文民變（1786-1788）</h2></div>
+            <div class="body"><p>為展示本網站的研究方法及各項功能，網站會以乾隆朝的林爽文民變作為示範案例。</p></div>
+          </div>
+          <div class="lay-acc" data-acc>
+            <div class="acc-visual" aria-label="林爽文事件固定示範面板">
+              <div class="acc-panels visual-frame" aria-live="polite">
+                <figure class="acc-panel is-active" data-acc-panel="case-background">
+                  <div class="photo-gallery" data-photo-gallery data-photo-gallery-id="case-background">
+                    <div class="photo-gallery-stage"></div>
+                    <div class="photo-gallery-body"></div>
+                    <script type="application/json" data-photo-gallery-data>
+                    [{
+                      "image": "done-intro-7.png",
+                      "alt": "《印版平定臺灣戰圖冊》",
+                      "title": "《印版平定臺灣戰圖冊》圖像",
+                      "paragraphs": ["圖為《印版平定臺灣戰圖冊》，共十二幅，是乾隆帝在平定林爽文民變後命宮廷畫家繪製的銅版戰圖，呈現了宣揚帝國武功的官方圖像。"],
+                      "source": { "text": "國家文化記憶庫，〈平定臺灣戰圖（七）生擒逆首林爽文〉，典藏單位：國立臺灣美術館，1793年。網址。", "href": "https://tcmb.culture.tw/zh-tw/detail?indexCode=MOCCOLLECTIONS&id=11000125703" }
+                    }]
+                    </script>
+                  </div>
+                </figure>
+                <div class="acc-panel" data-acc-panel="case-route" hidden>
+                  <div class="photo-gallery" data-photo-gallery data-photo-gallery-id="case-route">
+                    <div class="photo-gallery-stage"></div>
+                    <div class="photo-gallery-body"></div>
+                    <script type="application/json" data-photo-gallery-data>
+                    [{
+                      "image": "done-intro-8.png",
+                      "alt": "「十全武功」圖十三：軍報傳遞路線圖",
+                      "fit": "contain",
+                      "title": "林爽文民變中的資訊傳遞",
+                      "paragraphs": [
+                        "圖為乾隆帝「十全武功」期間軍情的主要傳遞路線，其中紅線為林爽文民變期間軍情的傳遞路徑，由臺灣渡海至福建，再經浙江、江蘇、山東、直隸送抵北京。"
+                      ],
+                      "source": { "text": "賴福順，《乾隆重要戰爭之軍需研究》。臺北：國立故宮博物院，1984年。", "href": "../Visual Material/情報路線/Fizzy Background.pdf" }
+                    }]
+                    </script>
+                  </div>
+                </div>
+                <div class="acc-panel" data-acc-panel="case-sources" hidden>
+                  <div class="photo-gallery" data-photo-gallery data-photo-gallery-id="case-sources">
+                    <div class="photo-gallery-stage"></div>
+                    <div class="photo-gallery-body"></div>
+                    <script type="application/json" data-photo-gallery-data>
+                    [
+                      {
+                        "image": "done-intro-9.png",
+                        "alt": "《明清臺灣檔案彙編》第30冊封面",
+                        "fit": "contain",
+                        "title": "《明清臺灣檔案彙編》封面",
+                        "paragraphs": [
+                          "《明清臺灣檔案彙編》第30冊封面，作為本研究所用奏摺史料集的出版物示例。"
+                        ],
+                        "source": { "text": "《明清臺灣檔案彙編》第30冊；網站視覺素材。", "href": "../Visual Material/明清台灣檔案匯編/明清台灣檔案匯編 30.pdf" }
+                      },
+                      {
+                        "image": "done-intro-10.png",
+                        "alt": "《天地會》（一）封面頁",
+                        "fit": "contain",
+                        "title": "《天地會》（一）封面",
+                        "paragraphs": [
+                          "《天地會》（一）封面頁，作為本研究所用上諭史料集的出版物示例。"
+                        ],
+                        "source": { "text": "中國人民大學清史研究所、中國第一歷史檔案館合編，《天地會》（一）；網站視覺素材。", "href": "../Visual Material/天地會/天地會 1 ，中國人民大學清史研究所，中國第一歷史檔案館合編.pdf" }
+                      }
+                    ]
+                    </script>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="acc-track" tabindex="0" aria-label="林爽文事件閱讀卡片">
+              <article class="acc-card" id="case-background" data-acc-card="case-background">
+                <button class="acc-heading" type="button" aria-expanded="false" data-acc-target="case-background"><span class="acc-index">01</span><strong>林爽文民變</strong><span class="acc-arrow" aria-hidden="true">▾</span></button>
+                <div class="acc-body"><p>林爽文民變於乾隆五十一年（1786）爆發，歷時約兩年，由天地會領袖林爽文在臺灣中部的彰化發動，並迅速蔓延至臺灣多地，最終促使清廷派遣福康安率軍來臺鎮壓。乾隆帝其後將平定此役列為「十全武功」之一。<a class="inline-reference" href="../references.html#ref-xu-2008">(許毓良，《清代臺灣軍事與社會》，2008年)</a></p></div>
+              </article>
+              <article class="acc-card" id="case-route" data-acc-card="case-route">
+                <button class="acc-heading" type="button" aria-expanded="false" data-acc-target="case-route"><span class="acc-index">02</span><strong>林爽文民變中的資訊傳遞</strong><span class="acc-arrow" aria-hidden="true">▾</span></button>
+                <div class="acc-body"><p>資訊傳遞是戰時軍事決策形成的重要環節。戰爭期間，地方官員須持續透過奏摺向皇帝奏報軍情，而皇帝則根據奏報發布上諭，指示軍事部署，形成地方與中央之間持續往返的決策過程。</p><p>然而，林爽文民變發生於臺灣，與北京相距遙遠，文書傳遞往往需時數星期。當皇帝收到奏摺時，前線局勢很可能已經改變，軍事決策因此仰賴前線官員臨機處置。因此，林爽文民變是一個合適的研究案例，可用來探討資訊傳遞延遲如何影響戰時軍事決策的形成與執行。</p></div>
+              </article>
+              <article class="acc-card" id="case-sources" data-acc-card="case-sources">
+                <button class="acc-heading" type="button" aria-expanded="false" data-acc-target="case-sources"><span class="acc-index">03</span><strong>史料來源</strong><span class="acc-arrow" aria-hidden="true">▾</span></button>
+                <div class="acc-body"><p>另外，現存保存了大量林爽文民變的漢文奏摺和上諭，記錄了當時地方官員與皇帝的溝通過程，為研究提供了豐富的材料。</p><p>本研究所使用的奏摺主要收錄於臺灣史料集成編輯委員會編《明清臺灣檔案彙編》，上諭則主要收錄於中國人民大學清史研究所、中國第一歷史檔案館編《天地會》。</p><p>這些史料均經當代學者整理、校勘及出版，完整保留文書原文、文書類型、收發日期及硃批等重要資訊，為研究提供了可靠的材料。</p></div>
+              </article>
+            </div>
+          </div>
+          </div>
+        </section>
+        <section class="story content-story" id="intro-1-6-b" data-tab="1.6" data-nav="#intro-1-6" style="--card-x: 8vw; --card-y: 10vh; --card-w: 610px; --story-height: 1260px; --card-accent: #b66d48;">
+          <div class="backdrop route-map-backdrop" data-mark="延"></div>
+          <img class="route-line-static" src="taiwan-war-report-route-reverse.svg" alt="" aria-hidden="true">
+          <a class="source-reference-button" href="../Visual Material/情報路線/2乾隆重要戰爭之軍需硏究. 賴福順. 國立故宮博物院, 1984 (dragged).pdf" target="_blank" rel="noopener noreferrer" title="賴福順。《乾隆重要戰爭之軍需研究》。臺北：國立故宮博物院，1984年。">
+            參考來源 <span aria-hidden="true">↗</span>
+          </a>
+          <article class="story-card">
+            <h2>示範案例：林爽文民變（1786-1788）</h2>
+            <div class="part-note">選取林爽文民變作為示範案例，主要有以下原因：</div>
+            <p>為展示本網站的研究方法及各項功能，網站會以林爽文民變作為示範案例。</p>
+          </article>
+        </section>
+        <section class="story content-story" id="intro-1-6-b-source" data-tab="1.6" data-nav="#intro-1-6" style="--card-x: 8vw; --card-y: 14vh; --card-w: 760px; --story-height: 1180px; --card-accent: #b66d48;">
+          <div class="backdrop route-map-backdrop" data-mark="遲"></div>
+          <article class="story-card">
+            <h2>示範案例：林爽文民變（1786-1788）</h2>
+            <div class="part-note">林爽文民變中的資訊傳遞</div>
+            <p>資訊傳遞是戰時軍事決策形成的重要環節。戰爭期間，地方官員須持續透過奏摺向皇帝奏報軍情、兵力部署及戰場變化，而皇帝則根據奏報發布上諭，指示軍事部署及後續行動，形成地方與中央之間持續往返的決策過程。</p>
+            <p>然而，林爽文民變發生於臺灣，與北京相距遙遠，文書傳遞往往需時數星期。當皇帝收到奏摺時，前線局勢很可能已經改變，軍事決策因此仰賴前線官員臨機處置。因此，林爽文民變是一個合適的研究案例，用來探討資訊傳遞延遲如何影響戰時軍事決策的形成與執行。</p>
+          </article>
+        </section>
+        <section class="story content-story" id="intro-1-6-c" data-tab="1.6" data-nav="#intro-1-6" style="--card-x: 47vw; --card-y: 12vh; --card-w: 610px; --story-height: 1260px; --card-accent: #ad7a35;">
+          <div class="backdrop gold" data-mark="史"></div>
+          <article class="story-card">
+            <h2>示範案例：林爽文民變（1786-1788）</h2>
+            <div class="part-note">史料來源</div>
+            <p>林爽文事件保存了大量漢文的奏摺和上諭，記錄了戰時地方官員和皇帝的溝通過程，為研究提供了豐富的材料。本研究所使用的奏摺主要收錄於臺灣史料集成編輯委員會編《明清臺灣檔案彙編》，上諭則主要收錄於中國人民大學清史研究所、中國第一歷史檔案館編《天地會》。這些史料均經當代學者整理、校勘及出版，完整保留文書原文、文書類型、收發日期及硃批等重要資訊，為研究提供了可靠的材料。</p>
+          </article>
+        </section>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="part-1-panel" data-tab-panel="part-1" aria-labelledby="part-1-title" hidden>
+      <section class="section-hero section-hero-part-1" id="part-1" data-mark="一">
+        <div class="section-hero-content">
+          <p class="eyebrow">第一部分</p>
+          <h1 id="part-1-title">1. 平台的整體介面</h1>
+          <p class="section-hero-note">本部分會先介紹平台的整體介面，再逐步說明平台的運作流程。</p>
+        </div>
+      </section>
+      <div id="part-1-content">
+        <section class="story surface-a" id="part-1-areas" data-tab="part-1" data-nav="#part-1-areas">
+          <div class="story-inner">
+          <div class="blk" style="margin-bottom:var(--head-gap)">
+            <div class="title-row"><span class="option-number">1</span><h2>平台的四大區域</h2></div>
+            <div class="body">
+              <p>平台介面主要由四個區域組成，分別是導覽列、時間與關係圖表、原始史料區，以及AI分析區。下方是平台的互動示範複本，載入的示範文書為硃42〈為彰化諸羅俱失及撥兵等緣由事〉。點擊複本上的編號標籤，或點開右側的說明卡片，即可逐一試用四個區域。</p>
+            </div>
+          </div>
+          <!-- 互動複本＋說明卡片。複本的版面與行為分別在
+               part-1-interface.css 與 part-1-interface.js 調整；
+               複本顯示的史料資料一律來自 part-1-interface-data.js。 -->
+          <div class="lay-acc part1-layout" data-part1>
+            <div class="acc-visual" aria-label="平台介面互動示範複本">
+              <div class="part1-replica" data-part1-replica aria-live="polite"></div>
+            </div>
+            <div class="acc-track part1-track" tabindex="0" aria-label="平台介面說明卡片">
+              <article class="acc-card" id="part-1-navigation" data-part1-card="nav">
+                <button class="acc-heading" type="button" aria-expanded="false" data-part1-target="nav"><span class="acc-index">01</span><strong>導覽列</strong><span class="acc-arrow" aria-hidden="true">▾</span></button>
+                <div class="acc-body">
+                  <h3>1. 輸入與輸出資料</h3>
+                  <p>研究者可以從本機輸入結構化的原始文本和AI 分析結果；完成檢視和修改後，亦可以將結構化資料輸出至本機，供後續研究使用。</p>
+                  <h3>2. 切換介面區域</h3>
+                  <p>研究者可以透過導覽列切換不同的介面區域。例如，在閱讀原文後，開啟 AI 分析區，檢視人工智能提取的資訊，同時開啟筆記頁，記錄閱讀所得，並在完成審閱後，點擊「事件鏈」，沿著事件的時間順序，追蹤戰場消息如何向上傳遞、皇帝的命令如何向下傳達，以及官員如何回應先前的硃批或上諭。</p>
+                </div>
+              </article>
+              <article class="acc-card" id="part-1-timeline" data-part1-card="chart">
+                <button class="acc-heading" type="button" aria-expanded="false" data-part1-target="chart"><span class="acc-index">02</span><strong>時間與關係圖表</strong><span class="acc-arrow" aria-hidden="true">▾</span></button>
+                <div class="acc-body">
+                  <p>時間與關係圖表位於介面的主要區域，用以呈現文書和事件的時間及傳遞關係。</p>
+                  <p>時間與關係圖表由四條事件線組成，中間兩條線「官員上奏」及「皇帝硃批下旨」呈現文書的發送及接收時間，資料來源自原始文本中已有的收發時間。一個節點代表一份文書。</p>
+                  <p>兩側的事件線是「戰場事件」和「皇帝行動」，其中的節點分別由「官員上奏」和「皇帝硃批下旨」的節點延伸而成。這些事件首先由 AI 從原始文書中提取，再由研究者閱讀原文查證，經確認後，才會以節點形式加入圖表。</p>
+                  <p>四條線上的文書和事件節點，會按照時間順序排列，並透過連線呈現彼此的傳遞關係。</p>
+                  <p>研究者可以點擊任何節點，查看該文書或事件的詳細資料，或進一步點擊「事件鏈」，沿著時間順序，了解相關文書和事件的具體傳遞關係。</p>
+                  <p class="part1-try">試用：在複本的四條線上各有一個圓點，點擊任何一個，開啟它的節點資訊區。</p>
+                </div>
+              </article>
+              <article class="acc-card" id="part-1-node" data-part1-card="chart">
+                <button class="acc-heading" type="button" aria-expanded="false" data-part1-target="chart"><span class="acc-index">03</span><strong>節點資訊區</strong><span class="acc-arrow" aria-hidden="true">▾</span></button>
+                <div class="acc-body">
+                  <p>當研究者點擊圖表上的節點時，介面會開啟獨立的資訊面板，顯示該節點的完整 AI 提取結果，包括標題、描述、時間、原文引文及史料來源。</p>
+                </div>
+              </article>
+              <article class="acc-card" id="part-1-original" data-part1-card="doc">
+                <button class="acc-heading" type="button" aria-expanded="false" data-part1-target="doc"><span class="acc-index">04</span><strong>原始史料區</strong><span class="acc-arrow" aria-hidden="true">▾</span></button>
+                <div class="acc-body">
+                  <p>文書區顯示原始文書的完整原文及基本資料，包括標題、文書類型、作者、收發日期和史料出處。</p>
+                  <p>文書區亦設有篩選功能，用以標示不同 AI Skills 的提取結果。研究者可以點擊相關結果的標籤，查看該項結果的完整資訊。</p>
+                  <p class="part1-try">試用：點擊複本原文上方的 AI Skill 標籤，標示該項結果在硃42原文中的位置。</p>
+                </div>
+              </article>
+              <article class="acc-card" id="part-1-ai" data-part1-card="ai">
+                <button class="acc-heading" type="button" aria-expanded="false" data-part1-target="ai"><span class="acc-index">05</span><strong>人工智能分析區</strong><span class="acc-arrow" aria-hidden="true">▾</span></button>
+                <div class="acc-body">
+                  <p>研究者可以在本機執行 AI Skills，並將整理後的結構化結果上載至網站。上載後，分析結果會以卡片形式顯示於 AI Chat 面板中。</p>
+                  <p>每張卡片均會列出相關原文引文。研究者可以點擊引文，返回原始文書的相應位置進行核對。</p>
+                  <p>確認結果後，研究者可以將其加入圖表，作為獨立事件或事件中的相關資訊；如結果需要修正，研究者可以編輯或拒絕該結果，亦可以手動新增事件。</p>
+                  <p class="part1-try">試用：依複本內的四個步驟操作一次——在本機執行、上載審閱包、核對引文、把結果加入圖表。</p>
+                </div>
+              </article>
+            </div>
+          </div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="part-2-panel" data-tab-panel="part-2" aria-labelledby="part-2-title" hidden>
+      <section class="section-hero section-hero-part-2" id="part-2" data-mark="二">
+        <div class="section-hero-content">
+          <p class="eyebrow">第二部分</p>
+          <h1 id="part-2-title">1. 平台的運作流程</h1>
+          <p class="section-hero-note">平台旨在處理清代奏摺與上諭研究中的兩大主要困難：文書數量龐大，以及文書之間的通信關係複雜。</p>
+        </div>
+      </section>
+      <div id="part-2-content">
+        <section class="story content-story" id="part-2-overview" data-tab="part-2" data-nav="#part-2-overview" style="--card-x: 7vw; --card-y: 13vh; --card-w: 640px; --story-height: 1100px; --card-accent: #7e6a39;">
+          <div class="backdrop archive" data-mark="流"></div>
+          <article class="story-card">
+            <h2>1. 平台的運作流程</h2>
+            <p>因此，平台運用人工智能協助研究者總結文書內容、提取重要資訊，供研究者進一步檢視和核驗，從而減輕整理史料的工作量。</p>
+            <p>同時，平台亦運用視覺化工具，透過時間與關係圖表呈現資訊的傳遞網絡，協助研究者掌握文書和事件的時間順序和相互關係。</p>
+          </article>
+        </section>
+        <section class="story content-story" id="part-2-flow" data-tab="part-2" data-nav="#part-2-flow" style="--card-x: 49vw; --card-y: 15vh; --card-w: 660px; --story-height: 900px; --card-accent: #c7543f;">
+          <div class="backdrop network" data-mark="圖"></div>
+          <article class="story-card">
+            <h2>3. 運作流程圖</h2>
+            <p>輸入結構化的原始文書 → AI Skills → 1. 總結文書、2. 重構文書間的通訊關係、3. 收取奏摺的資訊、4. 收取上諭的資訊→載入分析結果 → 研究者審閱 →結果載入至圖表中呈現</p>
+          </article>
+        </section>
+        <section class="story content-story cover-bar-story" id="part-2-input" data-tab="part-2" data-nav="#part-2-input" style="--card-x: 7vw; --card-y: 38vh; --card-w: 650px; --story-height: 1450px; --card-accent: #b66d48;">
+          <div class="backdrop paper" data-mark="資"></div>
+          <div class="cover-bar" data-mark="資">
+            <h2>4. 輸入結構化資料</h2>
+          </div>
+          <article class="story-card">
+            <p>在選定研究主題及所使用的奏摺與上諭後，第一步是對史料進行 OCR，並把結果輸出為結構化 的JSON 資料，再載入到平台之中。（由於 OCR 並不是本網站內置的功能，相關方法將留待下一節「重用平台於其他研究主題」中再作介紹。）</p>
+            <p>在結構化資料中，每份奏摺或上諭都需要分成不同欄位，包括文書類型、作者資料、標題、文書編號、文書正文及史料來源。</p>
+            <p>如果史料來自學者編纂的檔案彙編，通常都會清楚標示文書的發送和接收日期，因此亦應加入相關日期的欄位。這些日期資料可以用於排列文書的時間順序，以及重建文書之間的傳遞關係。</p>
+            <p>輸入後，網站會讀取這些欄位，並根據文書的收發日期，在時間與關係圖表上建立各份文書的節點；同時，文書區亦會顯示文書的基本資料及完整原文。</p>
+          </article>
+        </section>
+        <section class="story content-story cover-bar-story" id="part-2-ai" data-tab="part-2" data-nav="#part-2-ai" style="--card-x: 48vw; --card-y: 38vh; --card-w: 670px; --story-height: 1450px; --card-accent: #ad7a35;">
+          <div class="backdrop gold" data-mark="AI"></div>
+          <div class="cover-bar" data-mark="AI">
+            <h2>5. 使用AI從原文中抽取資訊</h2>
+          </div>
+          <article class="story-card">
+            <p>完成輸入結構化原始文書後，下一步便是運用 AI 和AI Skills，從史料中提取特定的資訊。</p>
+            <h3>1. AI Skills</h3>
+            <p>AI Skills 是一套預先設計的 AI 指令，讓人工智能按照指定規則處理數據，提取指定資料，並以特定格式輸出結果。</p>
+            <p>平台中的 AI Skills 是根據特定研究問題設計的，要求 AI 從文書中找出與研究問題相關的資訊，並保留相應的原文引文作為證據。</p>
+            <h3>2. 資訊提取的核心理念</h3>
+            <p>平台視 AI 為協助研究的工具，AI 提取的結果需要由研究者作出最後判斷。因此，在 AI 輸出結果後，研究者需要回到原始文書，檢查結果是否準確。相關資訊要經研究者確認，才會加入到圖表之中，成為後續研究和分析的一部分。</p>
+            <h3>3. 四個分析階段</h3>
+            <p>平台共有四組 AI Skills，分別用於四個分析階段：總結文書、重建通信關係、提取奏摺資訊，以及提取上諭資訊。</p>
+          </article>
+        </section>
+        <section class="story content-story cover-bar-story" id="part-2-summary" data-tab="part-2" data-nav="#part-2-summary" style="--card-x: 7vw; --card-y: 38vh; --card-w: 650px; --story-height: 1050px; --card-accent: #b66d48;">
+          <div class="backdrop paper" data-mark="總"></div>
+          <div class="cover-bar" data-mark="總">
+            <h2>1.  總結文書</h2>
+          </div>
+          <article class="story-card">
+            <p>第一組 AI Skills 負責總結文書。AI 會先將整份文書概括為一段摘要，再按照內容和功能將原文劃分成不同部分，並為每一部分提供簡短的標題和摘要。</p>
+            <p>摘要和分段結果會顯示在原始文書區中，供研究者在完整閱讀原文前快速瀏覽，掌握文書的主要內容和結構。</p>
+          </article>
+        </section>
+        <section class="story content-story cover-bar-story" id="part-2-communication" data-tab="part-2" data-nav="#part-2-communication" style="--card-x: 48vw; --card-y: 38vh; --card-w: 670px; --story-height: 1050px; --card-accent: #c7543f;">
+          <div class="backdrop network" data-mark="關"></div>
+          <div class="cover-bar" data-mark="關">
+            <h2>2. 重建通信關係</h2>
+          </div>
+          <article class="story-card">
+            <p>在奏摺和上諭的結尾，通常會標示奏摺的發送日期、硃批日期及上諭的發布日期。平台會利用這些日期建立文書之間的時間順序及收發關係，形成通信網絡的第一層。</p>
+            <p>然而，文書之間還存在更深層的通訊關係，例如奏摺是否回應了先前的上諭或硃批，以及上諭是否回應了先前收到的奏摺。這便需要從文書正文中尋找相關線索，並與其他文書相互比對，才能確認和重建這些更深層的關係。</p>
+            <p>平台因此設有兩種的 Skills，分別用於辨識一份奏摺所回應的硃批或上諭，以及辨識一份上諭所回應的奏摺。</p>
+          </article>
+        </section>
+        <section class="story content-story" id="part-2-yu-response" data-tab="part-2" data-nav="#part-2-yu-response" style="--card-x: 7vw; --card-y: 14vh; --card-w: 680px; --story-height: 1650px; --card-accent: #ad7a35;">
+          <div class="backdrop gold" data-mark="諭"></div>
+          <article class="story-card">
+            <h2>1. 辨識奏摺所回應的上諭</h2>
+            <p>「上諭—回應配對」Skill 會根據以下線索，辨識一份奏摺所回應的上諭：</p>
+            <p>首先，官員在奏摺中回應皇帝的上諭時，通常會使用「奉上諭」、「奉聖諭」、「聖諭」、「奉廷寄」、「欽奉諭旨」或「欽奉上諭」等引述標記，並在標記前寫明上諭的發出日期，再引用上諭的內容，部分也會使用「接奉」、「接准」或「敬奉」等的標記，注明自己收到上諭的日期。因此，平台會先利用 Python 從原始文書中擷取這些標記、引文和日期，再與較早的上諭內容作出比較。</p>
+            <p>系統會根據三項條件篩選候選文書。第一，上諭的發佈日期必須和「奉上諭」標記前的日期相符；第二，奏摺作者應為上諭的受文官員之一；第三，奏摺中的上諭引文必須與候選上諭的內容完全或大致相同。</p>
+            <p>AI 會輸出結構化的結果，列出相配的上諭和奏摺，並提供兩份文書中的引文和關鍵日期，包括上諭的發佈日期、官員的收到日期和回覆日期，供研究者查核。研究者確認無誤後，便可以把通信關係加入到圖表中。</p>
+          </article>
+        </section>
+        <section class="story content-story" id="part-2-zhu-response" data-tab="part-2" data-nav="#part-2-zhu-response" style="--card-x: 50vw; --card-y: 14vh; --card-w: 620px; --story-height: 920px; --card-accent: #a45e4c;">
+          <div class="backdrop ink" data-mark="批"></div>
+          <article class="story-card">
+            <h2>2. 辨識奏摺所回應的硃批</h2>
+            <p>在回應皇帝的硃批時，官員同樣會用「奉硃批」、「奉到硃批」、「敬奉硃批」、「欽奉硃批」或「蒙硃批」等引述標記，再引用硃批原文。因此，辨識奏摺所回應硃批的 Skill，其方法和判斷邏輯與「上諭—回應配對」基本相同。</p>
+          </article>
+        </section>
+        <section class="story content-story" id="part-2-yu-source" data-tab="part-2" data-nav="#part-2-yu-source" style="--card-x: 7vw; --card-y: 14vh; --card-w: 690px; --story-height: 2050px; --card-accent: #4d817c;">
+          <div class="backdrop river" data-mark="源"></div>
+          <article class="story-card">
+            <h2>3. 辨識上諭所回應的奏摺</h2>
+            <p>系統會使用「上諭來源配對」Skill 辨識上諭所回應的奏摺。</p>
+            <p>在評論官員奏報和下達命令前，上諭通常會先使用「據某人奏」、「據某人馳奏」或「據某人奏稱」等引述標記，交代皇帝所收到的官員奏報。</p>
+            <p>然而，與回應上諭的奏摺不同，上諭通常不會註明皇帝何時收到相關奏摺，以及相關奏摺的發送日期。</p>
+            <p>此外，同一項資訊可能由多位官員奏報，而上諭卻大多只會使用「據某人等奏稱」或「據奏」的標記，不會列出所有的奏報官員。因此，不能只用 Python 擷取人名或標記，來確定上諭所回應的奏摺。</p>
+            <p>儘管如此，上諭通常會回應最新收到的奏報，平台會先利用 Python搜尋上諭發布當日，以及發布前5日內收到的奏摺，作為後續分析的候選文本。</p>
+            <p>接著，系統會運用 AI，先提取上諭中有「據奏」標記的資訊，再閱讀每份候選奏摺的正文，判斷該資訊出現於哪一份或哪些奏摺之中，從以辨識哪些奏摺是上諭的回應對象。</p>
+          </article>
+        </section>
+        <section class="story content-story cover-bar-story" id="part-2-extract" data-tab="part-2" data-nav="#part-2-extract" style="--card-x: 48vw; --card-y: 38vh; --card-w: 670px; --story-height: 1050px; --card-accent: #7e6a39;">
+          <div class="backdrop archive" data-mark="取"></div>
+          <div class="cover-bar" data-mark="取">
+            <h2>3. 抽取奏摺的資訊</h2>
+          </div>
+          <article class="story-card">
+            <p>完成通信關係重建後，平台會進一步從奏摺和上諭正文中的資訊。</p>
+            <p>系統把奏摺內容劃分為四類資訊：官員奏報的事件、奏報者與其他官員對事件的回應、以上兩種資訊的來源，以及官員對皇帝先前硃批或上諭的回應。系統會用四種Skills 讓AI抽取以上資訊。</p>
+          </article>
+        </section>
+        <section class="story content-story" id="part-2-events" data-tab="part-2" data-nav="#part-2-events" style="--card-x: 7vw; --card-y: 14vh; --card-w: 700px; --story-height: 1700px; --card-accent: #c7543f;">
+          <div class="backdrop taiwan" data-mark="事"></div>
+          <article class="story-card">
+            <h2>1. 抽取官員奏報的事件、官員對事件的回應</h2>
+            <p>在林爽文民變的案例中，官員奏報的事件就是林爽文及其部眾的軍事行動，官員的回應則包括已採取或計劃採取的軍事行動，以及非軍事措施（如後勤調度、案件調查）。</p>
+            <p>所有事件和回應皆由AI提取，並以結構化格式輸出，包含標題、描述、發生時間及相關引文，供研究者核對、修正及確認。確認無誤後，研究者便可把事件加入到平台的第一條時間線——「戰場事件」上。</p>
+            <p>考慮到每類事件（如軍事事件）包含的細類眾多（如攻城、防守、追捕等），研究者可根據研究需要，在 Skills 中預先限定需抽取的事件類型及細類，亦可不設限制，由讓AI自行判斷和抽取，再由研究者選擇採用的抽取結果。</p>
+            <p>另外，如何在Skills中定義「事件」亦值得注意。事件可以按時間單位（如時辰、日期）劃分，也可以按事件的邏輯關係（如同一任務）劃分。不同的定義會影響 AI 提取事件的「粒度」（Granularity）。研究者應根據研究需要，在 Skills 中定義事件的劃分方式。</p>
+          </article>
+        </section>
+        <section class="story content-story" id="part-2-sources" data-tab="part-2" data-nav="#part-2-sources" style="--card-x: 49vw; --card-y: 14vh; --card-w: 650px; --story-height: 1200px; --card-accent: #b66d48;">
+          <div class="backdrop paper" data-mark="源"></div>
+          <article class="story-card">
+            <h2>2. 追溯資訊的來源</h2>
+            <p>完成抽取事件後，系統會用「來源鏈追溯」Skill，逐層追溯不同事件的資訊來源。</p>
+            <p>AI 會根據文書中的資訊傳遞標記，識別表示消息來源的文句，例如「字寄」、「咨」、「移會」、「稟」、「據某人稟」、「接據某人」等。</p>
+            <p>不少資訊並非直接來自奏摺作者，而是經多人逐層轉報，AI因此會追蹤資訊由最初報告者逐步傳遞至奏摺作者的過程，重建完整的傳遞鏈，例如「甲 → 乙 → 丙 → 奏摺作者」。</p>
+          </article>
+        </section>
+        <section class="story content-story cover-bar-story" id="part-2-yu-info" data-tab="part-2" data-nav="#part-2-yu-info" style="--card-x: 7vw; --card-y: 38vh; --card-w: 700px; --story-height: 1750px; --card-accent: #a45e4c;">
+          <div class="backdrop ink" data-mark="諭"></div>
+          <div class="cover-bar" data-mark="諭">
+            <h2>4. 收取上諭的資訊</h2>
+          </div>
+          <article class="story-card">
+            <h3>1.皇帝上諭對官員奏摺的回應</h3>
+            <p>完成提取奏摺中的事件和來源後，系統可以使用 `extract-yu-emperor-actions.md`，根據先前階段已確認的「上諭回應奏摺」關係，取得相應的上諭，分析皇帝如何回應奏摺中的內容。</p>
+            <p>每份上諭可以產生多項回應的結果，AI 會將每項結果整理成結構化資料，包括上諭、硃批和奏摺中的相關引文，並說明皇帝如何針對奏摺作出評論或命令。</p>
+            <h3>2. 官員對皇帝上諭的回應</h3>
+            <p>同樣，系統亦可以執行 confirmed-yu-response-analysis.md Skill，根據先前階段已確認的「奏摺回應上諭」關係，取得相關的奏摺，分析官員後續如何就上諭中的評論、命令作出回應。</p>
+            <h3>3. 上諭中皇帝所知的事件</h3>
+            <p>除此之外，在單獨分析上諭時，系統亦可以執行 extract-yu-reported-events.md Skill，根據「據奏」等引述標記，辨識皇帝從官員奏報中得知的事件；再根據先前已確認的「上諭來源配對」關係，從相關奏摺中找出報告這些事件的原文，追溯情報的來源。</p>
+          </article>
+        </section>
+        <section class="story content-story cover-bar-story" id="part-2-visualize" data-tab="part-2" data-nav="#part-2-visualize" style="--card-x: 48vw; --card-y: 38vh; --card-w: 680px; --story-height: 1100px; --card-accent: #c7543f;">
+          <div class="backdrop network" data-mark="呈"></div>
+          <div class="cover-bar" data-mark="呈">
+            <h2>4. 視覺化呈現分析的結果</h2>
+          </div>
+          <article class="story-card">
+            <p>AI 完成資訊抽取後，研究者可把分析結果匯入至平台，逐一與原文比對，並選擇接受、修改或拒絕結果。系統為被採用的結果，在圖表中建立相應的節點及連線，形成事件與文書之間的關係網絡。</p>
+            <p>研究者亦可以點擊圖表上的文書或事件節點，查看其詳細資料、原文引文和資料來源，也可以開啟事件鏈，沿著時間順序追蹤一項事件由最初的報告者傳遞至官員和皇帝的過程。</p>
+          </article>
+        </section>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="part-3-panel" data-tab-panel="part-3" aria-labelledby="part-3-title" hidden>
+      <section class="section-hero section-hero-part-3" id="part-3" data-mark="三">
+        <div class="section-hero-content">
+          <p class="eyebrow">第三部分</p>
+          <h1 id="part-3-title">運用平台研究其他的問題</h1>
+          <p class="section-hero-note">除了示例林爽文事件外，本平台亦可應用於其他的研究議題，本節會介紹如何調整平台的設定，以運用於不同的研究問題。</p>
+        </div>
+      </section>
+      <div id="part-3-content">
+        <section class="story surface-a" id="part-3-research-questions" data-tab="part-3" data-nav="#part-3-research-questions">
+          <div class="story-inner">
+            <div class="lay-split text-left" style="--vis-w: 54%;">
+              <div class="lay-copy">
+                <article class="copybox blk" id="part-3-research-card">
+                  <div class="title-row"><span class="option-number">1</span><h2>適合的研究問題</h2></div>
+                  <div class="body">
+                    <p>本平台運用 AI 與視覺化工具，重建奏摺與上諭之間的通信關係，並呈現資訊在皇帝與地方官員之間的傳遞網絡。</p>
+                      
+                      <p>因此，本平台適合用來研究政策如何在皇帝與地方官員的通信過程中形成、調整及落實。</p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="story surface-b" id="part-3-tools" data-tab="part-3" data-nav="#part-3-tools">
+          <div class="story-inner">
+            <div class="blk" style="margin-bottom:var(--head-gap)">
+              <div class="title-row"><span class="option-number">2</span><h2>所需的工具與資源</h2></div>
+            </div>
+            <div class="part3-tools-checklist" id="part-3-tools-card" data-part3-tools-checklist>
+              <aside class="part3-tools-list-window">
+                <div class="part3-tools-window-bar"><span>工具清單</span></div>
+                <div class="part3-tools-list">
+                  <label class="part3-tool-row is-active" data-part3-tool-id="repository">
+                    <input type="checkbox" checked>
+                    <span class="part3-tool-number">1</span>
+                    <span class="part3-tool-copy"><span class="part3-tool-title">GitHub Repository</span><span class="part3-tool-subtitle">原始碼與資料夾</span></span>
+                    <span class="part3-tool-tick" aria-hidden="true">✓</span>
+                  </label>
+                  <label class="part3-tool-row" data-part3-tool-id="agentic-ai">
+                    <input type="checkbox">
+                    <span class="part3-tool-number">2</span>
+                    <span class="part3-tool-copy"><span class="part3-tool-title">Agentic AI</span><span class="part3-tool-subtitle">閱讀原始碼與部署平台</span></span>
+                    <span class="part3-tool-tick" aria-hidden="true">✓</span>
+                  </label>
+
+
+                  <label class="part3-tool-row" data-part3-tool-id="api">
+                    <input type="checkbox">
+                    <span class="part3-tool-number">4</span>
+                    <span class="part3-tool-copy"><span class="part3-tool-title">AI API</span><span class="part3-tool-subtitle">批次處理與分析</span></span>
+                    <span class="part3-tool-tick" aria-hidden="true">✓</span>
+                  </label>
+                  <label class="part3-tool-row" data-part3-tool-id="backup">
+                    <input type="checkbox">
+                    <span class="part3-tool-number">5</span>
+                    <span class="part3-tool-copy"><span class="part3-tool-title">自己的 GitHub Repository</span><span class="part3-tool-subtitle">備份、管理與協作</span></span>
+                    <span class="part3-tool-tick" aria-hidden="true">✓</span>
+                  </label>
+                </div>
+              </aside>
+
+              <section class="part3-tools-info-window">
+                <div class="part3-tools-window-bar"><span>工具資訊</span></div>
+                <div class="part3-tools-info-panel">
+                  <article class="part3-tool-info-view" data-part3-tool-info="repository">
+                    <figure class="part3-tool-info-photo"><span class="part3-tool-info-number" aria-hidden="true">1</span></figure>
+                    <div class="part3-tool-info-copy"><p class="part3-tool-info-subtitle">原始碼與資料夾</p><h3>GitHub Repository</h3><div class="body"><p>首先，研究者可以從這個 GitHub Repository 下載平台的原始碼。Repository 內包含平台網站的程式碼、AI Skills的Markdown 檔案，以及儲存一手史料和 AI 分析結果的資料夾。</p></div></div>
+                  </article>
+                  <article class="part3-tool-info-view" data-part3-tool-info="agentic-ai" hidden>
+                    <figure class="part3-tool-info-photo">
+                      <!-- Agentic AI 動畫場景：Codex pet＋四個取自實際專案檔案的工作視窗。
+                           每個視窗的寬度、高度、位置、字級和傾斜角度在 storymap-cards.css 的
+                           #part-3-tools-card 區塊調整；內容由 storymap.js 逐行播放。 -->
+                      <div class="agentic-scene" data-agentic-scene aria-hidden="true">
+                        <div class="agentic-mac-window agentic-window-terminal" data-agentic-window="terminal">
+                          <div class="agentic-mac-titlebar"><span class="agentic-mac-dot red"></span><span class="agentic-mac-dot yellow"></span><span class="agentic-mac-dot green"></span><span class="agentic-window-title">Run Python</span></div>
+                          <div class="agentic-window-body agentic-terminal-body" data-agentic-sequence>
+                            <script type="application/json" data-agentic-lines>
+                              [
+                                "<span class=\"cmt\"># cwd: /Users/creamybanana/Downloads/DH Project</span>",
+                                "<span class=\"prompt\">$</span> python3 &quot;tool/scripts py/run_mass_prompt_chain_test.py&quot; \\",
+                                "<span class=\"arg\">--model</span> gemini-3.5-flash \\",
+                                "<span class=\"arg\">--doc-ids</span> 硃25,硃42 \\",
+                                "<span class=\"arg\">--bundle</span> zhu-december-official-loop <span class=\"arg\">--skip-done</span>",
+                                "<span class=\"out\">硃25 → summary → division-parts → lin-events</span>",
+                                "<span class=\"out\">硃25 → qing-actions-all → source-chain → official-response</span>",
+                                "<span class=\"out\">硃42 → summary → division-parts → qing-actions-all</span>",
+                                "<span class=\"out\">write: outputs/summary.json · division-parts.json</span>",
+                                "<span class=\"out\">write: outputs/qing-actions-all.json · source-chain.json</span>",
+                                "<span class=\"ok\">✓ review bundle kept for human review</span>"
+                              ]
+                            </script>
+                          </div>
+                        </div>
+                        <div class="agentic-mac-window agentic-window-html" data-agentic-window="html">
+                          <div class="agentic-mac-titlebar"><span class="agentic-mac-dot red"></span><span class="agentic-mac-dot yellow"></span><span class="agentic-mac-dot green"></span><span class="agentic-window-title">Create Website</span></div>
+                          <div class="agentic-window-body agentic-code" data-agentic-sequence>
+                            <script type="application/json" data-agentic-lines>
+                                [
+                                  "<span class=\"cmt\">&lt;!-- review-tools/(2) sample/index.html --&gt;</span>",
+                                  "<span class=\"kw\">const</span> STAGE1_SOURCE_PATH = <span class=\"str\">'/shared/stage1_original_text.json'</span>;",
+                                  "<span class=\"kw\">const</span> stage1Payload = window.__reviewEmbedStage1Docs || <span class=\"kw\">await</span> (async () =&gt; {",
+                                  "  <span class=\"kw\">const</span> stage1Response = <span class=\"kw\">await</span> fetch(STAGE1_SOURCE_PATH, { cache: <span class=\"str\">'no-store'</span> });",
+                                  "  <span class=\"kw\">if</span> (!stage1Response.ok) <span class=\"kw\">throw new</span> Error(<span class=\"str\">'canonical Stage 1 source unavailable'</span>);",
+                                  "  <span class=\"kw\">return</span> stage1Response.json();",
+                                  "})();",
+                                  "<span class=\"kw\">const</span> stage1Docs = Array.isArray(stage1Payload) ? stage1Payload : stage1Payload.documents || [];",
+                                  "<span class=\"kw\">const</span> stage1ById = <span class=\"kw\">new</span> Map(stage1Docs.map(doc =&gt; [String(doc.doc_id || <span class=\"str\">''</span>), doc]));",
+                                  "<span class=\"kw\">const</span> AI_DUAL = [<span class=\"str\">奏2</span>, <span class=\"str\">奏3</span>, <span class=\"str\">奏5</span>].map(id =&gt; stage1ById.get(id));",
+                                  "<span class=\"fn\">renderDualTimeline</span>(stage1ById, AI_DUAL);"
+                                ]
+                              </script>
+                          </div>
+                        </div>
+                        <div class="agentic-mac-window agentic-window-ocr" data-agentic-window="ocr">
+                          <div class="agentic-mac-titlebar"><span class="agentic-mac-dot red"></span><span class="agentic-mac-dot yellow"></span><span class="agentic-mac-dot green"></span><span class="agentic-window-title">Process OCR</span></div>
+                          <div class="agentic-window-body agentic-code agentic-ocr-text" data-agentic-sequence>
+                            <script type="application/json" data-agentic-lines>
+                              [
+                                "<span class=\"cmt\">硃25｜stage1_original_text.json｜OCR output → structured source</span>",
+                                "<span class=\"meta\">doc_id:</span> 硃25",
+                                "<span class=\"meta\">title:</span> 為奏彰化失陷已調兵赴臺事",
+                                "<span class=\"meta\">author:</span> 福建水師提督 黃仕簡",
+                                "<span class=\"meta\">send_date:</span> 乾隆五十一年十二月十日 1786/12/10",
+                                "<span class=\"meta\">receive_date:</span> 乾隆五十一年十二月二十七日 1786/12/27",
+                                "<span class=\"ocr-text-line\">福建水師提督一等海澄公奴才黃仕簡謹奏，為奏聞事。</span>",
+                                "<span class=\"ocr-text-line\">竊照臺灣近來屢有匪徒滋事，奴才時刻留心察查，不敢稍有懈忽。</span>",
+                                "<span class=\"ocr-text-line\">茲本年十二月初五日戌刻，訪聞得臺灣彰化縣屬又有匪徒聚集會黨。</span>",
+                                "<span class=\"ocr-text-line\">一面飭令挑選提標五營員弁及備戰兵丁一千名，配足軍火、器械。</span>",
+                                "<span class=\"ocr-text-line\">仍擬續調水陸官兵酌由鹿耳門、淡水南北兩路夾攻在案。</span>",
+                                "<span class=\"ok\">rescript_text: 已有旨了。欽此。</span>"
+                              ]
+                            </script>
+                          </div>
+                        </div>
+                        <div class="agentic-mac-window agentic-window-skills" data-agentic-window="skills">
+                          <div class="agentic-mac-titlebar"><span class="agentic-mac-dot red"></span><span class="agentic-mac-dot yellow"></span><span class="agentic-mac-dot green"></span><span class="agentic-window-title">Write Skills</span></div>
+                          <div class="agentic-window-body agentic-code agentic-skill-text" data-agentic-sequence>
+                            <script type="application/json" data-agentic-lines>
+                              [
+                                "<span class=\"cmt\"># tool/skills md/quick-summary.md</span>",
+                                "<span class=\"cmt\"># Skill: Quick Document Summary</span>",
+                                "<span class=\"meta\">Kind:</span> summary",
+                                "<span class=\"cmt\">## Website Prompt</span>",
+                                "<span class=\"str\">用繁體中文，為上述文書寫一段更精簡、流暢的摘要（約 3-5 句），突出最關鍵的人、事、時、地，避免逐句翻譯。</span>",
+                                "<span class=\"cmt\">## Purpose</span>",
+                                "Fast, generic prose summary of any single document (上奏／硃批／上諭).",
+                                "This is the same instruction used by the terminal batch runner's <span class=\"arg\">summary</span> step and the website's 「進一步摘要」button.",
+                                "One skill file, two ways to trigger it: a large scan on many documents from the terminal, or a single document from the website.",
+                                "This is intentionally a lighter, non-schema summary.",
+                                "For richer per-doc-type structured analysis with quoted evidence, use summarize-shangyu.md, summarize-shangzou.md, or summarize-zhupi.md.",
+                                "<span class=\"cmt\">## Used By</span>",
+                                "<span class=\"kw\">Terminal:</span> tool/scripts py/run_review_bundle_test.py --steps summary",
+                                "<span class=\"out\">reads this file's Website Prompt and sends it as the instruction field</span>",
+                                "<span class=\"kw\">Website:</span> per-document AI panel, 「進一步摘要」button",
+                                "<span class=\"kw\">Proxy:</span> tool/proxy/gemini-proxy/main.py, mode: <span class=\"str\">summary</span>",
+                                "<span class=\"out\">falls back to its own default text if the instruction field is empty</span>",
+                                "<span class=\"ok\">✓ full summary Skill loaded for human review</span>"
+                              ]
+                            </script>
+                          </div>
+                        </div>
+                        <div class="agentic-pet-wrap">
+                          <div class="agentic-pet-desk"></div>
+                          <div class="agentic-pet">
+                            <div class="agentic-pet-head">
+                              <div class="agentic-pet-fluff"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                              <div class="agentic-pet-head-core"></div>
+                              <div class="agentic-pet-face"><span>&gt;</span><span>_</span></div>
+                            </div>
+                            <div class="agentic-pet-body">
+                              <span class="agentic-pet-limb arm l"></span>
+                              <span class="agentic-pet-limb arm r"></span>
+                              <div class="agentic-pet-body-face"><span>&gt;-</span></div>
+                              <span class="agentic-pet-leg l"></span>
+                              <span class="agentic-pet-leg r"></span>
+                            </div>
+                          </div>
+                          <div class="agentic-pet-keyboard"></div>
+                        </div>
+                      </div>
+                      <span class="part3-tool-info-number" aria-hidden="true">2</span>
+                    </figure>
+                    <div class="part3-tool-info-copy"><p class="part3-tool-info-subtitle">閱讀原始碼與部署平台</p><h3>Agentic AI</h3><div class="body"><p>其次，研究者可以使用 Agentic AI （如ChatGPT Work 和Codex） 閱讀下載的原始碼，並按照 README.md 的說明部署平台，在本機開啟前端網頁。</p></div><div class="body"><p>其後，研究者可以利用 Agentic AI 協助整理原始文書、轉換為結構化資料、修改或建立 AI Skills，以及修改網站介面和功能等的程序。</p></div></div>
+                  </article>
+                
+                  <article class="part3-tool-info-view" data-part3-tool-info="api" hidden>
+                    <figure class="part3-tool-info-photo"><img src="done-into-8.png" alt="" loading="lazy" decoding="async"><span class="part3-tool-info-number" aria-hidden="true">4</span></figure>
+                    <div class="part3-tool-info-copy"><p class="part3-tool-info-subtitle">批次處理與分析</p><h3>AI API</h3><div class="body"><p>此外，研究者亦需要使用成本較低的 AI API，例如 Gemini 或 DeepSeek，用於處理大量文本的 OCR，以及在多份文書上批次執行 AI Skills。</p></div></div>
+                  </article>
+                  <article class="part3-tool-info-view" data-part3-tool-info="backup" hidden>
+                    <figure class="part3-tool-info-photo part3-tool-info-photo-cloud">
+                      <!-- 雲端上傳動畫：真實檔名（AI Skills／程式碼／文書 JSON）持續從下往上飄，
+                           代表備份到 GitHub。大小顏色在 storymap-cards.css 的
+                           #part-3-tools-card .cloud-scene 調整；內容清單與節奏在
+                           storymap.js 的 initCloudUploadScene() 裡。 -->
+                      <div class="cloud-scene" data-cloud-scene aria-hidden="true">
+                        <div class="cloud-wrap">
+                          <div class="cloud-glow-layer"></div>
+                          <svg class="cloud-svg" viewBox="0 0 200 120">
+                            <path d="M46 92c-19 0-34-14-34-32 0-16 12-29 28-31 5-16 20-27 38-27 20 0 37 14 40 33 15 2 27 14 27 30 0 17-15 30-33 30H46z"/>
+                          </svg>
+                          <div class="gh-badge">
+                            <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+                          </div>
+                          <div class="cloud-arrow-wrap">
+                            <svg class="cloud-arrow" viewBox="0 0 24 24"><path d="M12 3 L20 12 L15 12 L15 21 L9 21 L9 12 L4 12 Z"/></svg>
+                          </div>
+                        </div>
+                        <div class="upload-lane" data-upload-lane></div>
+                      </div>
+                      <span class="part3-tool-info-number" aria-hidden="true">5</span>
+                    </figure>
+                    <div class="part3-tool-info-copy"><p class="part3-tool-info-subtitle">備份、管理與協作</p><h3>自己的 GitHub Repository</h3><div class="body"><p>最後，建議研究者建立自己的 GitHub Repository，在雲端備份和管理程式碼、AI Skills、結構化資料及分析結果，方便後續維護、更新和協作。</p></div></div>
+                  </article>
+                </div>
+              </section>
+            </div>
+          </div>
+        </section>
+
+        <section class="story surface-c" id="part-3-basic-flow" data-tab="part-3" data-nav="#part-3-basic-flow">
+          <div class="story-inner">
+            <div class="lay-stack">
+              <article class="blk" id="part-3-basic-flow-card">
+                <div class="title-row"><span class="option-number">3</span><h2>重用平台的基本流程</h2></div>
+                <div class="body"><p>有準備好以上的工具後，研究者可以按照以下流程，把平台應用於新的研究主題：</p></div>
+              </article>
+              <div class="part3-flow-frame" id="part-3-basic-flow-chart" role="group" aria-label="選定研究主題與史料 → OCR 並結構化原始史料→ 調整 AI Skills → 執行 AI 分析 → 載入網站核驗 → 修改及擴展平台 → 保存分析結果→後續研究">
+                <div class="part3-flow-chev">
+                  <button type="button" class="part3-flow-step" data-part3-flow-target="#part-3-research-card"><span class="part3-flow-step-no">1</span><span class="part3-flow-step-label">選定研究主題與史料</span></button>
+                  <button type="button" class="part3-flow-step" data-part3-flow-target="#part-3-ocr-definition-card-1"><span class="part3-flow-step-no">2</span><span class="part3-flow-step-label">OCR 並結構化原始史料</span></button>
+                  <button type="button" class="part3-flow-step" data-part3-flow-target="#part-3-ai-skills-card-1"><span class="part3-flow-step-no">3</span><span class="part3-flow-step-label">調整 AI Skills</span></button>
+                  <button type="button" class="part3-flow-step" data-part3-flow-target="#part-3-ai-chain-card-1"><span class="part3-flow-step-no">4</span><span class="part3-flow-step-label">執行 AI 分析</span></button>
+                  <button type="button" class="part3-flow-step" data-part3-flow-target="#part-3-ai-bar"><span class="part3-flow-step-no">5</span><span class="part3-flow-step-label">載入網站核驗</span></button>
+                  <button type="button" class="part3-flow-step" data-part3-flow-target="#part-3-ai-bar"><span class="part3-flow-step-no">6</span><span class="part3-flow-step-label">修改及擴展平台</span></button>
+                  <button type="button" class="part3-flow-step" data-part3-flow-target="#part-3-wiki-data"><span class="part3-flow-step-no">7</span><span class="part3-flow-step-label">保存分析結果</span></button>
+                  <button type="button" class="part3-flow-step" data-part3-flow-target="#part-3-wiki"><span class="part3-flow-step-no">8</span><span class="part3-flow-step-label">後續研究</span></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="part3-stage" id="part-3-ocr" data-tab="part-3" data-nav="#part-3-ocr">
+          <section class="section-hero section-hero-part-3 part3-stage-bar" id="part-3-ocr-bar" aria-labelledby="part-3-ocr-title">
+            <div class="section-hero-content"><p class="eyebrow">步驟二</p><h1 id="part-3-ocr-title">OCR 並結構化原始史料</h1></div>
+          </section>
+
+          <section class="story surface-a" id="part-3-ocr-definition" data-tab="part-3" data-nav="#part-3-ocr-definition">
+            <div class="story-inner">
+              <div class="part3-ocr-def-layout">
+                <div class="part3-two-card-grid">
+                  <article class="copybox blk" id="part-3-ocr-definition-card-1"><div class="title-row"><span class="option-number">1</span><h2>甚麼是 OCR？</h2></div><div class="body"><p>OCR（Optical Character Recognition，光學字元辨識）是一種將影像中的文字辨識並轉換為機器可讀文本的技術。</p></div></article>
+                  <article class="copybox blk" id="part-3-ocr-definition-card-2"><div class="title-row"><span class="option-number">2</span><h2>使用OCR的原因</h2></div><div class="body"><p>由於 AI 無法直接讀取掃描影像形式的歷史材料，研究者因此需要先利用 OCR 將史料轉換為可編輯及可搜尋的文本，再整理成結構化資料，後續才能用 AI 進行資訊提取和分析。</p></div></article>
+                </div>
+
+                <!-- OCR 掃描動畫：兩份同一份文書（硃25）的不同版面（手抄本／刊本）
+                     各自循環翻頁（由右至左），下方以 VS Code 風格視窗逐字打出
+                     結構化後的 JSON。內容與圖片來源見 storymap.js 的 initOcrScanScene()
+                     與本檔內的 <script type="application/json"> 區塊。 -->
+                <div class="ocr-scan-scene" data-ocr-scene aria-hidden="true">
+                  <div class="ocr-pages">
+                    <div class="ocr-filestack handwritten">
+                      <div class="ocr-page">
+                        <img class="ocr-page-img" src="ocr-zhu25-handwritten-1-enhanced.png" alt="" data-ocr-page-img>
+                        <span class="ocr-scan-line" aria-hidden="true"></span>
+                        <script type="application/json" data-ocr-pages>
+                          ["ocr-zhu25-handwritten-1-enhanced.png","ocr-zhu25-handwritten-2-enhanced.png","ocr-zhu25-handwritten-3-enhanced.png","ocr-zhu25-handwritten-4-enhanced.png"]
+                        </script>
+                      </div>
+                    </div>
+                    <div class="ocr-filestack printed">
+                      <div class="ocr-page">
+                        <img class="ocr-page-img" src="ocr-zhu25-printed-1-enhanced.png" alt="" data-ocr-page-img>
+                        <span class="ocr-scan-line" style="--scan-delay: 1.6s" aria-hidden="true"></span>
+                        <script type="application/json" data-ocr-pages>
+                          ["ocr-zhu25-printed-1-enhanced.png","ocr-zhu25-printed-2-enhanced.png"]
+                        </script>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="ocr-output">
+                    <div class="ocr-output-bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="file">硃25.json</span></div>
+                    <div class="ocr-output-body" data-ocr-output>
+                      <script type="application/json" data-ocr-output-lines>
+                        [
+                          "<span class=\"punc\">{</span>",
+                          "&nbsp;&nbsp;<span class=\"key\">\"doc_id\"</span><span class=\"punc\">:</span> <span class=\"str\">\"硃25\"</span><span class=\"punc\">,</span>",
+                          "&nbsp;&nbsp;<span class=\"key\">\"title\"</span><span class=\"punc\">:</span> <span class=\"str\">\"為奏彰化失陷已調兵赴臺事\"</span><span class=\"punc\">,</span>",
+                          "&nbsp;&nbsp;<span class=\"key\">\"body\"</span><span class=\"punc\">:</span> <span class=\"str\">\"福建水師提督一等海澄公奴才黃仕簡謹奏，為奏聞事。竊照臺灣近來屢有匪徒滋事，奴才時刻留心察查，不敢稍有懈忽。茲本年十二月初五日戌刻，訪聞得臺灣彰化縣屬又有匪徒聚集會黨，於十一月二十九日辰刻，攻打彰化縣城。至午刻，縣城被陷，文武官員不知生死之事。查臺灣不法民番，甫經兩次大加懲治，乃該匪等竟膽敢聚眾攻陷城池。其謀為不軌，四行無忌，烏合之眾，自必甚多，罪惡至此已極，殊堪痛恨。雖未准臺灣鎮、道等報到，未知虛實，急當預為查辦征剿。奴才一面委令提標右營遊擊邱維揚，先帶兵二百名渡臺，確查賊匪共有若干，為首者何人，作何起釁，四近村莊有無擾害，臺地文武曾否業已收復城池，首夥均行捕獲，如尚有散逃，協同追拿盡淨。一面飭令挑選提標五營員弁及備戰兵丁一千名，配足軍火、器械，封備商哨船只齊足。奴才冬間舊染風症，雖復時愈時發，現在心神氣力不能如常，但仰蒙聖主深恩，值海疆緊要事務，當即力疾星速親赴該地剿捕。所有廈門地方，札達督臣檄委金門鎮總兵羅英笈，就近前來彈壓照應。又慮賊匪聞拿竄逃內地，飛札撫臣、陸路提臣、藩臬兩司、興泉道及水師各鎮協營，並臺灣鎮、道，一體嚴飭營、縣在於各口岸要隘，堵緝盤拿。仍擬續調水陸官兵酌由鹿耳門、淡水南北兩路夾攻在案。現在派撥本標五營官兵，軍械船隻均點驗齊備，未據臺地報到事宜緊急救援。奴才於初十日帶領官兵登舟候風放洋飛渡之際（硃批：仍以調養為要，勿過勞），接據署北路淡水同知程峻、守備董得魁會稟稱，彰化縣匪犯林爽文等，結黨肆虐，擒捕未獲。十一月二十九日，彰邑大肚社番字寄淡屬大甲社通事據稱，本月二十七日夜，本縣俞在大墩地方拿匪被害。二十九早，彰城失陷，卑職等督同兵役，整齊槍炮，募集鄉勇社番，在於扼要〔處〕所，分頭堵禦，一面救援。第兵力單薄，道路隔絕，伏祈迅發大兵拯救。再，彰城失陷，被害文武官員若干，此時探聽維艱，未知的實，俟查確另稟。等情前來。查，奴才原擬淡水一路，已屬必須由此救援夾攻。省城直對淡水，際此北風當令，渡往甚易。除星飛咨行陸路提臣、水師、海壇、閩安、烽火各鎮、協、營，立就近省營分，續調官兵北路援剿。奴才直由鹿耳門、郡城南路進兵，會督夾攻。容俟在接實在情形具奏外，合將聞報彰化賊匪殺官陷城，及奴才辦理赴剿緣由，謹先恭摺由驛六百里奏聞，伏乞皇上睿鑒。謹奏。\"</span>",
+                          "<span class=\"punc\">}</span>"
+                        ]
+                      </script>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="story surface-b" id="part-3-paddleocr" data-tab="part-3" data-nav="#part-3-paddleocr">
+            <div class="story-inner">
+              <div class="paddleocr-layout">
+                <article class="copybox blk" id="part-3-paddleocr-card">
+                  <div class="title-row"><span class="option-number">3</span><h2>PaddleOCR</h2></div>
+                  <div class="body">
+                    <p>研究者可使用 PaddleOCR 作為 OCR 的工具。PaddleOCR 是由百度開發，具有以下優點：</p>
+                    <ul class="acc-point-list paddleocr-point-list">
+                      <li>能夠辨識掃描影像或 PDF 中的中文文字，並支援版面分析。</li>
+                      <li>中文辨識準確率高，而且辨識速度快。</li>
+                      <li>開源且免費，支援本地部署，可離線運行。</li>
+                    </ul>
+                  </div>
+                </article>
+                <div class="paddleocr-visual-box">
+                  <div class="photo-gallery visual-frame paddleocr-photo-gallery" data-photo-gallery data-photo-gallery-id="paddleocr">
+                    <div class="photo-gallery-stage"></div>
+                    <div class="photo-gallery-body"></div>
+                    <script type="application/json" data-photo-gallery-data>
+                    [
+                      {
+                        "image": "../Visual Material/PaddleOCR.png",
+                        "alt": "PaddlePaddle/PaddleOCR GitHub Repository 頁面截圖",
+                        "title": "PaddleOCR GitHub",
+                        "titleHref": "https://github.com/PaddlePaddle/PaddleOCR"
+                      }
+                    ]
+                    </script>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="story surface-c" id="part-3-agentic-ocr" data-tab="part-3" data-nav="#part-3-agentic-ocr">
+            <div class="story-inner">
+              <div class="lay-split text-left" style="--vis-w: 56%;">
+                <div class="lay-copy">
+                  <article class="copybox blk" id="part-3-agentic-ocr-card">
+                    <div class="title-row"><span class="option-number">4</span><h2>運用 Agentic AI 使用 PaddleOCR</h2></div>
+                    <div class="body"><p>PaddleOCR 通常透過 Python在本機安裝和運行。然而，研究者即使不具備編程能力，亦可透過自然語言指示 Agentic AI 安裝 PaddleOCR，以及撰寫執行 OCR 的 Python 代碼。</p></div>
+                  </article>
+                </div>
+                <div class="lay-visual">
+                  <!-- Agentic AI × PaddleOCR 示範動畫：淺色 Codex 對話視窗（使用者指令＋AI
+                       思考過程＋安裝完成摘要）與深色 PaddleOCR Python 視窗重疊排列，點擊
+                       任一視窗標題列可切換上下層。逐字播放沿用 storymap.js 既有的
+                       typeAgenticSequence／initAgenticScene() 與 Codex 兩階段播放，內容陣列見下方 JSON 區塊。
+                       視窗尺寸與位置在 storymap-cards.css 的 #part-3-agentic-ocr-chart 區塊調整。 -->
+                  <div class="part3-agentic-ocr-frame visual-frame" id="part-3-agentic-ocr-chart" role="group" aria-label="運用 Agentic AI 使用 PaddleOCR 示範動畫">
+                    <div class="agentic-scene agentic-scene-paddleocr" data-agentic-scene aria-hidden="true">
+                      <div class="agentic-mac-window agentic-window-pyocr" data-agentic-window="pyocr">
+                        <div class="agentic-mac-titlebar" data-agentic-bring-front="pyocr"><span class="agentic-mac-dot red"></span><span class="agentic-mac-dot yellow"></span><span class="agentic-mac-dot green"></span><span class="agentic-window-title">PaddleOCR Python</span></div>
+                        <div class="agentic-window-body agentic-code" data-agentic-sequence>
+                          <script type="application/json" data-agentic-lines>
+                            [
+                              "<span class=\"kw\">from</span> paddleocr <span class=\"kw\">import</span> PaddleOCR",
+                              "ocr = <span class=\"fn\">PaddleOCR</span>(",
+                              "    lang=<span class=\"str\">\"chinese_cht\"</span>,",
+                              "    device=<span class=\"str\">\"cpu\"</span>,",
+                              "    use_doc_orientation_classify=<span class=\"kw\">False</span>,",
+                              "    use_doc_unwarping=<span class=\"kw\">False</span>,",
+                              "    use_textline_orientation=<span class=\"kw\">False</span>,",
+                              ")",
+                              "<span class=\"kw\">for</span> result <span class=\"kw\">in</span> ocr.<span class=\"fn\">predict</span>(<span class=\"str\">\"/path/to/image.png\"</span>):",
+                              "    result.<span class=\"fn\">print</span>()",
+                              "    result.<span class=\"fn\">save_to_json</span>(<span class=\"str\">\"/Users/creamybanana/Downloads/PaddleOCR-output\"</span>)",
+                              "    result.<span class=\"fn\">save_to_img</span>(<span class=\"str\">\"/Users/creamybanana/Downloads/PaddleOCR-output\"</span>)",
+                              "    data = result.json",
+                              "    <span class=\"kw\">for</span> text, score <span class=\"kw\">in</span> <span class=\"fn\">zip</span>(data[<span class=\"str\">\"rec_texts\"</span>], data[<span class=\"str\">\"rec_scores\"</span>]):",
+                              "        <span class=\"fn\">print</span>(f<span class=\"str\">\"{score:.3f}\\t{text}\"</span>)",
+                              "<span class=\"ok\">✓ OCR complete — JSON and annotated image saved</span>"
+                            ]
+                          </script>
+                        </div>
+                      </div>
+                      <div class="agentic-mac-window agentic-window-codex is-agentic-front" data-agentic-window="codex">
+                        <div class="agentic-mac-titlebar" data-agentic-bring-front="codex"><span class="agentic-mac-dot red"></span><span class="agentic-mac-dot yellow"></span><span class="agentic-mac-dot green"></span><span class="agentic-window-title">Codex</span></div>
+                        <div class="agentic-codex-user-row"><div class="agentic-codex-user-bubble">set up PaddleOCR on my mac, and use it to OCR '/Users/mymac/Downloads/Text/奏摺1.pdf'</div></div>
+                        <div class="agentic-window-body agentic-prose agentic-codex-body" data-agentic-codex-phases>
+                          <div class="agentic-codex-phase agentic-codex-thinking" data-agentic-codex-thinking>
+                            <div class="agentic-codex-status">Working…</div>
+                            <div class="agentic-codex-thinking-sequence" data-agentic-codex-thinking-sequence data-agentic-codex-char-delay="12" data-agentic-codex-line-delay="320">
+                              <script type="application/json" data-agentic-lines>
+                                [
+                                  "I’ll set up PaddleOCR in an isolated macOS virtual environment, run a first OCR test, and cover common Apple Silicon, Intel, and PDF/image issues. I’m checking the latest installation guide first since compatibility changes frequently.",
+                                  "<span class=\"meta-line\"><span class=\"ic\">⊙</span>Ran commands, searched the web</span>",
+                                  "I confirmed your Mac is Apple Silicon with Python 3.14 by default and Python 3.13 installed. Since PaddlePaddle supports Python 3.13, we’ll use that.",
+                                  "<span class=\"meta-line\"><span class=\"ic\">⊙</span>Read files, ran commands, searched the web</span>",
+                                  "I created an isolated virtual environment at ~/.venvs/paddleocr to keep it separate from your project and Python 3.14. I’m now installing PaddlePaddle and PaddleOCR.",
+                                  "<span class=\"meta-line\"><span class=\"ic\">⊙</span>Ran command</span>",
+                                  "Installation completed successfully (paddlepaddle 3.3.1, paddleocr 3.7.0). Next, I’m verifying the installation and running a quick OCR test, which will download the required models on first use."
+                                ]
+                              </script>
+                            </div>
+                          </div>
+                          <div class="agentic-codex-phase agentic-codex-result" data-agentic-codex-result hidden>
+                            <div class="agentic-codex-result-lines" data-agentic-codex-result-lines>
+                              <script type="application/json" data-agentic-lines>
+                                [
+                                  "<span class=\"agentic-codex-worked\">Worked for 5m 44s</span>",
+                                  "<span class=\"final-lead\">PaddleOCR is now installed and verified on your Apple Silicon Mac.</span>",
+                                  "<span class=\"final-label\">Installed:</span>",
+                                  "<span class=\"final-item\">PaddlePaddle <code>3.3.1</code></span>",
+                                  "<span class=\"final-item\">PaddleOCR <code>3.7.0</code></span>",
+                                  "<span class=\"final-item\">Python <code>3.13</code></span>",
+                                  "<span class=\"final-note\">Activate it whenever you want to use OCR.</span>"
+                                ]
+                              </script>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="story surface-a" id="part-3-material" data-tab="part-3" data-nav="#part-3-material">
+            <div class="story-inner">
+              <div class="part3-material-layout">
+                <article class="copybox blk" id="part-3-material-card">
+                  <div class="title-row"><span class="option-number">5</span><h2>OCR 前的材料準備</h2></div>
+                  <div class="body"><p>OCR 所處理的材料通常為 PDF 或 JPG、PNG、TIFF 等影像檔案。因此，如果史料為紙本書籍，研究者可先查找是否已有可合法使用的電子版本，若沒有，則需以掃描器或相機把書頁數位化，轉換為 PDF 等形式的影像檔案。</p><p class="part3-material-copyright-note">研究者應遵守所在地的版權法規及資料庫使用條款，優先使用公有領域、已獲授權或依法可供研究使用的材料。</p></div>
+                </article>
+                <div class="part3-material-visual">
+                  <div class="photo-gallery visual-frame part3-material-photo-gallery" data-photo-gallery data-photo-gallery-id="book-scanner">
+                    <div class="photo-gallery-stage"></div>
+                    <div class="photo-gallery-body"></div>
+                    <script type="application/json" data-photo-gallery-data>
+                    [{
+                      "image": "../Visual Material/book_scanner_202401.png",
+                      "alt": "理大數碼創意空間的書籍掃描器",
+                      "title": "理大圖書館中的掃描器",
+                      "paragraphs": [
+                        "理大圖書館四樓的書籍掃描器具備半自動掃描、影像校正及手指影像自動移除等功能，可協助同學掃描古籍和檔案史料。"
+                      ],
+                      "source": { "text": "詳見理大圖書館〈書籍掃描器〉網頁。", "href": "https://www.lib.polyu.edu.hk/makerspace/book-scanner" }
+                    }]
+                    </script>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="story surface-c" id="part-3-format" data-tab="part-3" data-nav="#part-3-format">
+            <div class="story-inner">
+              <div class="lay-stack">
+                <article class="blk" id="part-3-format-card">
+                  <div class="title-row"><span class="option-number">6</span><h2>檢視史料的版面及格式</h2></div>
+                  <div class="body">
+                    <p>要使用 PaddleOCR，研究者首先需要檢視史料的版面及格式，以便要求 Agentic AI 撰寫合適的 Python OCR 規則。</p>
+                    <p>研究者需要留意字體類型（印刷或手寫）、字體清晰度、文字方向（橫排或直排），以及文書結構，如標題、正文、批註、硃批和頁碼等。</p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </section>
+
+          <!-- 7 辨識印刷字：標題與說明佔滿版寬（不放在卡片框內），
+               下方為互動視覺元素：左半為書冊頁面（可翻頁），右半為該項版面特徵
+               對應的 AI 指示、Python 代碼與 JSON 輸出。資料見 data-part3-feature-data。 -->
+          <section class="story surface-c" id="part-3-printed" data-tab="part-3" data-nav="#part-3-printed">
+            <div class="story-inner">
+              <div class="lay-stack">
+                <article class="blk" id="part-3-printed-card">
+                  <div class="title-row"><span class="option-number">7</span><h2>辨識印刷字</h2></div>
+                  <div class="body">
+                    <p>印刷字的字形較為統一，因此較容易進行 OCR。然而，研究者仍需檢視史料的版面和格式，確認需要保留的結構，再要求 Agentic AI 撰寫相應的 Python OCR 規則。</p>
+                  </div>
+                </article>
+
+                <div class="part3-feature-explorer" id="part-3-printed-explorer" data-part3-explorer="printed">
+                  <div class="part3-fx-doc part3-fx-doc-pages">
+                    <div class="part3-fx-pagestack">
+                      <div class="part3-fx-page">
+                        <img data-part3-fx-img src="ocr-zhu25-printed-1-enhanced.png" alt="印刷本奏摺頁面" loading="lazy" decoding="async">
+                      </div>
+                      <div data-part3-fx-tags></div>
+                    </div>
+                    <div class="part3-fx-nav">
+                      <button type="button" data-part3-fx-prev aria-label="上一頁">←</button>
+                      <span class="part3-fx-ind" data-part3-fx-ind></span>
+                      <button type="button" data-part3-fx-next aria-label="下一頁">→</button>
+                    </div>
+                  </div>
+                  <div class="part3-fx-out" data-part3-fx-out></div>
+
+                  <script type="application/json" data-part3-feature-data>
+                  {
+                    "pages": ["ocr-zhu25-printed-1-enhanced.png", "ocr-zhu25-printed-2-enhanced.png"],
+                    "features": [
+                      {
+                        "key": "text-info", "page": 0, "image": "辨識印刷字Label/文本資訊.png", "colour": "#8fcfe0",
+                        "tag": {"right":"-132px","top":"14%"},
+                        "title": "文本資訊",
+                        "desc": "圖為《明清臺灣檔案彙編》的書影。每篇文本正文前均列有文本的資料，包括資料來源、標題、作者和日期。這些資料是後續檢索和分析的重要依據，因此應進行 OCR 辨識，並輸出為結構化的資料。",
+                        "prompt": "辨識正文前的文本資訊：史料來源、標題、作者、日期，\n並把這四項資料輸出為結構化的資料。\n不要把文本資訊混入正文當中。",
+                        "py": "<span class=\"cmt\"># 先抽取文本資訊，再處理正文</span>\nheader = <span class=\"fn\">extract_header</span>(result)\ndoc = {\n    <span class=\"str\">\"source\"</span>: <span class=\"str\">\"《明清臺灣檔案彙編》第30冊\"</span>,\n    <span class=\"str\">\"title\"</span>:  header[<span class=\"str\">\"title\"</span>],\n    <span class=\"str\">\"author\"</span>: header[<span class=\"str\">\"author\"</span>],\n    <span class=\"str\">\"date\"</span>:   header[<span class=\"str\">\"date\"</span>],\n}",
+                        "json": "{\n  <span class=\"jkey\">\"source\"</span>: <span class=\"jstr\">\"《明清臺灣檔案彙編》第30冊\"</span>,\n  <span class=\"jkey\">\"title\"</span>: <span class=\"jstr\">\"為奏彰化失陷已調兵赴臺事\"</span>,\n  <span class=\"jkey\">\"author\"</span>: <span class=\"jstr\">\"福建水師提督 黃仕簡\"</span>,\n  <span class=\"jkey\">\"date\"</span>: <span class=\"jstr\">\"乾隆五十一年十二月初十日\"</span>\n}"
+                      },
+                      {
+                        "key": "single-column", "page": 0, "image": "辨識印刷字Label/直排單欄.png", "colour": "#82adef",
+                        "tag": {"right":"-132px","top":"36%"},
+                        "title": "直排單欄",
+                        "desc": "《明清臺灣檔案彙編》採用單欄印刷，閱讀方向由右至左、由上至下。OCR 必須按此順序輸出文字，而非由左至右的閱讀方式。",
+                        "prompt": "按照由右至左、由上至下的順序輸出文本。",
+                        "py": "<span class=\"cmt\"># 單欄印刷：由右至左、由上至下排序</span>\nregions = <span class=\"fn\">sorted</span>(\n    data[<span class=\"str\">\"raw_regions\"</span>],\n    key=<span class=\"kw\">lambda</span> r: (-r[<span class=\"str\">\"box\"</span>][<span class=\"num\">0</span>], r[<span class=\"str\">\"box\"</span>][<span class=\"num\">1</span>])\n)",
+                        "json": "{\n  <span class=\"jkey\">\"layout\"</span>: <span class=\"jstr\">\"single_column\"</span>,\n  <span class=\"jkey\">\"reading_order\"</span>: <span class=\"jstr\">\"right_to_left_top_to_bottom\"</span>,\n  <span class=\"jkey\">\"column_count\"</span>: <span class=\"jnum\">1</span>,\n  <span class=\"jkey\">\"text\"</span>: <span class=\"jstr\">\"福建水師提督一等海澄公奴才黃仕簡謹奏，為奏聞事。竊照臺灣近來屢有匪徒滋事，奴才時刻留心察查，不敢稍有懈忽。茲本年十二月初五日戌刻，訪聞得臺灣彰化縣屬又有匪徒聚集會黨，於十一月二十九日辰刻，攻打彰化縣城。至午刻，縣城被陷，文武官員不知生死之事。……\"</span>\n}"
+                      },
+                      {
+                        "key": "paragraphs", "page": 0, "image": "辨識印刷字Label/分段.png", "colour": "#8e77dd",
+                        "tag": {"right":"-132px","top":"58%"},
+                        "title": "分段",
+                        "desc": "《明清臺灣檔案彙編》以縮排分隔段落。OCR 時需要辨認縮排，保留每段完整內容，不要合併不同段落。",
+                        "prompt": "請辨認段首縮排，以縮排區分段落，\n保留每段完整內容，\n不要因一般換行而錯誤切斷段落。",
+                        "py": "<span class=\"cmt\"># 以縮排辨識段落，不把每個直欄誤切成新段落</span>\nparagraphs = <span class=\"fn\">split_paragraphs_by_indent</span>(\n    reading_order_regions,\n    indent_tolerance=<span class=\"num\">12</span>\n)\nbody = <span class=\"str\">\"\\n\\n\"</span>.<span class=\"fn\">join</span>(paragraphs)",
+                        "json": "{\n  <span class=\"jkey\">\"paragraph_break\"</span>: <span class=\"jstr\">\"indentation\"</span>,\n  <span class=\"jkey\">\"paragraph_count\"</span>: <span class=\"jnum\">2</span>,\n  <span class=\"jkey\">\"printed_pages\"</span>: [<span class=\"jnum\">80</span>, <span class=\"jnum\">81</span>],\n  <span class=\"jkey\">\"paragraphs\"</span>: [\n    {<span class=\"jkey\">\"paragraph_number\"</span>: <span class=\"jnum\">1</span>, <span class=\"jkey\">\"text\"</span>: <span class=\"jstr\">\"竊照臺灣近來屢有匪徒滋事，奴才時刻留心察查，不敢稍有懈忽。茲本年十二月初五日戌刻，訪聞得臺灣彰化縣屬又有匪徒聚集會黨，於十一月二十九日辰刻，攻打彰化縣城。至午刻，縣城被陷，文武官員不知生死之事。查臺灣不法民番，甫經兩次大加懲治乃該匪等竟膽敢聚眾攻陷城池。……\"</span>},\n    {<span class=\"jkey\">\"paragraph_number\"</span>: <span class=\"jnum\">2</span>, <span class=\"jkey\">\"text\"</span>: <span class=\"jstr\">\"查，奴才原擬淡水一路，已屬必須由此救援夾攻。省城直對淡水，際此北風當令，渡往甚易。除星飛咨行陸路提臣水師海壇閩安烽火各鎮協營，立就近省營分續調官兵北路援剿。奴才直由鹿耳門郡城南路進兵，會督夾攻。……\"</span>}\n  ]\n}"
+                      },
+                      {
+                        "key": "page", "page": 0, "image": "辨識印刷字Label/頁碼.png", "colour": "#bd70de",
+                        "tag": {"right":"-132px","top":"90%"},
+                        "title": "頁碼",
+                        "desc": "頁碼位於頁面右下角。為方便日後引用與查考，每一頁、每一份奏摺的頁碼都要 OCR，並以結構化的形式保存。",
+                        "prompt": "請辨識每一頁右下角的頁碼，\n並儲存於獨立欄位，不要納入正文。",
+                        "py": "<span class=\"cmt\"># 擷取所有頁碼，與正文分開保存</span>\npage_numbers = []\n<span class=\"kw\">for</span> page_result <span class=\"kw\">in</span> pages:\n    number = <span class=\"fn\">match_page_number</span>(page_result, corner=<span class=\"str\">\"bottom_right\"</span>)\n    page_numbers.<span class=\"fn\">append</span>(number)\ndoc[<span class=\"str\">\"printed_page_numbers\"</span>] = page_numbers",
+                        "json": "{\n  <span class=\"jkey\">\"page\"</span>: <span class=\"jnum\">80</span>,\n  <span class=\"jkey\">\"printed_page_numbers\"</span>: [<span class=\"jnum\">80</span>, <span class=\"jnum\">81</span>],\n  <span class=\"jkey\">\"page_in_body\"</span>: <span class=\"jstr\">\"removed\"</span>\n}"
+                      },
+                      {
+                        "key": "mark", "page": 0, "image": "辨識印刷字Label/標題符號.png", "colour": "#d980a0",
+                        "tag": {"left":"-124px","top":"5%"},
+                        "title": "標題符號",
+                        "desc": "這份 PDF 的標點符號清晰可見，容易辨識。然而，其他PDF的標點符號可能會比較模糊，影響 OCR 結果。因此，完成 OCR 後，研究者應人工核對標點符號，或要求 AI 協助檢查標點。",
+                        "prompt": "保留所有的標點符號，\n標記模糊或低辨識信心的標點，供後續檢查。",
+                        "py": "<span class=\"cmt\"># 標題符號清晰度不固定：保留後續檢查標記</span>\nsymbol = <span class=\"fn\">detect_title_mark</span>(image)\nreview_needed = symbol.confidence &lt; <span class=\"num\">0.90</span>\ndoc[<span class=\"str\">\"title_mark\"</span>] = {\n    <span class=\"str\">\"present\"</span>: symbol.found,\n    <span class=\"str\">\"confidence\"</span>: <span class=\"fn\">round</span>(symbol.confidence, <span class=\"num\">3</span>),\n    <span class=\"str\">\"review_needed\"</span>: review_needed\n}",
+                        "json": "{\n  <span class=\"jkey\">\"title_mark\"</span>: {\n    <span class=\"jkey\">\"present\"</span>: <span class=\"jstr\">\"true\"</span>,\n    <span class=\"jkey\">\"clarity\"</span>: <span class=\"jstr\">\"clear_in_this_pdf\"</span>,\n    <span class=\"jkey\">\"review_needed\"</span>: <span class=\"jstr\">\"manual_or_ai_check\"</span>\n  },\n  <span class=\"jkey\">\"text\"</span>: <span class=\"jstr\">\"竊照臺灣近來屢有匪徒滋事，奴才時刻留心察查，不敢稍有懈忽。茲本年十二月初五日戌刻，訪聞得臺灣彰化縣屬又有匪徒聚集會黨，於十一月二十九日辰刻，攻打彰化縣城。至午刻，縣城被陷，文武官員不知生死之事。查臺灣不法民番，甫經兩次大加懲治乃該匪等竟膽敢聚眾攻陷城池。……\"</span>\n}"
+                      },
+                      {
+                        "key": "inline-zhu", "page": 1, "image": "辨識印刷字Label/夾批.png", "colour": "#e6ada4",
+                        "tag": {"left":"-132px","top":"38%"},
+                        "title": "夾批",
+                        "desc": "正文內有小字夾註的皇帝硃批「仍以調養為要，勿過勞」。應保留硃批的原文和位置，並在輸出的結果中明確標記為皇帝的硃批。",
+                        "prompt": "正文中（硃批：）內的小字是皇帝的硃批。\n保留這些文字，並標記為皇帝的硃批，\n不要將其視為官員的原文。",
+                        "py": "<span class=\"cmt\"># 小字夾批另存為皇帝硃批，不併入官員正文</span>\ninline_zhu = <span class=\"fn\">find_inline_annotation</span>(\n    text, pattern=<span class=\"str\">\"仍以調養為要\"</span>\n)\ndoc[<span class=\"str\">\"zhu\"</span>] = {\n    <span class=\"str\">\"text\"</span>: inline_zhu.text,\n    <span class=\"str\">\"type\"</span>: <span class=\"str\">\"emperor_rescript\"</span>\n}\nbody = <span class=\"fn\">remove_annotation</span>(text, inline_zhu)",
+                        "json": "{\n  <span class=\"jkey\">\"zhu\"</span>: {\n    <span class=\"jkey\">\"text\"</span>: <span class=\"jstr\">\"仍以調養為要，勿過勞\"</span>,\n    <span class=\"jkey\">\"type\"</span>: <span class=\"jstr\">\"emperor_rescript\"</span>,\n    <span class=\"jkey\">\"in_original_body\"</span>: <span class=\"jstr\">\"false\"</span>\n  }\n}"
+                      },
+                      {
+                        "key": "tail-zhu", "page": 1, "image": "辨識印刷字Label/落款與尾批.png", "colour": "#dfc484",
+                        "tag": {"left":"-132px","top":"60%"},
+                        "title": "落款與尾批",
+                        "desc": "正文後有兩行日期，第一行是官員上奏的日期，另一行是皇帝硃批的日期與尾批。在輸出的結果中，兩者都應與正文分開保存，方便日後分析。",
+                        "prompt": "正文結束後有兩行日期：官員上奏日期、皇帝硃批日期，以及尾批。\n辨識並分別保存這三項資料，不要將把它們納入正文。",
+                        "py": "<span class=\"cmt\"># 落款日期、硃批日期與尾批分開抽取</span>\nfooter = <span class=\"fn\">extract_footer</span>(result)\ndoc[<span class=\"str\">\"footer\"</span>] = {\n    <span class=\"str\">\"send_date\"</span>: footer[<span class=\"str\">\"send_date\"</span>],\n    <span class=\"str\">\"zhu_date\"</span>: footer[<span class=\"str\">\"zhu_date\"</span>],\n    <span class=\"str\">\"zhu_text\"</span>: footer[<span class=\"str\">\"zhu_text\"</span>]\n}",
+                        "json": "{\n  <span class=\"jkey\">\"footer\"</span>: {\n    <span class=\"jkey\">\"send_date\"</span>: <span class=\"jstr\">\"乾隆五十一年十二月初十日\"</span>,\n    <span class=\"jkey\">\"zhu_date\"</span>: <span class=\"jstr\">\"乾隆五十一年十二月二十七日\"</span>,\n    <span class=\"jkey\">\"zhu_text\"</span>: <span class=\"jstr\">\"已有旨了。欽此。\"</span>\n  },\n  <span class=\"jkey\">\"footer_in_body\"</span>: <span class=\"jstr\">\"false\"</span>\n}"
+                      }
+                    ]
+                  }
+                  </script>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 8 辨識手寫字：標題與說明佔滿版寬。左半為原件的風琴摺展開效果
+               （4 張掃描各分 3 摺、共 12 摺，每次展開一組兩摺），右半與 7 相同。 -->
+          <section class="story surface-a" id="part-3-handwritten" data-tab="part-3" data-nav="#part-3-handwritten">
+            <div class="story-inner">
+              <div class="lay-stack">
+                <article class="blk" id="part-3-handwritten-card">
+                  <div class="title-row"><span class="option-number">8</span><h2>辨識手寫字</h2></div>
+                  <div class="body">
+                    <p>和印刷文本相比，手寫史料的 OCR 辨識難度較高，但並非完全無法辨識。</p>
+                  </div>
+                </article>
+
+                <div class="part3-feature-explorer" id="part-3-handwritten-explorer" data-part3-explorer="folded">
+                  <div class="part3-fx-doc part3-fx-doc-folded">
+                    <div class="part3-fx-striparea">
+                      <div class="part3-fx-strip" data-part3-fx-strip></div>
+                      <div data-part3-fx-tags></div>
+                    </div>
+                    <div class="part3-fx-nav">
+                      <button type="button" data-part3-fx-prev aria-label="向右收摺">←</button>
+                      <span class="part3-fx-ind" data-part3-fx-ind></span>
+                      <button type="button" data-part3-fx-next aria-label="向左展開">→</button>
+                    </div>
+                  </div>
+                  <div class="part3-fx-out" data-part3-fx-out></div>
+
+                  <script type="application/json" data-part3-feature-data>
+                  {
+                    "sheets": ["ocr-zhu25-handwritten-1-enhanced.png", "ocr-zhu25-handwritten-2-enhanced.png", "ocr-zhu25-handwritten-3-enhanced.png", "ocr-zhu25-handwritten-4-enhanced.png"],
+                    "foldAspect": "344 / 747",
+                    "features": [
+                      {
+                        "key": "vertical", "panel": 0, "image": "辨識手寫字Label/直排單欄.png", "colour": "#7fb5b1",
+                        "tag": {"right":"-142px","top":"6%"},
+                        "title": "直排單欄",
+                        "desc": "奏摺採用直排書寫，閱讀方向由右至左、由上至下。OCR 必須按此順序輸出文字，而非由左至右的閱讀方式。",
+                        "prompt": "奏摺用直排書寫，閱讀方向由右至左、由上至下。\n按此順序輸出文字，而非由左至右。",
+                        "py": "<span class=\"cmt\"># 直排、由右至左：指定文字方向與排序規則</span>\nboxes = <span class=\"fn\">sorted</span>(\n    result.boxes,\n    key=<span class=\"kw\">lambda</span> b: (-b.x_center, b.y_top),  <span class=\"cmt\"># x 由大到小 = 由右至左</span>\n)",
+                        "json": "{\n  <span class=\"jkey\">\"text_direction\"</span>: <span class=\"jstr\">\"vertical_rtl\"</span>,\n  <span class=\"jkey\">\"column_count\"</span>: <span class=\"jnum\">9</span>,\n  <span class=\"jkey\">\"text\"</span>: <span class=\"jstr\">\"竊照臺灣近來屢有匪徒滋事奴才時刻留心察查不敢稍有懈忽茲本年十二月初五日戌刻訪聞得臺灣彰化縣屬又有匪徒聚集會黨於十一月二十九日辰刻攻打彰化縣城至午刻縣城被陷文武官員不知生死之事查臺灣不法民番甫經兩次大加懲治乃該匪等竟膽敢聚眾攻陷城池\"</span>\n}"
+                      },
+                      {
+                        "key": "regular-script", "panel": 0, "image": "辨識手寫字Label/正文字體.png", "colour": "#a28ca8",
+                        "tag": {"right":"-142px","top":"20%"},
+                        "title": "正文字體",
+                        "desc": "這份奏摺採用楷書書寫，字跡清晰，字與字、行與行之間間距明確，且字體大小一致，容易進行 OCR 辨識。。",
+                        "prompt": "請辨識奏摺中的所有中文字，並按照原有順序輸出。\n不要輸出任何其他語言的文字和阿拉伯數字。 ",
+                        "py": "<span class=\"cmt\"># 楷書正文：清楚字距與行距有助於 OCR</span>\nbody_regions = [\n    r <span class=\"kw\">for</span> r <span class=\"kw\">in</span> regions\n    <span class=\"kw\">if</span> r.script == <span class=\"str\">\"regular_kai_shu\"</span>\n]\nbody = <span class=\"fn\">ocr</span>(body_regions, preserve_order=<span class=\"kw\">True</span>)",
+                        "json": "{\n  <span class=\"jkey\">\"body_script\"</span>: <span class=\"jstr\">\"regular_kai_shu\"</span>,\n  <span class=\"jkey\">\"legibility\"</span>: <span class=\"jstr\">\"clear\"</span>,\n  <span class=\"jkey\">\"word_spacing\"</span>: <span class=\"jstr\">\"clear\"</span>,\n  <span class=\"jkey\">\"line_spacing\"</span>: <span class=\"jstr\">\"clear\"</span>,\n  <span class=\"jkey\">\"ocr_possible\"</span>: <span class=\"jstr\">\"true\"</span>,\n  <span class=\"jkey\">\"text\"</span>: <span class=\"jstr\">\"竊照臺灣近來屢有匪徒滋事奴才時刻留心察查不敢稍有懈忽茲本年十二月初五日戌刻訪聞得臺灣彰化縣屬又有匪徒聚集會黨於十一月二十九日辰刻攻打彰化縣城至午刻縣城被陷文武官員不知生死之事查臺灣不法民番甫經兩次大加懲治乃該匪等竟膽敢聚眾攻陷城池\"</span>\n}"
+                      },
+                      {
+                        "key": "author", "panel": 0, "image": "辨識手寫字Label/上奏官員.png", "colour": "#c88f8a",
+                        "tag": {"right":"-142px","top":"72%"},
+                        "title": "上奏官員",
+                        "desc": "奏摺第二頁首行註明上奏官員的官職與姓名「福建水師提督黃仕簡」。OCR 時應辨識並獨立標記這項作者資料，不要與正文混合。",
+                        "prompt": "奏摺第二頁的首行通常會標有上奏官員的官職和姓名，\n例如「福建水師提督 黃仕簡」。\n辨識並獨立標記官職與姓名。",
+                        "py": "<span class=\"cmt\"># 從第二頁首行抽取上奏官員</span>\nauthor_line = <span class=\"fn\">first_line</span>(page_results[<span class=\"num\">1</span>])\ndoc[<span class=\"str\">\"author\"</span>] = <span class=\"fn\">parse_author</span>(author_line)",
+                        "json": "{\n  <span class=\"jkey\">\"author\"</span>: {\n    <span class=\"jkey\">\"office\"</span>: <span class=\"jstr\">\"福建水師提督\"</span>,\n    <span class=\"jkey\">\"name\"</span>: <span class=\"jstr\">\"黃仕簡\"</span>\n  },\n  <span class=\"jkey\">\"saved_individually\"</span>: <span class=\"jstr\">\"true\"</span>\n}"
+                      },
+                      {
+                        "key": "minister", "panel": 0, "image": "辨識手寫字Label/臣字款.png", "colour": "#6e98d0",
+                        "tag": {"left":"-134px","top":"34%"},
+                        "title": "臣字款（小字自稱）",
+                        "desc": "官員在文中自稱「奴才」或「臣」時以小字偏右書寫，字體小於正文。這些字也要作正文一部份進行 OCR。",
+                        "prompt": "正文中的「奴才」或「臣」以較小字體書寫，但仍屬正文一部份。\n請保留它們於原有位置，不要省略或刪除。",
+                        "py": "<span class=\"cmt\"># 臣字款：辨識小字，但保留在正文 body</span>\nsmall_self_refs = [b <span class=\"kw\">for</span> b <span class=\"kw\">in</span> boxes <span class=\"kw\">if</span> b.height &lt; median_height * <span class=\"num\">0.7</span>]\nbody = <span class=\"fn\">ocr</span>(boxes, preserve_order=<span class=\"kw\">True</span>)\nself_reference = <span class=\"fn\">find_terms</span>(body, terms=[<span class=\"str\">\"奴才\"</span>, <span class=\"str\">\"臣\"</span>])",
+                        "json": "{\n  <span class=\"jkey\">\"self_reference\"</span>: [<span class=\"jstr\">\"奴才\"</span>, <span class=\"jstr\">\"臣\"</span>],\n  <span class=\"jkey\">\"style\"</span>: <span class=\"jstr\">\"small_inline\"</span>,\n  <span class=\"jkey\">\"in_body\"</span>: <span class=\"jstr\">\"true\"</span>\n}"
+                      },
+                      {
+                        "key": "respect", "panel": 4, "image": "辨識手寫字Label/抬頭.png", "colour": "#d97967",
+                        "tag": {"right":"-142px","top":"38%"},
+                        "title": "抬頭",
+                        "desc": "當提及皇帝時，官員會另起一行並提高書寫位置，這種格式稱為「抬頭」。「抬頭」會把同一句話拆成兩行，OCR 需要把分隔的文字重新合併。",
+                        "prompt": "辨識「抬頭」格式，並把另起一行的抬頭文字合併回正文。",
+                        "py": "<span class=\"cmt\"># 合併因抬頭而斷開的行</span>\nmerged, breaks = [], []\n<span class=\"kw\">for</span> i, col <span class=\"kw\">in</span> <span class=\"fn\">enumerate</span>(columns):\n    <span class=\"kw\">if</span> col.top &lt; page_top + <span class=\"num\">20</span>:  <span class=\"cmt\"># 位置抬高 = 抬頭</span>\n        breaks.<span class=\"fn\">append</span>(i)\n        merged[-<span class=\"num\">1</span>] += col.text\n    <span class=\"kw\">else</span>:\n        merged.<span class=\"fn\">append</span>(col.text)",
+                        "json": "{\n  <span class=\"jkey\">\"honorific_breaks\"</span>: [<span class=\"jnum\">3</span>, <span class=\"jnum\">11</span>],\n  <span class=\"jkey\">\"merged_sentences\"</span>: <span class=\"jnum\">2</span>\n}"
+                      },
+                      {
+                        "key": "rescript", "panel": 4, "image": "辨識手寫字Label/硃批.png", "colour": "#c86f62",
+                        "tag": {"left":"-142px","top":"58%"},
+                        "title": "硃批（草書）",
+                        "desc": "硃批以草書書寫，連筆多、字形變化大，辨識準確率低。OCR 時應先辨識紅色筆跡範圍，並把它與正文分開，留待人工判讀。",
+                        "prompt": "尋找紅色的硃批文字，不要對它們進行ocr。",
+                        "py": "<span class=\"cmt\"># 硃批：以紅色筆跡定位，不強行辨識草書</span>\nred = <span class=\"fn\">detect_red_ink</span>(image)\ndoc[<span class=\"str\">\"rescript\"</span>] = {\n    <span class=\"str\">\"bbox\"</span>: red.bbox,\n    <span class=\"str\">\"text\"</span>: <span class=\"str\">\"\"</span>,\n    <span class=\"str\">\"needs_manual_reading\"</span>: <span class=\"kw\">True</span>\n}",
+                        "json": "{\n  <span class=\"jkey\">\"rescript\"</span>: {\n    <span class=\"jkey\">\"text\"</span>: <span class=\"jstr\">\"\"</span>,\n    <span class=\"jkey\">\"script\"</span>: <span class=\"jstr\">\"cursive\"</span>,\n    <span class=\"jkey\">\"needs_manual_reading\"</span>: <span class=\"jstr\">\"true\"</span>\n  }\n}"
+                      },
+                      {
+                        "key": "watermark", "panel": 10, "image": "辨識手寫字Label/浮水印.png", "colour": "#d7c47d",
+                        "tag": {"right":"-142px","top":"56%"},
+                        "title": "浮水印",
+                        "desc": "奏摺的PDF來源自臺北國立故宮博物院的電子資料庫，因此有「國立故宮博物院」及「NATIONAL PALACE MUSEUM」浮水印。不應對它們進行OCR。",
+                        "prompt": "忽略「國立故宮博物院」和「NATIONAL PALACE MUSEUM」的浮水印。",
+                        "py": "<span class=\"cmt\"># 浮水印：先遮蔽中英文機構名稱，再進行 OCR</span>\nwatermark = [<span class=\"str\">\"國立故宮博物院\"</span>, <span class=\"str\">\"NATIONAL PALACE MUSEUM\"</span>]\nimage = <span class=\"fn\">mask_text_regions</span>(image, watermark)\nocr = <span class=\"fn\">PaddleOCR</span>()",
+                        "json": "{\n  <span class=\"jkey\">\"watermark\"</span>: [<span class=\"jstr\">\"國立故宮博物院\"</span>, <span class=\"jstr\">\"NATIONAL PALACE MUSEUM\"</span>],\n  <span class=\"jkey\">\"excluded_from_text\"</span>: <span class=\"jstr\">\"true\"</span>\n}"
+                      },
+                      {
+                        "key": "stamp", "panel": 10, "image": "辨識手寫字Label/印章.png", "colour": "#d89a7e",
+                        "tag": {"left":"-142px","top":"10%"},
+                        "title": "印章",
+                        "desc": "奏摺正文後蓋有印章，不應對它們進行OCR。",
+                        "prompt": "忽略奏摺正文後的印章。",
+                        "py": "<span class=\"cmt\"># 印章：遮蔽圖像區域，不送入文字辨識</span>\nstamp = <span class=\"fn\">detect_stamp</span>(image, region=<span class=\"str\">\"top_left\"</span>)\nimage = <span class=\"fn\">mask_region</span>(image, stamp.bbox)\nocr = <span class=\"fn\">PaddleOCR</span>()",
+                        "json": "{\n  <span class=\"jkey\">\"stamp\"</span>: {\n    <span class=\"jkey\">\"page\"</span>: <span class=\"jnum\">6</span>,\n    <span class=\"jkey\">\"position\"</span>: <span class=\"jstr\">\"top_left\"</span>\n  },\n  <span class=\"jkey\">\"excluded_from_text\"</span>: <span class=\"jstr\">\"true\"</span>\n}"
+                      }
+                    ]
+                  }
+                  </script>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="story surface-b part3-json-split" id="part-3-json" data-tab="part-3" data-nav="#part-3-json">
+            <div class="story-inner">
+              <div class="lay-split text-left" style="--vis-w: 56%;">
+                <div class="lay-copy">
+                  <article class="copybox blk" id="part-3-json-card"><div class="title-row"><span class="option-number">9</span><h2>輸出格式：JSON</h2></div><div class="body"><p>除了設定版面辨識的規則外，研究者亦應要求 Agentic AI 把 OCR 結果輸出為 JSON的格式。</p><p>JSON 是一種常用的結構化資料格式，能以「欄位－內容」的方式儲存資料，方便 Python、AI 及網站讀取和處理資料，亦有利於後續的搜尋、分析和視覺化。</p></div></article>
+                </div>
+                <div class="lay-visual">
+                  <div class="part3-json-viewer-wrap" id="part-3-json-chart" role="group" aria-label="輸出格式：JSON——硃25 完整 OCR JSON">
+                    <div class="part3-json-label-carousel" role="group" aria-label="JSON欄位導覽">
+                      <button type="button" class="part3-json-nav" data-json-nav="prev" aria-label="上一個欄位" title="上一個欄位">‹</button>
+                      <div class="part3-json-label-viewport">
+                        <div class="part3-json-labels">
+                      <button type="button" class="part3-json-label" data-json-target="loc-source">來源</button>
+                      <button type="button" class="part3-json-label" data-json-target="loc-title">標題</button>
+                      <button type="button" class="part3-json-label" data-json-target="loc-official-post">官職</button>
+                      <button type="button" class="part3-json-label" data-json-target="loc-author">姓名</button>
+                      <button type="button" class="part3-json-label" data-json-target="loc-sent-date">具奏日期</button>
+                      <button type="button" class="part3-json-label" data-json-target="loc-zhu-date">硃批日期</button>
+                      <button type="button" class="part3-json-label" data-json-target="loc-zhu-text">硃批內容</button>
+                      <button type="button" class="part3-json-label" data-json-target="loc-pages">頁碼</button>
+                      <button type="button" class="part3-json-label" data-json-target="loc-para-0">段落一</button>
+                      <button type="button" class="part3-json-label" data-json-target="loc-para-1">段落二</button>
+                      <button type="button" class="part3-json-label" data-json-target="loc-para-2">段落三</button>
+                        </div>
+                      </div>
+                      <button type="button" class="part3-json-nav" data-json-nav="next" aria-label="下一個欄位" title="下一個欄位">›</button>
+                    </div>
+                    <div class="part3-json-window">
+                      <div class="part3-json-titlebar"><span class="part3-json-dot red"></span><span class="part3-json-dot yellow"></span><span class="part3-json-dot green"></span><span class="part3-json-file">硃25.ocr.json</span></div>
+                      <div class="part3-json-body" id="part-3-json-body">
+<span class="line">{</span>
+<span class="line"><span class="loc" id="loc-source">  <span class="key">"source"</span>: <span class="str">"《明清臺灣檔案彙編》第30冊"</span>,</span></span>
+<span class="line"><span class="loc" id="loc-title">  <span class="key">"title"</span>: <span class="str">"為奏彰化失陷已調兵赴臺事"</span>,</span></span>
+<span class="line"><span class="loc" id="loc-official-post">  <span class="key">"official_post"</span>: <span class="str">"福建水師提督"</span>,</span></span>
+<span class="line"><span class="loc" id="loc-author">  <span class="key">"author"</span>: <span class="str">"黃仕簡"</span>,</span></span>
+<span class="line"><span class="loc" id="loc-sent-date">  <span class="key">"sent_date"</span>: <span class="str">"乾隆五十一年十二月初十日"</span>,</span></span>
+<span class="line"><span class="loc" id="loc-zhu-date">  <span class="key">"zhu_date"</span>: <span class="str">"乾隆五十一年十二月二十七日"</span>,</span></span>
+<span class="line"><span class="loc" id="loc-zhu-text">  <span class="key">"zhu_text"</span>: <span class="str">"已有旨了。欽此。"</span>,</span></span>
+<span class="line"><span class="loc" id="loc-pages">  <span class="key">"page_numbers"</span>: [<span class="str">"80"</span>, <span class="str">"81"</span>],</span></span>
+<span class="line">  <span class="key">"paragraphs"</span>: [</span>
+<span class="line"><span class="loc" id="loc-para-0">    <span class="str">"福建水師提督一等海澄公奴才黃仕簡謹奏，為奏聞事。"</span>,</span></span>
+<span class="line"><span class="loc" id="loc-para-1">    <span class="str">"<span class="para-visible">竊照臺灣近來屢有匪徒滋事，奴才時刻留心察查，不敢稍有懈忽。茲本年十二月初五日戌刻，訪聞得臺灣彰化縣屬又有匪徒聚集會黨，於十一月二十九日辰刻，攻打彰化縣城。至午刻，縣城被陷，文武官員不知生死之事。查臺灣不法民番，甫經兩次大加懲治乃該匪等竟膽敢聚眾攻陷城池。其謀為不軌，肆行無忌，烏合之眾，自必甚多，罪惡至此已極，殊堪痛恨。</span><span class="para-hidden" data-para-rest="para-1-rest" hidden>雖未准臺灣鎮道等報到，未知虛實，急當預為查辦征剿。奴才一面委令提標右營遊擊邱維揚，先帶兵二百名渡臺，確查賊匪共有若干，為首者何人，作何起釁，四近村莊有無擾害，臺地文武曾否業已收復城池，首夥均行捕獲，如尚有散逃，協同追拿盡淨。一面飭令挑選提標五營員弁及備戰兵丁一千名，配足軍火器械，封備商哨船只齊足。奴才冬間舊染風症雖復時愈時發現在心神氣力不能如常，但仰蒙聖主深恩，值海疆緊要事務，當即力疾星速親赴該地剿捕所有廈門地方札達督臣檄委金門鎮總兵羅英笈，就近前來彈壓照應。又慮賊匪聞拿竄逃內地，飛札撫臣陸路提臣藩臬兩司興泉道及水師各鎮協營並臺灣鎮道一體嚴飭營縣在於各口岸要隘，堵緝盤拿。仍擬續調水陸官兵酌由鹿耳門淡水南北兩路夾攻在案。現在派撥本標五營官兵，軍械船隻均點驗齊備，未據臺地報到事宜緊急救援。奴才於初十日帶領官兵登舟候風放洋飛渡之際，接據署北路淡水同知程峻守備董得魁會稟稱，彰化縣匪犯林爽文等，結黨肆虐擒捕未獲。十一月二十九日，彰邑大肚社番字寄淡屬大甲社通事據稱，本月二十七日夜本縣俞在大墩地方拿匪被害二十九早，彰城失陷，卑職等督同兵役，整齊槍炮，募集鄉勇社番，在於扼要「處所，分頭堵禦，一面救援。第兵力單薄道路隔絕伏祈迅發大兵拯救再彰城失陷被害文武官員若干，此時探聽維艱未知的實，俟查確另稟。等情前來。</span><button class="para-toggle" type="button" data-para-toggle="para-1-rest" aria-label="展開" title="展開">...</button>"</span>,</span></span>
+<span class="line"><span class="loc" id="loc-para-2">    <span class="str">"查，奴才原擬淡水一路，已屬必須由此救援夾攻。省城直對淡水，際此北風當令，渡往甚易。除星飛咨行陸路提臣水師海壇閩安烽火各鎮協營，立就近省營分續調官兵北路援剿。奴才直由鹿耳門郡城南路進兵，會督夾攻。容俟在接實在情形具奏外，合將聞報彰化賊匪殺官陷城，及奴才辦理赴剿緣由，謹先恭摺由驛六百里奏聞，伏乞皇上睿鑒。謹奏。"</span></span></span>
+<span class="line">  ]</span>
+<span class="line">}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="story surface-c part3-test-split" id="part-3-test" data-tab="part-3" data-nav="#part-3-test">
+            <div class="story-inner">
+              <div class="lay-split text-left" style="--vis-w: 46%;">
+                <div class="lay-copy">
+                  <article class="copybox blk" id="part-3-test-card"><div class="title-row"><span class="option-number">10</span><h2>OCR測試</h2></div><div class="body"><p>完成 Python OCR 程式後，研究者可注意 Agentic AI 執行 OCR，但建議先以 1 至 5 頁史料作為測試。</p><p>研究者應檢查OCR能否正確辨識文字和格式，並根據測試結果修正 Python 規則。若沒有明顯錯誤，便可開始進行完整史料的 OCR。</p><p>為避免程式中斷和方便檢查，建議把大型史料分批處理，例如每次處理 50 頁，完成一批後先檢查 結果，再繼續處理下一批。</p></div></article>
+                </div>
+                <div class="lay-visual">
+                  <!-- 批次掃描／驗證動畫。所有尺寸、顏色在 storymap-cards.css 的
+                       #part-3-test .batch-scene 區塊調整；時間快慢在 storymap.js 的
+                       initBatchTestScene() 裡。四份文書內容逐字取自 stage1_original_text.json。 -->
+                  <div class="batch-scene" data-batch-scene aria-hidden="true">
+                    <div class="batch-track" data-batch-track></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 11 試一試：左半為史料（只有標示區、不顯示標籤），右半為闖關式資訊面板。
+               三個步驟：下載史料 → 逐句組 prompt（Codex 視窗）→ 比對 OCR 結果。
+               引導文字固定在面板底部的 RPG 對話框，互動選項都在引導文字下方。
+               所有可調尺寸、顏色、標示區位置寫在 storymap-cards.css 的
+               「Part 3.4.10 — 試一試」區塊；本檔只放內容資料。 -->
+          <section class="story surface-a" id="part-3-try" data-tab="part-3" data-nav="#part-3-try">
+            <div class="story-inner">
+              <div class="lay-stack">
+                <article class="blk" id="part-3-try-card">
+                  <div class="title-row">
+                    <span class="option-number">11</span><h2>試一試</h2>
+                    <div class="part3-try-switch" data-part3-try-switch role="group" aria-label="切換印刷字或手寫字">
+                      <button type="button" data-try-mode="printed" class="is-on">印刷字</button>
+                      <button type="button" data-try-mode="handwritten">手寫字</button>
+                    </div>
+                  </div>
+                </article>
+
+                <div class="part3-feature-explorer part3-try-explorer" id="part-3-try-explorer" data-part3-try data-try-mode="printed">
+                  <div class="part3-fx-doc part3-try-doc">
+                    <div class="part3-try-pagestack" data-try-pagestack>
+                      <div class="part3-fx-page">
+                        <img data-try-img alt="試一試史料頁面" loading="lazy" decoding="async">
+                        <div data-try-hls></div>
+                      </div>
+                    </div>
+                    <div class="part3-fx-nav">
+                      <button type="button" data-try-prev aria-label="上一頁">←</button>
+                      <span class="part3-fx-ind" data-try-ind></span>
+                      <button type="button" data-try-next aria-label="下一頁">→</button>
+                    </div>
+                  </div>
+                  <div class="part3-try-panel">
+                    <div class="part3-try-scroll">
+                      <div data-try-todo></div>
+                      <div data-try-stage></div>
+                    </div>
+                    <div class="part3-try-guidehost" data-try-guide></div>
+                  </div>
+
+                  <script type="application/json" data-part3-try-data>
+                  {
+                    "printed": {
+                      "pdf": "為請酌籌加調官兵協力進剿事_印刷字.pdf",
+                      "pdfSub": "",
+                      "pdfPath": "試一試/印刷字/為請酌籌加調官兵協力進剿事_印刷字.pdf",
+                      "href": "試一試/印刷字/為請酌籌加調官兵協力進剿事_印刷字.pdf",
+                      "assetDir": "試一試/印刷字/",
+                      "pages": ["page1.png", "page2.png"],
+                      "features": {
+                        "info":   {"page": 0, "image": "文本資訊.png", "colour": "#cfe0ef", "box": {"left": "70%", "top": "9%",  "width": "24%", "height": "28%"}},
+                        "column": {"page": 0, "image": "直排單欄.png", "colour": "#cfe3d4", "box": {"left": "12%", "top": "20%", "width": "56%", "height": "62%"}},
+                        "para":   {"page": 0, "image": "分段.png", "colour": "#f5e6bd", "box": {"left": "14%", "top": "44%", "width": "50%", "height": "26%"}},
+                        "punctuation": {"page": 0, "image": "標點.png", "colour": "#f3bdd4", "box": {"left": "10%", "top": "20%", "width": "60%", "height": "62%"}},
+                        "signoff": {"page": 1, "image": "尾批.png", "colour": "#d3e5e2", "box": {"left": "14%", "top": "70%", "width": "60%", "height": "20%"}},
+                        "page":   {"page": 0, "image": "頁數.png", "colour": "#ddd6ea", "box": {"left": "6%",  "top": "88%", "width": "14%", "height": "7%"}}
+                      },
+                      "steps": [
+                        {"kind": "advance", "k": "撰寫 Prompt",
+                         "guide": "現在，開始撰寫給 Agentic AI 的 OCR prompt。"},
+                        {"kind": "chip", "k": "一 · 安裝工具",
+                         "guide": "先讓 Agentic AI 在你的電腦下載PaddleOCR的工具。",
+                         "chip": "請在我的電腦下載 PaddleOCR。", "skip": "已下載"},
+                        {"kind": "chip", "k": "二 · OCR 目的",
+                         "guide": "再告訴它要辨識哪一份檔案。",
+                         "chip": "請在我的電腦上搜尋「為請酌籌加調官兵協力進剿事_印刷字.pdf」，並對它進行OCR。"},
+                        {"kind": "chip", "k": "2.1 史料來源",
+                         "guide": "告訴 AI 這份 PDF 的來源。",
+                         "chip": "這份 PDF 出自《明清臺灣檔案彙編》第30冊。"},
+                        {"kind": "advance", "k": "三 · 版面要求",
+                         "guide": "接下來，請觀察PDF的版面，再向AI指定OCR的規則。"},
+                        {"kind": "mc", "k": "3.1 閱讀順序", "feature": "column",
+                         "guide": "這份史料的閱讀順序是什麼？",
+                         "before": "按照", "after": "、由上至下的順序輸出文本。",
+                         "options": ["由右至左", "由左至右", "由下至上"], "answer": "由右至左"},
+                        {"kind": "multi", "inline": true, "k": "3.2 文本資訊", "feature": "info",
+                         "guide": "正文前的這些資料，屬於正文嗎？",
+                         "before": "辨識正文前的文本資訊：", "after": "，並輸出為獨立的 data。",
+                         "items": ["史料來源", "標題", "作者", "日期"]},
+                        {"kind": "mc", "k": "3.3 分段", "feature": "para",
+                         "guide": "段落之間要靠什麼來分隔？",
+                         "before": "根據段首的", "after": "，劃分段落，保留每一段的內容，不要合併不同段落。",
+                         "options": ["縮排", "空行", "標點符號"], "answer": "縮排"},
+                        {"kind": "mc", "k": "3.4 標點符號", "feature": "punctuation",
+                         "guide": "標點符號要用全形還是半形？",
+                         "before": "辨識正文的標點符號，所有標點使用", "after": "，並在輸出 JSON 的最後，標記模糊標點和附近的文句。",
+                         "options": ["全形", "半形"], "answer": "全形"},
+                        {"kind": "multi", "inline": true, "k": "3.5 落款與尾批", "feature": "signoff",
+                         "guide": "正文結束後的日期與尾批，應該怎麼處理？",
+                         "before": "正文結束後包含：", "after": "，請分別保存，不要混入正文。",
+                         "items": ["官員上奏日期", "皇帝硃批日期", "尾批"]},
+                        {"kind": "choice", "k": "3.6 頁碼", "feature": "page",
+                         "guide": "應否保留頁碼？",
+                         "before": "辨識每一頁角落的頁碼，", "after": "於獨立欄位，不要納入正文。",
+                         "options": ["保留", "不保留"], "answer": "保留"},
+                        {"kind": "advance", "k": "4. 輸出要求",
+                         "guide": "定義好版面規則後，現在要定義輸出格式。"},
+                        {"kind": "mc", "k": "4.1 JSON 格式",
+                         "guide": "辨識完成後，要用什麼格式存下來？",
+                         "before": "請把辨識結果輸出為", "after": "。",
+                         "options": ["JSON", "TXT", "DOCX"], "answer": "JSON"},
+                        {"kind": "chip", "k": "4.2 輸出 JSON 的結構",
+                         "guide": "先說明整體結構，AI 才知道要把哪些欄位放進 JSON。",
+                         "chip": "輸出的 JSON 分為三部分：史料資訊、正文、待查。"},
+                        {"kind": "multi", "k": "4.3 史料資訊",
+                         "guide": "史料資訊要包含哪些欄位？",
+                         "before": "史料資訊包含：", "after": "。",
+                         "items": ["來源", "頁碼", "標題", "官職", "姓名", "具奏日期", "硃批日期", "硃批內容"]},
+                        {"kind": "mc", "k": "4.4 正文",
+                         "guide": "最後，正文本身要怎麼輸出？",
+                         "before": "正文請", "after": "。",
+                         "options": ["逐段列出", "合併成一段"], "answer": "逐段列出"},
+                        {"kind": "chip", "k": "4.5 待查",
+                         "guide": "不確定的字要怎麼標記？",
+                         "chip": "在 JSON 最後的待查部分，標記所有不確定的文字和標點，格式為「（前5字，如有）＋？（不確定的字）＋（後5字，如有）」。"},
+                        {"kind": "chip", "k": "4.6 儲存為 Skill",
+                         "guide": "以後要辨識同一本書的其他史料，不想每次都重打一次 prompt，怎麼辦？",
+                         "chip": "請把以上所有規則整理為 skill「memorial_print.md」。"},
+                        {"kind": "free", "k": "4.7 你自己的要求",
+                         "guide": "還有其他想要求嗎？ ",
+                         "placeholder": ""}
+                      ],
+                      "reference": "{\n  \"史料資訊\": {\n    \"來源\": \"《明清臺灣檔案彙編》第30冊\",\n    \"頁碼\": [\n      {\n        \"PDF頁\": 1,\n        \"頁碼\": \"136\"\n      },\n      {\n        \"PDF頁\": 2,\n        \"頁碼\": \"137\"\n      }\n    ],\n    \"原始檔案來源\": \"《天地會第一冊》\",\n    \"標題\": \"為請酌籌加調官兵協力進剿事\",\n    \"官職\": \"閩浙總督\",\n    \"姓名\": \"常青\",\n    \"具奏日期\": \"乾隆五十一年十二月二十日\",\n    \"硃批日期\": \"乾隆五十二年正月初七日\",\n    \"硃批內容\": \"看來爾等皆過於張皇矣。豈有因一匪犯，使全省以及鄰疆皆懷恐惶之理。欽此。\",\n    \"編者註\": \"本文原收錄於軍錄\",\n    \"辨識狀態\": \"PaddleOCR 候選文字；已按原頁影像整理閱讀順序、段落、全形標點、頁碼、日期與硃批，仍應以原頁影像覆核待查項目。\"\n  },\n  \"正文\": [\n    {\n      \"段落\": 1,\n      \"頁碼\": [\n        \"136\"\n      ],\n      \"內容\": \"閩浙總督臣常青跪奏，為酌籌加調官兵協力進剿，速殲逆匪事。\"\n    },\n    {\n      \"段落\": 2,\n      \"頁碼\": [\n        \"136\",\n        \"137\"\n      ],\n      \"內容\": \"竊照彰化賊人林爽文等，謀為不軌，攻占城池，先經臣派撥三路官兵赴剿。嗣聞賊勢蔓延臺灣，郡城尤關緊要，臣抵泉後，即與提臣任承恩籌劃，令其加帶官兵，仍由鹿耳門前進。該提臣於十四日登舟，十七日乘風開駕，緣臺地遠隔重洋，必須出奇制變，方可迅奏膚功。因覆面為商定，或竟由鹿港進攻，或由鹿耳門入口，聽其察探賊情，隨宜辦理各緣由，均經節次奏聞在案。惟是調往官兵，雖有六千，內水師提臣黃仕簡帶領本標及調取南澳、銅山等營官兵，共計二千數百名，其由閩安出口派赴淡北之官兵一千五百名。臣於十三日據淡水同知程峻之子程必大稟報：竹塹地方亦被賊人占踞，因飭領兵之海壇鎮總兵郝壯猷相奪度情形，非於新莊堵禦，即赴南路應援。而鹿耳為臺地咽喉，尤須厚集兵力，庶可近護郡城，遠赴攻剿。茲臣復添派督、撫二標兵一千名，檄令原任閩安協副將徐鼎士帶領，由省城南臺口配船；又調福寧鎮並桐山、羅源等營兵一千名，檄令福寧右營遊擊延山帶領，於福安縣白石口配船，俱從各該處出口候風，直渡過臺。經由鹿耳門進口，交與水師提臣黃仕簡，聽其調度，俾軍容益昭壯盛，賊匪聞風膽落，自可克期殄滅。臣一面仍再於各營兵丁內，預為挑備，酌量機宜，隨時策應外，所有加調官兵赴剿緣由，理合恭摺馳奏。\"\n    },\n    {\n      \"段落\": 3,\n      \"頁碼\": [\n        \"137\"\n      ],\n      \"內容\": \"再，查十八、九兩日，未有臺來文報，惟據差往探聽之守備林登雲稟稱：探得澎湖陳副將差蔡遊擊領兵於十四日到郡，安平林遊擊亦帶兵赴援，現在賊勢稍退。又水師黃提臺於十五日帶孫遊擊領兵開船，因風勢甚猛，仍於十六日收回，十七日始行東渡。等語。合併奏聞。伏乞皇上睿鑒。謹奏。\"\n    }\n  ],\n  \"待查\": [\n    \"膚功。因？（覆／復）面為商\",\n    \"澎湖陳副將？（，）差蔡遊擊領\"\n  ]\n}"
+                    },
+
+                    "handwritten": {
+                      "pdf": "為請酌籌加調官兵協力進剿事_手寫字.pdf",
+                      "pdfSub": "",
+                      "pdfPath": "試一試/手寫字/為請酌籌加調官兵協力進剿事_手寫字.pdf",
+                      "href": "試一試/手寫字/為請酌籌加調官兵協力進剿事_手寫字.pdf",
+                      "assetDir": "試一試/手寫字/",
+                      "pages": ["page1.png", "page2.png", "page3.png"],
+                      "features": {
+                        "column":   {"page": 0, "image": "直欄.png", "colour": "#cfe3d4", "box": {"left": "14%", "top": "12%", "width": "62%", "height": "70%"}},
+                        "author":   {"page": 0, "image": "作者.png", "colour": "#cfe0ef", "box": {"left": "68%", "top": "10%", "width": "20%", "height": "20%"}},
+                        "minor":    {"page": 0, "image": "臣字.png", "colour": "#f5e6bd", "box": {"left": "30%", "top": "40%", "width": "12%", "height": "14%"}},
+                        "rescript": {"page": 2, "image": "硃批.png", "colour": "#f0d6d0", "box": {"left": "20%", "top": "16%", "width": "26%", "height": "34%"}},
+                        "sendDate": {"page": 2, "image": "奏報日期.png", "colour": "#e3d4b8", "box": {"left": "60%", "top": "10%", "width": "22%", "height": "20%"}},
+                        "stamp":    {"page": 2, "image": "水印.png", "colour": "#ddd6ea", "box": {"left": "50%", "top": "60%", "width": "22%", "height": "22%"}}
+                      },
+                      "steps": [
+                        {"kind": "advance", "k": "撰寫 Prompt",
+                         "guide": "準備好撰寫 OCR prompt 了嗎？"},
+                        {"kind": "chip", "k": "一 · 安裝工具",
+                         "guide": "先讓 Agentic AI 在你的電腦下載PaddleOCR的工具。",
+                         "chip": "請在我的電腦上下載並安裝 PaddleOCR。", "skip": "已下載"},
+                        {"kind": "chip", "k": "二 · OCR 目的",
+                         "guide": "再告訴它要辨識哪一份檔案。",
+                         "chip": "請在我的電腦上搜尋「為請酌籌加調官兵協力進剿事_手寫字.pdf」 ，並OCR這個檔案。"},
+                        {"kind": "chip", "k": "2.1 史料來源",
+                         "guide": "告訴AI這份 PDF 的來源。",
+                         "chip": "這份 PDF 出自國立故宮博物院的「清代檔案檢索系統」（編號：故宮075669號）。"},
+                        {"kind": "advance", "k": "三 · 版面要求",
+                         "guide": "接下來，觀察PDF的版面，再向AI指定OCR的規則。"},
+                        {"kind": "mc", "k": "3.1 閱讀順序", "feature": "column",
+                         "guide": "這份史料的閱讀順序是什麼？",
+                         "before": "按照", "after": "、由上至下的順序輸出文字。",
+                         "options": ["由右至左", "由左至右", "由下至上"], "answer": "由右至左"},
+                        {"kind": "mc", "k": "3.2 上奏官員", "feature": "author",
+                         "guide": "提醒AI要OCR第一行上奏官員的資料。",
+                         "before": "奏摺首行標有上奏官員的", "after": "，例如「福建水師提督黃仕簡」，請分別獨立標記。",
+                         "options": ["官職與姓名", "籍貫與年齡", "品級與俸祿"], "answer": "官職與姓名"},
+                        {"kind": "mc", "k": "3.3 小字自稱", "feature": "minor",
+                         "guide": "提醒AI要OCR字體較小的臣字款。",
+                         "before": "正文中的「奴才」或「臣」以較小字體書寫，是", "after": "，請保留於原有位置OCR。",
+                         "options": ["正文的一部份", "註釋", "裝飾文字"], "answer": "正文的一部份"},
+                        {"kind": "mc", "k": "3.4 硃批", "feature": "rescript",
+                         "guide": "如何處理用草書書寫的硃批？",
+                         "before": "請", "after": "紅色的硃批文字。",
+                         "options": ["不要 OCR", "優先 OCR", "合併進正文"], "answer": "不要 OCR"},
+                        {"kind": "mc", "k": "3.5 具奏日期", "feature": "sendDate",
+                         "guide": "如何處理文末的日期？",
+                         "before": "文末「乾隆X年X月X日」格式的日期是", "after": "，辨識並輸出為獨立的 data。",
+                         "options": ["具奏日期", "硃批日期"], "answer": "具奏日期"},
+                        {"kind": "mc", "k": "3.6 印章與浮水印", "feature": "stamp",
+                         "guide": "如何處理印章、編號和浮水印？",
+                         "before": "請", "after": "「國立故宮博物院」的浮水印，以及正文後的印章，不要輪出漢字以外的文字和數字。",
+                         "options": ["忽略", "辨識"], "answer": "忽略"},
+                        {"kind": "advance", "k": "4. 輸出要求",
+                         "guide": "定義好版面規則後，現在要定義輸出格式。"},
+                        {"kind": "mc", "k": "4.1 JSON 格式",
+                         "guide": "辨識完成後，要用什麼格式輸出結果？",
+                         "before": "完成辨識後，把所有結果輸出為", "after": "。",
+                         "options": ["JSON", "TXT", "DOCX"], "answer": "JSON"},
+                        {"kind": "chip", "k": "4.2 輸出 JSON 的結構",
+                         "guide": "JSON 要分成哪些部分？",
+                         "chip": "輸出的 JSON 分為三部分：史料資訊、正文、待查。"},
+                        {"kind": "multi", "k": "4.3 史料資訊",
+                         "guide": "史料資訊要包含哪些欄位？",
+                         "before": "史料資訊包含：", "after": "。",
+                         "items": ["來源", "史料編號", "標題", "官職", "姓名", "具奏日期"],
+                         "wrong": ["硃批日期", "硃批內容"]},
+                        {"kind": "mc2", "k": "4.4 正文",
+                         "guide": "最後，正文本身要怎麼輸出？",
+                         "before": "正文請", "mid": "，", "after": "抬頭引致的分段。",
+                         "options1": ["合併成一整段", "逐段列出"], "answer1": "合併成一整段",
+                         "options2": ["忽略", "保留"], "answer2": "忽略"},
+                        {"kind": "chip", "k": "4.5 待查",
+                         "guide": "不確定的字要怎麼標記？",
+                         "chip": "在 JSON 最後的待查部分，標記所有不確定的文字，格式為「（前5字，如有）＋？（不確定的字）＋（後5字，如有）」。"},
+                        {"kind": "chip", "k": "4.6 儲存為 Skill",
+                         "guide": "以後要辨識其他手寫的奏摺，不想每次都重打一次 prompt，怎麼辦？",
+                         "chip": "請把以上所有規則整理為 skill「memorial_handwritten.md」。"},
+                        {"kind": "free", "k": "4.7 你自己的要求",
+                         "guide": "還有其他想要求嗎？ ",
+                         "placeholder": ""}
+                      ],
+                      "reference": "{\"史料資訊\": {\"來源\": \"國立故宮博物院的「清代檔案檢索系統」\", \"史料編號\": \"故宮075669號\", \"標題\": \"為請酌籌加調官兵協力進剿事\", \"官職\": \"閩浙總督\", \"姓名\": \"常青\", \"具奏日期\": \"乾隆五十一年十二月二十日\"}, \"正文\": \"閩浙總督臣常青跪奏，為酌籌加調官兵協力進剿，速殲逆匪事。竊照彰化賊人林爽文等，謀為不軌，攻佔城池，先經臣派撥三路官兵赴剿。嗣聞賊勢蔓延，臺灣郡城尤關緊要，臣抵泉後，即與提臣任承恩籌畫，令其加帶官兵，仍由鹿耳門前進。該提臣於十四日登舟，十七日乘風開駕。緣臺地遠隔重洋，必須出奇制變，方可迅奏膚功。因復面為商定，或竟由鹿港進攻，或由鹿耳門入口，聽其察探賊情，隨宜辦理。各緣由均經節次奏聞在案。惟是調往官兵，雖有六千，內水師提臣黃仕簡帶領本標及調取南澳、銅山等營官兵，共計二千數百名，其由閩安出口派赴淡北之官兵一千五百名。臣於十三日據淡水同知程峻之子程必大稟報：竹塹地方亦被賊人佔踞，因飭領兵之海壇鎮總兵郝壯猷相奪情形，非於新莊堵禦，即赴南路應援。而鹿耳為臺地咽喉，尤須厚集兵力，庶可近護郡城，遠赴攻剿。茲臣復添派督、撫二標兵一千名，檄令原任閩安協副將徐鼎士帶領，由省城南臺口配船；又調福寧鎮並桐山、羅源等營兵一千名，檄令福寧右營遊擊延山帶領，於福安縣白石口配船。俱從各該處出口候風，直渡過臺，逕由鹿耳門進口，交與水師提臣黃仕簡，聽其調度。俾軍容益昭壯盛，賊匪聞風膽落，自可剋期殄滅。臣一面仍再於各營兵丁內，預為挑備，酌量機宜，隨時策應。外所有加調官兵赴剿緣由，理合恭摺馳奏。再，查十八、九兩日，未有臺來文報，惟據差往探聽之守備林登雲稟稱：探得澎湖陳副將，差蔡遊擊領兵於十四日到郡，安平林遊擊亦帶兵赴援，現在賊勢稍退。又，水師黃提臺於十五日帶孫遊擊領兵開船，因風勢甚猛，仍於十六日收回，十七日始行東渡。等語。合併奏聞，伏祈皇上睿鑒。謹奏。\", \"待查\": [\"十七日＋？（乘／乗）＋風開駕\", \"謀為不軌＋？（攻佔／攻占）＋城池先經\", \"必須出＋？（奇）＋制變方可\", \"郝壯猷相奪＋？（情形／度情形）＋非於新莊\", \"臣內預為＋？（挑／桃）＋備酌量機宜\", \"福寧鎮＋？（並／并）＋桐山羅源\", \"自可＋？（剋／克／尅）＋期殄滅臣一面\", \"皇上睿鑒謹＋？（奏）＋\"]}"
+                    }
+                  }
+                  </script>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!--
+          <section class="story surface-a" id="part-3-import" data-tab="part-3" data-nav="#part-3-import">
+            <div class="story-inner">
+              <article class="copybox blk"><div class="title-row"><span class="option-number">11</span><h2>輸入結構化史料至平台</h2></div><div class="body"><p>完成OCR和後續整理後，所有的史料都應儲存在一個完整的 JSON 檔案中，研究者於是可以要求 Agentic AI把 JSON 檔案匯入平台。以本平台為例，只需將整理完成的 JSON 檔案放入網站專案中的 「儲存一手史料」 資料夾，平台便可直接讀取該檔案。</p></div></article>
+            </div>
+          </section>
+        </section> -->
+
+        <section class="part3-stage" id="part-3-ai" data-tab="part-3" data-nav="#part-3-ai">
+          <section class="section-hero section-hero-part-3 part3-stage-bar" id="part-3-ai-bar" aria-labelledby="part-3-ai-title">
+            <div class="section-hero-content"><p class="eyebrow">步驟三至五</p><h1 id="part-3-ai-title">運用AI抽取資訊</h1></div>
+          </section>
+
+          <section class="story surface-a" id="part-3-ai-skills" data-tab="part-3" data-nav="#part-3-ai-skills">
+            <div class="story-inner"><div class="part3-two-card-grid">
+              <article class="copybox blk" id="part-3-ai-skills-card-1"><div class="title-row"><span class="option-number">1</span><h2>修改、建立AI Skills</h2></div><div class="body"><p>完成資料整理後，研究者需要按照新的研究問題，修改或建立新的 Skills。例如，現時系統用於提取林爽文軍事行動的 Skills，可以根據新的研究主題，改為其他的事件類型，例如水災的情況、司法案件的調查進展等。</p></div></article>
+              <article class="copybox blk" id="part-3-ai-skills-card-2"><div class="title-row"><h2>建立新的 Skill 時，研究者應說明：</h2></div><div class="body"><p>- 這項 Skill 要回答哪一個研究問題；</p><p>- AI 需要從文本中提取哪些資訊；</p><p>- 每項結果需要保存哪些原文引文等。</p><p>研究者可以請 Agentic AI修改和建立指令，完成 Skill 後，應先用少量文書測試，檢查 AI 是否能按照要求提取合適的結果，再進行批次處理。</p></div></article>
+            </div></div>
+          </section>
+
+          <section class="story surface-b" id="part-3-ai-chain" data-tab="part-3" data-nav="#part-3-ai-chain">
+            <div class="story-inner">
+              <div class="part3-two-card-grid">
+                <article class="copybox blk" id="part-3-ai-chain-card-1"><div class="title-row"><span class="option-number">2</span><h2>執行 AI Skills的方法</h2></div><div class="body"><p>完成修改或建立 AI Skills 後，研究者便可透過 AI API，在本機呼叫 AI Model，根據 AI Skills 的設定，批次分析大量結構化史料。</p></div></article>
+                <article class="copybox blk" id="part-3-ai-chain-card-2"><div class="body"><p>為減少重複操作，研究者可要求 Agentic AI 撰寫 Python代碼，將多個 AI Skills 串聯成自動化的分析流程 （Chain）。程式會逐份讀取結構化文書，依序執行各項 AI Skills，並自動將結果儲存至 JSON 檔案，直至完成所有史料的分析，</p></div></article>
+              </div>
+              <div class="part3-flow-frame part3-chain-frame" id="part-3-ai-chain-chart" role="group" aria-label="文書總結、分段 → 抽取事件及官員行動 → 追溯資訊來源 → 抽取上諭中皇帝對奏摺的回應 → 抽取後續官員的回應 → 輸出結構化 JSON">
+                <div class="body"><p>例如，研究者可以建立一條處理奏摺的 AI Chain：</p></div>
+                <div class="workflow-chain">
+                  <button type="button" class="workflow-node part3-chain-node" data-part3-chart-toggle="chain-1" aria-pressed="true">文書總結、分段</button><span class="workflow-link" aria-hidden="true"></span><button type="button" class="workflow-node part3-chain-node" data-part3-chart-toggle="chain-2" aria-pressed="false">抽取事件及官員行動</button><span class="workflow-link" aria-hidden="true"></span><button type="button" class="workflow-node part3-chain-node" data-part3-chart-toggle="chain-3" aria-pressed="false">追溯資訊來源</button><span class="workflow-link" aria-hidden="true"></span><button type="button" class="workflow-node part3-chain-node" data-part3-chart-toggle="chain-4" aria-pressed="false">抽取上諭中皇帝對奏摺的回應</button><span class="workflow-link" aria-hidden="true"></span><button type="button" class="workflow-node part3-chain-node" data-part3-chart-toggle="chain-5" aria-pressed="false">抽取後續官員的回應</button><span class="workflow-link" aria-hidden="true"></span><button type="button" class="workflow-node part3-chain-node" data-part3-chart-toggle="chain-6" aria-pressed="false">輸出結構化 JSON</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="story surface-c" id="part-3-model" data-tab="part-3" data-nav="#part-3-model">
+            <div class="story-inner">
+              <article class="copybox blk"><div class="title-row"><span class="option-number">3</span><h2>選用的AI Model</h2></div><div class="body"><p>然而，由於 AI Skills 鏈（Chain）需要對每份史料逐步執行多項的分析，因此需要消耗大量 Token，提高了使用 API 的成本。因此，建議研究者選擇成本較低，但仍具備足夠分析能力的 AI Model，以兼顧研究成本和分析品質。</p><p>目前推薦 Gemini Flash 系列及 DeepSeek 的模型。兩者的 API 成本較低，亦能大致正確理解奏摺、上諭中的文言文，因此適合用來批次執行 AI Skills，分析大量文書。</p></div></article>
+            </div>
+          </section>
+
+          <section class="story surface-a" id="part-3-cloud" data-tab="part-3" data-nav="#part-3-cloud">
+            <div class="story-inner">
+              <div class="part3-cloud-layout">
+                <article class="copybox blk" id="part-3-cloud-card"><div class="title-row"><span class="option-number">4</span><h2>Google Cloud</h2></div><div class="body"><p>研究者可透過 Google Cloud 使用 Gemini Flash 及 DeepSeek 的 API，因為Google Cloud 為新用戶提供一定金額的免費額度（約港幣 2,000 元），足以應付大量的 AI Skills 批次分析工作。</p></div></article>
+                <div class="part3-cloud-visual">
+                  <div class="photo-gallery visual-frame part3-cloud-photo-gallery" data-photo-gallery data-photo-gallery-id="google-cloud">
+                    <div class="photo-gallery-stage"></div>
+                    <div class="photo-gallery-body"></div>
+                    <script type="application/json" data-photo-gallery-data>
+                    [
+                      {
+                        "image": "1661514832038.jpeg",
+                        "alt": "Google Cloud 免費試用額度宣傳圖",
+                        "fit": "contain",
+                        "title": "Google Cloud 免費試用詳情",
+                        "titleHref": "https://docs.cloud.google.com/free/docs/free-cloud-features?hl=zh-tw"
+                      }
+                    ]
+                    </script>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section class="part3-stage" id="part-3-wiki" data-tab="part-3" data-nav="#part-3-wiki">
+          <section class="section-hero section-hero-part-3 part3-stage-bar" id="part-3-wiki-bar" aria-labelledby="part-3-wiki-title">
+            <div class="section-hero-content"><p class="eyebrow">步驟八</p><h1 id="part-3-wiki-title">後續功能：LLM Wiki</h1></div>
+          </section>
+
+          <section class="story surface-a" id="part-3-wiki-intro" data-tab="part-3" data-nav="#part-3-wiki-intro">
+            <div class="story-inner">
+              <article class="copybox blk" id="part-3-wiki-intro-card"><div class="body"><p>完成 AI 分析及研究者審核後，研究者可進一步將本平台與 LLM Wiki 整合，擴展平台的應用功能。LLM Wiki 可視為大型語言模型的知識庫，讓 AI 在回答問題前，先搜尋其中的相關資料，再根據搜尋結果生成答案，以減少 AI 幻覺，提升回答的準確度。</p></div></article>
+            </div>
+          </section>
+
+          <section class="story surface-b" id="part-3-wiki-data" data-tab="part-3" data-nav="#part-3-wiki-data">
+            <div class="story-inner">
+              <article class="copybox blk" id="part-3-wiki-data-card"><div class="body"><p>研究者可將已審核的資料按類型匯出為多份結構化資料，包括已確認的事件、事件資訊來源、皇帝及後續官員的回應等，一同匯入至 LLM Wiki，為 AI 建立研究主題的專屬知識庫。</p></div></article>
+            </div>
+          </section>
+
+          <section class="story surface-c" id="part-3-wiki-analysis" data-tab="part-3" data-nav="#part-3-wiki-analysis">
+            <div class="story-inner">
+              <article class="copybox blk" id="part-3-wiki-analysis-card"><div class="body"><p>LLM Wiki 於是可以利用這些結構化資料進行更複雜的資訊整合及推理，協助研究者深化史料分析、整理研究成果和撰寫論文。</p></div></article>
+            </div>
+          </section>
+        </section>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

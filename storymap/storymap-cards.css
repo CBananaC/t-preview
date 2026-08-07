@@ -1,0 +1,1749 @@
+/*
+  STORYMAP CARD SOURCE — EDIT THIS FILE ONLY
+
+  一節一個區塊，改數字即可，不必碰 storymap.css 或 storymap-example.html。
+
+  ---------------------------------------------------------------------------
+  共用版面設定：
+
+    --vis-w      視覺元素（地圖／照片／工具畫面）佔的寬度百分比。
+                 文字欄自動佔用剩下的部分。
+                 例：--vis-w: 56%;  → 元素 56%，文字自動 44%。
+
+    --panel-w    同上，但用於「小卡展開＋對應元素」的小節（引言 03、06）。
+                 右側元素佔的百分比，左側小卡欄自動佔用剩餘。
+
+    --visual-x   視覺元素的高度＝文字欄高度的幾倍。
+                 1 = 與文字等高；.8 = 只有文字的八成；1.2 = 比文字高兩成。
+                 這是預設的方式，版面會隨文字長短自動配合。
+                 例：--visual-x: 1;
+
+    --visual-h   若想改用固定高度，才寫這一行（px）。
+                 同時寫了兩者時，以 --visual-h 為準，--visual-x 會被忽略。
+                 例：--visual-h: 480px;
+
+    --pad-y      這一節「頂部與底部」的留白（px）。所有節預設共用同一個值
+                 （目前是 clamp(56px, 6vw, 96px)），只有在想讓某一節特別
+                 寬鬆或緊湊時才需要在這裡覆寫。
+                 例：--pad-y: 120px;
+
+    --gallery-fit / --gallery-left / --gallery-top
+                 只用於含有圖片畫廊（.photo-gallery）的節，例如引言 01。
+                 設定「整組畫廊」預設的顯示方式：
+                   --gallery-fit: contain;   圖片完整顯示，可能上下或左右留白（預設）
+                   --gallery-fit: cover;     圖片裁切至填滿整個框，不留白但可能切邊
+                   --gallery-left: 50%;
+                   --gallery-top: 30%;             對齊位置，預設 center（正中央）
+
+    單張圖片覆寫（同樣在這個檔案改，不必碰 storymap-example.html）：
+                 若某一節的某一張圖片需要跟整組預設不同的裁切／位置／縮放，
+                 在該節區塊「下面」另外加一行，用 :nth-of-type(N) 指定是
+                 第幾張圖片（N 從 1 開始算，跟畫廊裡的順序一致）：
+
+                   #intro-1-1 .photo-gallery-frame:nth-of-type(2) {
+                     --photo-fit: cover;        （只有第 2 張改成裁切填滿）
+                   --photo-left: 50%;
+                   --photo-top: 42%;
+                     --photo-zoom: 1.35;        （額外放大 35%）
+                   }
+
+                 --photo-fit / --photo-left / --photo-top / --photo-zoom 只影響指定的
+                 那一張，其餘圖片仍套用整組的 --gallery-fit / --gallery-left / --gallery-top。
+                 --photo-fit 控制顯示範圍（contain 或 cover）；--photo-left 與
+                 --photo-top 分別控制圖片在框內的左右及上下位置，使用百分比、px
+                 或 left／center／right、top／center／bottom。
+                 --photo-zoom 不寫則預設 1（不放大）。
+                 下面「引言 01」區塊後面已附上一個實際範例，可直接參考修改。
+
+    --gallery-body-max-h
+                 說明區展開時的最大高度，預設為整組畫廊高度的 62%。
+                 展開後實際高度依每一張圖片自己的說明文字而定：短說明只佔
+                 較小區域，長說明才會增加高度；超過最大高度時在說明區內捲動。
+                 如需個別頁面上限，可在該頁 JSON 加入 bodyMaxHeight，例如
+                 "bodyMaxHeight": "70%"。圖片區本身仍維持固定視覺框高度。
+
+    --panel-h    只用於「小卡展開＋對應元素」的小節（引言 03、06）。
+                 為其中「某一張」面板單獨指定固定高度（px）。
+                 例：點開第一張小卡時右邊要 420px、第二張要 640px，就分別設定。
+                 沒有設定的面板，仍沿用該節的 --visual-h／--visual-x。
+                 寫法是在該節區塊下面另加一行，用 [data-acc-panel="名稱"] 指定：
+
+                   #intro-1-3-a .acc-panel[data-acc-panel="difficulty-relations"] {
+                     --panel-h: 640px;
+                   }
+
+                 每張面板的高度是各自獨立的：先看 B 再切回 A，A 一定回到
+                 A 自己的高度，不會被 B 撐大。下面各節已列出可用的面板名稱。
+
+    GIF 浮動標註（目前只用於引言 05 的工具示範 GIF）：
+                 段落文字與 GIF 之間會留出一塊空白區，說明卡片浮在這塊空白裡，
+                 因此不會蓋到段落文字，也不會蓋到 GIF 畫面本身。
+
+                 --band-h                 空白區的高度（px）。卡片放不下就調大。
+                 --label-x / --label-y    卡片在空白區內的位置
+                                          （水平為百分比、垂直為 px，0 = 貼齊空白區頂端）。
+                 --label-w                卡片寬度（px）。
+                 --dot-x / --dot-y        指標圓點在 GIF 上的位置（百分比），
+                                          請對準畫面中要說明的那個區塊。
+                 --line-w / --line-color  連接線的粗細與顏色。
+
+                 連接線預設會自動從圓點連到卡片，移動卡片或圓點就自動重連，
+                 一般不必理會。若自動的結果不理想，可以手動微調。
+                 每一個標註都是各自獨立設定的（1 號改了不會影響 2 號），
+                 寫在該標註自己的區塊裡即可。
+
+                 寫在「圓點」的區塊（#intro-1-5 .annotation-dot[data-dot="N"]）：
+                 --mark-x / --mark-y            整組「圓點＋線」一起往右／往下
+                                                移動幾 px（線的起點永遠跟著圓點）
+                 --line-length                  線的長度（px）
+                 --line-angle                   線的角度（度數，
+                                                0 = 向右、90 = 向下、-90 = 向上）
+
+                 寫在「卡片」的區塊（#intro-1-5 .annotation-label[data-label="N"]）：
+                 --line-from-x / --line-from-y  只移動線的起點，圓點不動
+                 --line-to-x   / --line-to-y    移動線的終點（卡片端）
+
+                 注意：--line-length 與 --line-angle 是完全接手，寫了之後線
+                 就不再自動連到卡片；只想小幅修正時建議改用平移類的設定。
+                 下面「引言 05」區塊後面已列出兩個標註各自的實際設定。
+
+    分頁封面帶（引言與第一至三部分頂端的深色帶）：
+                 --hero-pad-t   文字「上方」的留白（px）。想讓標題離頂欄更遠就調大。
+                 --hero-pad-b   文字「下方」的留白（px）。
+                 兩者寫在 .section-hero（或個別的 #part-1／#part-2／#part-3）即可，
+                 例：#part-3 { --hero-pad-t: 96px; }
+
+    第三部分「所需的工具與資源」checklist 視窗：
+                 --part3-tools-width       整組 checklist 與資訊視窗的寬度。
+                 --part3-tools-list-width   左側 checklist 佔整組的寬度比例。
+                 --part3-tools-height       整組視窗的固定高度（px）。
+                 --part3-tools-row-height   左側每一列的固定高度（px）。
+                 --part3-tools-photo-height 右側圖片區的最低高度；content-driven 版面通常使用 0px。
+                 --part3-tools-info-height  右側文字區高度；使用 auto 會按文字長度自動計算。
+                 這些設定寫在下方的 #part-3-tools 區塊即可。
+
+    第三部分每一個內容卡片：
+                 每個 #part-3-... 區塊都有自己的設定，可個別調整，不會影響
+                 其他部分：
+                   --part3-card-width       卡片寬度（例如 100%、680px）。
+                   --part3-card-max-width   卡片最大寬度（例如 74ch、none）。
+                   --part3-card-height      固定卡片高度；一般保留 auto。
+                   --part3-card-min-height  卡片最低高度（例如 420px）。
+                   --part3-card-padding     卡片內邊距（例如 32px）。
+                   --part3-title-size       卡片標題字級（例如 34px）。
+                   --part3-body-size        卡片正文該節的字級（例如 18px）。
+                   --part3-body-line-height 正文字行距（例如 1.85）。
+                 這些變數寫在下方對應的 Part 3 卡片 ID 區塊內，寫法跟
+                 #intro-1-2 一樣。若要保持正文跟隨網站右上角的字級控制，
+                 請使用 calc(18px * var(--font-scale))。
+                 只有一張文字卡的部分可直接改該部分的 ID，例如 #part-3-paddleocr；
+                 同一部分有多張卡時，請改實際卡片 ID，例如
+                 #part-3-ocr-definition-card-1 與 #part-3-ocr-definition-card-2。
+                 --part3-card-height 一般不要固定；內容較長時優先使用
+                 --part3-card-min-height，避免文字被截斷。
+
+                 Part 3 的圖表、流程圖和工具視窗也各自有 --part3-visual-*、
+                 --part3-flow-* 及 --part3-tools-* 設定，寫在同一個區塊即可。
+                 OCR／AI／LLM Wiki 的階段帶可在 #part-3-ocr、#part-3-ai、
+                 #part-3-wiki 各自調整 --part3-stage-title-size、
+                 --part3-stage-bar-height 及 --part3-stage-bar-padding。
+
+    OCR 掃描動畫（「甚麼是 OCR？」旁邊那個會動的視覺元素）：
+                 寫在 #part-3-ocr-definition .ocr-scan-scene 區塊裡（下面已經
+                 附上一份，直接改數字即可）。
+
+                   --ocr-scene-max-w   整個視覺元素的寬度上限
+                   --ocr-scene-column-w
+                                       視覺元素在文字區旁邊所佔的欄位寬度；
+                                       想放大動畫時要一併調大
+                   --ocr-pages-gap     兩份文書之間的間距
+
+                   --ocr-hw-w / --ocr-pr-w
+                                       手抄本／刊本各自佔的寬度比例
+                                       （兩者不需要加起來等於 100%，因為兩者
+                                       中間還有 --ocr-pages-gap 的間距）
+                   --ocr-hw-aspect / --ocr-pr-aspect
+                                       手抄本／刊本框的寬高比，寫法是
+                                       「寬 / 高」，例如 1.1 / 1、.63 / 1
+                   --ocr-hw-rotate / --ocr-pr-rotate
+                                       手抄本／刊本的傾斜角度
+
+                   --ocr-scan-h        掃描光暈的高度（頁面高度的百分比）
+                   --ocr-scan-color    掃描光暈顏色，要寫成「R, G, B」三個
+                                       數字（不要寫 #hex 或 rgb(...)），
+                                       例如 255, 90, 60 是紅橙色
+                   --ocr-scan-speed    掃描光暈跑完一輪（頂到底）的時間
+
+                   --ocr-output-h      JSON 輸出視窗的固定高度；文字打字時
+                                       超過這個高度就會自動往上捲動
+                   --ocr-output-w      JSON 輸出視窗的寬度；預設填滿動畫區
+                   --ocr-output-font-size
+                                       JSON 文字的字級
+                   --ocr-output-line-height
+                                       JSON 文字的行距
+                   --ocr-output-font-family
+                                       JSON 文字的字體
+                   --ocr-output-file-font-size
+                                       上方檔案名稱的字級
+
+                 翻頁的間隔快慢、JSON 逐字打出的速度屬於動畫「時間」而非
+                 大小／位置，寫在 storymap.js 的 initOcrScanScene() 裡，
+                 不在這個檔案。
+
+    輸出格式：JSON（#part-3-json 右側真實 JSON 檢視器，硃25 的完整 JSON）：
+                 全部寫在 #part-3-json-chart 區塊裡（下面已經附上一份），
+                 不要分別寫在子元素上，避免子元素預設值蓋過設定。
+
+                   --json-window-max-w
+                                       整個視窗（含上方標籤列）的寬度上限，
+                                       例如 480px；預設 none（不限制）
+                   --json-window-w    VS Code 視窗本身的寬度，例如 90%、
+                                       420px；預設 100%（填滿容器）
+                   --json-labels-gap  標籤列（在視窗外面、上方）與下方
+                                       視窗之間的間距
+                   --json-label-font-size
+                                       每個標籤按鈕的文字字級
+                   --json-file-font-size
+                                       標題列「硃25.ocr.json」檔名字級
+                   --json-body-h      JSON 視窗的固定高度，超過會自動
+                                       往上捲動
+                   --json-body-font-size
+                                       JSON 文字的字級
+                   --json-body-line-height
+                                       JSON 文字的行距
+
+                 標籤點擊後的捲動＋反白效果、段落二的展開／收合，都是純
+                 互動（沒有時間快慢可調），寫在 storymap.js 的
+                 initJsonViewer() 裡。
+
+    OCR測試 批次動畫（#part-3-test 右側那個會動的方形視覺元素）：
+                 寫在 #part-3-test .batch-scene 區塊裡（下面已經附上一份，
+                 直接改數字即可）。
+
+                   --batch-w          整個動畫舞台的寬度，例如 80%、420px
+                   --batch-aspect     整個舞台的寬高比
+                   --batch-pad        舞台內邊距
+                   --tile-gap         2×2 之間的間距
+                   --single-tile-h    單頁階段那一頁的高度（佔舞台）
+                   --tile-aspect      每一頁／每個視窗的寬高比
+
+                   --scan-rgb         掃描光線顏色，要寫成「R, G, B」三個
+                                       數字（不要寫 #hex 或 rgb(...)）
+                   --scan-h           掃描光線的厚度
+                   --tick-color       綠色勾號的顏色
+
+                   --glass-color      眼鏡的顏色
+                   --glass-w          眼鏡的寬度
+                   --lens-l-x / --lens-r-x / --lens-y / --lens-w / --lens-h
+                                       兩片鏡片反光的位置與大小；如果反光
+                                       沒對準眼鏡圖片，就調這幾個
+
+                   --tile-json-font-size / --tile-json-font-size-single
+                                       批次階段／單頁階段的 JSON 文字字級
+                   --count-font-size / --count-font-size-single
+                                       批次階段「50頁」／單頁階段「1頁」的字級
+
+                   --batch-grid-w     批次階段 2 欄格線的寬度；數字越小＝
+                                       格子越小、下一列露出越多。用來對出
+                                       「2 整列 ＋ 下一列露出 10%」的畫面
+                   --scroll-speed     批次階段往下捲一輪的時間
+                   --switch-dur       兩個階段之間轉場的時間
+
+                 掃描、閱讀、綠勾各自停留多久，以及每一格相差幾秒開始
+                 （STAGGER），屬於動畫流程，寫在 storymap.js 的
+                 initBatchTestScene() 裡。
+
+    自己的 GitHub Repository 雲端上傳動畫（「工具資訊」面板裡「備份、
+                 管理與協作」那一頁的視覺元素）：
+                 寫在 #part-3-tools-card .cloud-scene 區塊裡。
+
+                   --scene-bg-1 / --scene-bg-2  背景漸層的深／淺色
+                   --circuit-color / --circuit-size
+                                       電路紋理的線條顏色與格線間距
+                   --cloud-color      雲朵顏色
+                   --cloud-glow       雲朵發光顏色
+                   --cloud-w          雲朵寬度（雲朵永遠置中在舞台正中央）
+                   --gh-right / --gh-top / --gh-w
+                                       GitHub 頭像的位置與大小；數字越小
+                                       越貼近雲朵中央
+                   --arrow-w          上傳箭頭的寬度
+                   --card-bg / --card-border
+                                       飄浮卡片的底色與邊框顏色
+
+                 卡片顯示哪些真實檔名、飄浮速度與間隔，屬於動畫流程，
+                 寫在 storymap.js 的 initCloudUploadScene() 裡。
+
+  記得寫單位：百分號（56%）、px（480px）；倍數則不加單位（1、.8、1.2）。
+  改完存檔，然後在瀏覽器按 Cmd+Shift+R 重新整理。
+
+  螢幕寬度在 980px 以下時，這些設定會自動失效，改為文字在上、元素在下的
+  單欄排列，不需另外調整。
+  ---------------------------------------------------------------------------
+
+  2026-08-01 重寫。舊版在此為每張卡設定絕對定位變數（--card-x／--card-y／
+  --card-w／--story-height）；新版版面改為格線並置，卡片不再浮在背景之上，
+  因此那些變數已無作用並全部移除。
+
+  維護規則不變：每當新增或修改卡片，或更動其標題／副標時，請在同一次變更中
+  更新下方對應的標示區塊，並保持註解中的中文標題與實際內容一致。
+*/
+
+/* ============================== 引言 ===================================== */
+
+/* 1 — 清代奏折制度／研究價值｜文字在左、共用圖片畫廊在右 */
+#intro-1-1 {
+  --vis-w: 50%;
+  --card-accent: #b66d48;
+  --visual-h: 900px;          /*畫廊固定高度，與文字欄相近 */
+  --gallery-fit: contain;     /*整組畫廊預設：完整顯示（改 cover 則裁切填滿框） */
+  --gallery-left: 50%;
+  --gallery-top: 50%; /*整組畫廊預設對齊位置 */
+}
+
+/* 研究價值卡片與制度卡片之間保留額外上方留白 */
+#intro-1-2 { margin-top: clamp(24px, 2.2vw, 40px) !important; }
+
+/* 引言 01・第 2 張圖片（遞送奏摺／路線圖）：原圖是一整頁掃描，地圖本身只佔
+   頁面一小部分，因此改用 cover 裁切並放大，讓地圖填滿整個框，而不是縮成
+   小圖飄在大片空白中。 */
+#intro-1-1 .photo-gallery-frame:nth-of-type(2) {
+  --photo-fit: contain;
+  --photo-left: 70%;
+  --photo-top: 42%;
+  --photo-zoom: 1.2;
+}
+
+/* 3 — 研究清代奏折的主要困難｜左側小卡展開、右側對應畫面 */
+#intro-1-3-a {
+  --panel-w: 40%;
+  --visual-x: 2;
+  --card-accent: #ad7a35;
+
+ /* 硃113／硃119 文書面板：集中在這裡調整，不必改動共用 storymap.css。 */
+  --source-panel-width: 110%;
+  --source-panel-height: 1000px;
+  --source-panel-margin-top: clamp(30px, 4.5vh, 56px);
+  --source-panel-margin-right: 0px;
+  --source-panel-margin-bottom: 0px;
+  --source-panel-margin-left: 0px;
+  --source-panel-offset-x: 0px;
+  --source-panel-offset-y: 0px;
+  --source-panel-source-space: clamp(122px, 19%, 184px);
+  --source-panel-mobile-top-gap: 86px;
+}
+
+/* 引言 03 的三張面板，可各自指定固定高度（不寫則沿用上面的 --visual-x）。
+   面板名稱依小卡順序：01 difficulty-quantity／02 difficulty-relations／
+   03 difficulty-network。 */
+#intro-1-3-a .acc-panel[data-acc-panel="difficulty-quantity"]  {--panel-h: 520px; }
+#intro-1-3-a .acc-panel[data-acc-panel="difficulty-relations"] {--panel-h: 900px; }
+#intro-1-3-a .acc-panel[data-acc-panel="difficulty-network"]   {--panel-h: 900px;}
+
+/* 4 — 以數位方法研究清代奏折和上諭｜文字在上、比較表在下
+       （表格為滿版，沒有寬度可調） */
+#intro-1-4 {
+  --card-accent: #7e6a39;
+}
+#intro-1-4 .blk { width: 100%; max-width: none !important; }
+#intro-1-4 .body { width: 100%; max-width: none; }
+
+/* 5 — 研究成果：「清代奏摺與上諭分析平台」｜文字在上、工具畫面滿版在下
+       （文字與元素上下排列，沒有並排的文字欄可作基準，
+       因此這一節用 --visual-scale 按原始 GIF 比例放大或縮小。 */
+#intro-1-5 {
+  --visual-scale: 1;
+  --card-accent: #c46a2b;
+
+  /* GIF 浮動標註：段落文字與 GIF 之間空白區的高度。
+     卡片就浮在這塊空白裡，因此不會蓋到段落文字，也不會蓋到 GIF。
+     卡片放不下時把這個數字調大即可。 */
+  --band-h: 180px;
+
+  /* 連接線的粗細與顏色（線的位置由卡片與圓點自動決定，不需手動設定）。 */
+  --line-w: 2px;
+  --line-color: #c45d38;
+}
+
+/* 標註 1｜時間線與關係網絡
+   --label-x / --label-y：卡片在空白區內的位置（水平百分比／垂直 px）
+   --label-w：卡片寬度
+   --dot-x / --dot-y：圓點在 GIF 上的位置（百分比，對準畫面左側時間線） */
+#intro-1-5 .annotation-label[data-label="1"] {
+  --label-x: 4%;
+  --label-y: 8px;
+  --label-w: 320px;
+
+/*線的手動微調（不需要就整段留著註解即可，維持自動連接）：*/
+  --line-from-x: 0px;
+  --line-from-y: 0px;
+  --line-to-x: 0px;
+  --line-to-y: 0px;
+  --line-length: 200px;
+  --line-angle: -90;
+
+}
+#intro-1-5 .annotation-dot[data-dot="1"] {
+  --dot-x: 16%;
+  --dot-y: 60%;
+
+  /* 「圓點＋線」整組一起調整（不需要就留著註解）：
+     --mark-x／--mark-y  整組往右／往下移動幾 px（圓點與線一起動）
+     --line-length       線的長度（px）
+     --line-angle        線的角度（度，0 = 向右、90 = 向下、-90 = 向上）
+  --mark-x: 0px;
+  --mark-y: 0px;
+  --line-length: 220px;
+  --line-angle: -90;
+  */
+}
+
+/* 標註 2｜AI 提取與人工核對（對準畫面右側 AI 證據欄） */
+#intro-1-5 .annotation-label[data-label="2"] {
+  --label-x: 56%;
+  --label-y: 8px;
+  --label-w: 340px;
+
+  /* 線的手動微調（不需要就整段留著註解即可，維持自動連接）：
+  --line-from-x: 0px;
+  --line-from-y: 0px;
+  --line-to-x: 0px;
+  --line-to-y: 0px;
+  */
+}
+#intro-1-5 .annotation-dot[data-dot="2"] {
+  --dot-x: 72%;
+  --dot-y: 46%;
+
+  /* 「圓點＋線」整組一起調整（不需要就留著註解）：
+  --mark-x: 0px;
+  --mark-y: 0px;
+  --line-length: 220px;
+  --line-angle: -90;
+  */
+}
+#intro-1-5 > .story-inner {
+  width: min(2200px, 100%);
+  max-width: none;
+}
+#intro-1-5 .blk { width: 100%; max-width: none !important; }
+#intro-1-5 .review-capture-frame {
+  width: calc(100% * var(--visual-scale, 1));
+  height: auto;
+  aspect-ratio: 2048 / 1080;
+  min-height: 320px;
+  margin-inline: auto;
+  display: grid;
+  place-items: center;
+  background: #f8f5ee;
+}
+#intro-1-5 .review-capture-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #f8f5ee;
+}
+
+/* 6 — 示範案例：林爽文民變（1786-1788）｜左側小卡展開、右側對應畫面 */
+#intro-1-6-a-source {
+  --panel-w: 35%;
+  --visual-x: 1;
+  --card-accent: #c7543f;
+}
+
+/* 引言 06 的三張面板，面板名稱依小卡順序：01 case-background／
+   02 case-route（單張軍報路線圖）／03 case-sources（兩張出版物封面畫廊）。 */
+#intro-1-6-a-source .acc-panel[data-acc-panel="case-background"] {--panel-h: 700px;}
+#intro-1-6-a-source .acc-panel[data-acc-panel="case-route"]      {--panel-h: 720px;}
+#intro-1-6-a-source .acc-panel[data-acc-panel="case-sources"]    {--panel-h: 900px;}
+#intro-1-6-a-source .acc-panel[data-acc-panel="case-route"] .photo-gallery,
+#intro-1-6-a-source .acc-panel[data-acc-panel="case-sources"] .photo-gallery {
+  --gallery-fit: contain;
+  --gallery-left: 50%;
+  --gallery-top: 50%;
+}
+/* 示範案例第 2 張圖片：軍報傳遞路線圖（intro_8）。 */
+#intro-1-6-a-source .photo-gallery[data-photo-gallery-id="case-route"] .photo-gallery-frame:nth-of-type(1) {
+  --photo-fit: cover;
+  --photo-left: 79%;
+  --photo-top: 50%;
+  --photo-zoom: 1;
+}
+#intro-1-6-a-source > .story-inner > .blk { width: 100%; max-width: none !important; }
+
+/* 編號方塊沿用各節的強調色作漸層底（一般不需修改） */
+.story .option-number {
+  background:
+    radial-gradient(circle at 74% 22%, rgba(255, 255, 255, .1), transparent 60%),
+    linear-gradient(135deg, #173b3f 8%, #315d5a 56%, var(--card-accent, #c45d38) 175%);
+}
+
+/* ============================== PART 3 ================================= */
+
+/*
+   Part 3 CSS index
+   ─────────────────
+   Part 3.0  Shared card, chart, flow, and stage-bar rules
+   Part 3.1  適合的研究問題
+     Part 3.1.1  Section defaults: #part-3-research-questions
+     Part 3.1.2  Text card:       #part-3-research-card
+     Part 3.1.3  Relationship chart: #part-3-research-chart
+   Part 3.2  所需的工具與資源
+     Part 3.2.1  Section defaults and tool typography: #part-3-tools
+     Part 3.2.2  Tool card: #part-3-tools-card
+   Part 3.3  重用平台的基本流程
+     Part 3.3.1  Section defaults and text layout: #part-3-basic-flow
+     Part 3.3.2  Text block: #part-3-basic-flow-card
+     Part 3.3.3  Workflow: #part-3-basic-flow-chart
+   Part 3.4  OCR 並結構化原始史料
+     Part 3.4.1  OCR 並結構化原始史料
+     Part 3.4.2  甚麼是 OCR？／使用OCR的原因
+       Part 3.4.2.1  甚麼是 OCR？
+       Part 3.4.2.2  使用OCR的原因
+     Part 3.4.3  PaddleOCR
+     Part 3.4.4  運用 Agentic AI 使用 PaddleOCR
+     Part 3.4.5  OCR 前的材料準備
+     Part 3.4.6  檢視史料的版面及格式
+     Part 3.4.7  辨識印刷字
+       Part 3.4.7.1  辨識印刷字（文字卡）
+       Part 3.4.7.2  辨識印刷字（圖表）
+     Part 3.4.8  辨識手寫字
+     Part 3.4.9  輸出格式：JSON
+       Part 3.4.9.1  輸出格式：JSON（文字卡）
+       Part 3.4.9.2  輸出格式：JSON（圖表）
+     Part 3.4.10 OCR測試
+     Part 3.4.11 輸入結構化史料至平台
+   Part 3.5  運用 AI 抽取資訊
+     Part 3.5.1  Stage bar: #part-3-ai
+     Part 3.5.2  AI Skills (#part-3-ai-skills)
+       Part 3.5.2.1  Card 1: #part-3-ai-skills-card-1
+       Part 3.5.2.2  Card 2: #part-3-ai-skills-card-2
+     Part 3.5.3  AI Skills chain (#part-3-ai-chain)
+       Part 3.5.3.1  Card 1: #part-3-ai-chain-card-1
+       Part 3.5.3.2  Card 2: #part-3-ai-chain-card-2
+       Part 3.5.3.3  Workflow: #part-3-ai-chain-chart
+     Part 3.5.4–3.5.5  AI Model and Google Cloud
+   Part 3.6  後續功能：LLM Wiki
+     Part 3.6.1  Stage bar: #part-3-wiki
+     Part 3.6.2–3.6.4  Wiki intro, data, and analysis cards
+   Part 3.7  Accent colours
+
+   To adjust an individual card, find its numbered block below and edit only
+   the variables in that block. The selector ID is repeated in every heading.
+*/
+
+/* Part 3.0 — Shared section accents */
+#part-3-research-questions { --card-accent: #c7543f; }
+#part-3-tools {
+  --card-accent: #7e6a39;
+  /* Checklist 與工具資訊視窗的寬度／高度控制，直接在此調整。 */
+  --part3-tools-width: 100%;
+  --part3-tools-list-width: 100px;
+  --part3-tools-height: 1000px;
+  --part3-tools-row-height: 100px;
+  --part3-tools-photo-height: 0px;
+  --part3-tools-info-height: auto;
+}
+#part-3-basic-flow { --card-accent: #4d817c; }
+
+/* Part 3.0.1 — Shared card layer
+   第三部分的內容卡片共用套用層。
+   下面每個 #part-3-... 區塊只需改自己的變數，不必修改 storymap.css。 */
+#part-3-content .copybox {
+  width: var(--part3-card-width, auto);
+  max-width: var(--part3-card-max-width, 74ch);
+  height: var(--part3-card-height, auto);
+  min-height: var(--part3-card-min-height, 0);
+  padding: var(--part3-card-padding, clamp(18px, 1.8vw, 26px));
+}
+
+#part-3-content .copybox .title-row h2,
+#part-3-content .copybox h2 {
+  font-size: var(--part3-title-size, clamp(27px, 3.4vw, 46px));
+  line-height: var(--part3-title-line-height, 1.12);
+}
+
+#part-3-content .copybox .body > p {
+  font-size: var(--part3-body-size, calc(16px * var(--font-scale)));
+  line-height: var(--part3-body-line-height, 1.9);
+}
+
+#part-3-content .part3-stage-bar {
+  min-height: var(--part3-stage-bar-height, clamp(140px, 19vh, 195px));
+  padding: var(--part3-stage-bar-padding, 28px 0);
+}
+#part-3-content .part3-stage-bar h1 {
+  font-size: var(--part3-stage-title-size, clamp(26px, 3.4vw, 44px));
+}
+
+/* Part 3.5.1 — Stage bar: 運用 AI 抽取資訊 */
+#part-3-ai {
+  --part3-stage-title-size: clamp(26px, 3.4vw, 44px);
+  --part3-stage-bar-height: clamp(140px, 19vh, 195px);
+  --part3-stage-bar-padding: 28px 0;
+}
+
+/* Part 3.6.1 — Stage bar: 後續功能：LLM Wiki */
+#part-3-wiki {
+  --part3-stage-title-size: clamp(26px, 3.4vw, 44px);
+  --part3-stage-bar-height: clamp(140px, 19vh, 195px);
+  --part3-stage-bar-padding: 28px 0;
+}
+
+/* Part 3.1.1 — Section defaults: 適合的研究問題 (#part-3-research-questions) */
+#part-3-research-questions {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+  --part3-visual-width: 100%;
+}
+
+/* Part 3.2.1 — Section defaults: 所需的工具與資源 (#part-3-tools) */
+#part-3-tools {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+  --part3-tools-title-size: clamp(21px, 1.8vw, 25px);
+  --part3-tools-subtitle-size: 13px;
+  --part3-tools-info-title-size: clamp(36px, 4.8vw, 66px);
+  --part3-tools-info-body-size: clamp(20px, 1.8vw, 27px);
+  --part3-tools-info-padding: clamp(24px, 4vw, 48px);
+}
+
+#part-3-tools .part3-tool-title {
+  font-size: var(--part3-tools-title-size, clamp(21px, 1.8vw, 25px));
+}
+#part-3-tools .part3-tool-subtitle {
+  font-size: var(--part3-tools-subtitle-size, 13px);
+}
+#part-3-tools .part3-tool-info-copy {
+  padding: var(--part3-tools-info-padding, clamp(24px, 4vw, 48px));
+}
+#part-3-tools .part3-tool-info-copy h3 {
+  font-size: var(--part3-tools-info-title-size, clamp(36px, 4.8vw, 66px));
+}
+#part-3-tools .part3-tool-info-copy .body > p {
+  font-size: var(--part3-tools-info-body-size, clamp(20px, 1.8vw, 27px));
+}
+
+/* Part 3.3.1 — Section defaults: 重用平台的基本流程 (#part-3-basic-flow) */
+#part-3-basic-flow {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 100ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+  --part3-flow-width: 100%;
+  --part3-flow-min-height: 0;
+  --part3-flow-padding: clamp(18px, 2.4vw, 32px);
+  --part3-flow-node-size: calc(15px * var(--font-scale));
+}
+
+/* Part 3.3.1.1 — Full-width text layout inside #part-3-basic-flow
+   沿用「以數位方法研究清代奏折」的滿版文字排版：標題和說明文字
+   不使用卡片背景，直接在網站內容寬度內展開。 */
+#part-3-basic-flow .lay-stack > .blk {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+}
+#part-3-basic-flow .lay-stack > .blk .title-row h2 {
+  font-size: var(--part3-title-size, clamp(27px, 3.4vw, 46px));
+  line-height: var(--part3-title-line-height, 1.12);
+}
+#part-3-basic-flow .lay-stack > .blk .body > p {
+  font-size: var(--part3-body-size, calc(16px * var(--font-scale)));
+  line-height: var(--part3-body-line-height, 1.9);
+}
+
+#part-3-basic-flow .part3-flow-frame {
+  width: var(--part3-flow-width, 100%);
+  min-height: var(--part3-flow-min-height, 0);
+  padding: var(--part3-flow-padding, clamp(18px, 2.4vw, 32px));
+}
+#part-3-basic-flow .part3-flow-frame .workflow-node {
+  font-size: var(--part3-flow-node-size, calc(15px * var(--font-scale)));
+}
+
+/* Part 3.4.1 — OCR 並結構化原始史料 */
+#part-3-ocr {
+  --part3-stage-title-size: clamp(26px, 3.4vw, 44px);
+  --part3-stage-bar-height: clamp(140px, 19vh, 195px);
+  --part3-stage-bar-padding: 28px 0;
+}
+
+/* Part 3.4.2 — 甚麼是 OCR？／使用OCR的原因 */
+#part-3-ocr-definition {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+}
+
+/* Part 3.4.2.1 — 甚麼是 OCR？ */
+#part-3-ocr-definition-card-1 {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+}
+
+/* Part 3.4.2.2 — 使用OCR的原因 */
+#part-3-ocr-definition-card-2 {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+}
+
+/* Part 3.4.2.3 — OCR 掃描動畫 */
+#part-3-ocr-definition {
+  --ocr-scene-column-w: 60%;     /* 動畫佔 Part 3.4 內容寬度的比例 */
+}
+
+#part-3-ocr-definition .ocr-scan-scene {
+  --ocr-scene-max-w: 1000px;      /* 整個視覺元素的寬度上限 */
+  --ocr-pages-gap: 7%;           /* 兩份文書之間的間距 */
+
+  --ocr-hw-w: 55%;               /* 手抄本佔兩份文書總寬度的比例 */
+  --ocr-hw-aspect: 1.1 / 1;      /* 手抄本框的寬高比 */
+  --ocr-hw-rotate: -2deg;        /* 手抄本的傾斜角度 */
+
+  --ocr-pr-w: 34%;               /* 刊本佔兩份文書總寬度的比例 */
+  --ocr-pr-aspect: .63 / 1;      /* 刊本框的寬高比（書頁本身較窄較高） */
+  --ocr-pr-rotate: 2.5deg;       /* 刊本的傾斜角度 */
+
+  --ocr-scan-h: 18%;             /* 掃描光暈的高度（相對頁面高度） */
+  --ocr-scan-color: 120, 180, 255; /* 掃描光暈顏色，要寫成「R, G, B」三個數字 */
+  --ocr-scan-speed: 3.6s;        /* 掃描光暈跑完一輪（頂到底）所需時間 */
+
+  --ocr-output-h: 12em;          /* JSON 輸出視窗的固定高度，超過會自動往上捲動 */
+  --ocr-output-w: 70%;           /* JSON 輸出視窗寬度，可改成 80%、420px 等 */
+  --ocr-output-font-size: 16px; /* JSON 文字字級 */
+  --ocr-output-line-height: 1.5; /* JSON 文字行距 */
+  --ocr-output-font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  --ocr-output-file-font-size: 0px; /* 上方檔案名稱字級 */
+}
+
+/* Part 3.6 — 輸出格式：JSON（#part-3-json 右側真實 JSON 檢視器）
+   所有 JSON 視覺元素的可調設定集中在下方 #part-3-json-chart 區塊，
+   避免子元素上的預設值蓋過外層設定。 */
+
+/* Part 3.4.4 — OCR測試：批次掃描／驗證動畫（#part-3-test 右側視覺元素） */
+#part-3-test .batch-scene {
+  --batch-w: 90%;                /* 整個動畫舞台的寬度，例如 80%、420px */
+  --batch-aspect: 1 / 1;         /* 整個舞台的寬高比 */
+  --batch-pad: 6%;               /* 舞台內邊距 */
+  --tile-gap: 3%;                /* 2×2 之間的間距 */
+  --single-tile-h: 78%;          /* 單頁階段那一頁的高度（佔舞台） */
+  --tile-aspect: .74 / 1;        /* 每一頁／每個視窗的寬高比 */
+
+  --scan-rgb: 120, 180, 255;     /* 掃描光線顏色，要寫成「R, G, B」三個數字 */
+  --scan-h: 22%;                 /* 掃描光線的厚度（相對頁面高度） */
+  --tick-color: #4fbf72;         /* 綠色勾號顏色 */
+
+  --glass-color: #7fd4ff;        /* 眼鏡顏色（PNG 用遮罩重新上色） */
+  --glass-w: 62%;                /* 眼鏡寬度（相對每一格） */
+  --lens-l-x: 11%;               /* 左鏡片反光的左邊位置 */
+  --lens-r-x: 62%;               /* 右鏡片反光的左邊位置 */
+  --lens-y: 26%;                 /* 兩片反光的上邊位置 */
+  --lens-w: 27%;                 /* 反光寬度 */
+  --lens-h: 46%;                 /* 反光高度 */
+
+  --tile-json-font-size: 20px;        /* 批次階段 JSON 文字字級 */
+  --tile-json-font-size-single: 20px; /* 單頁階段 JSON 文字字級 */
+  --count-font-size: 50px;             /* 批次階段「50頁」字級 */
+  --count-font-size-single: 50px;      /* 單頁階段「1頁」字級 */
+
+  --batch-grid-w: 74%;           /* 批次階段 2 欄格線的寬度（相對舞台內寬）。
+                                     數字越小＝格子越小、下一列露出越多；
+                                     用來對出「2 整列 ＋ 下一列露出 10%」 */
+  --scroll-speed: 30s;           /* 批次階段往下捲一輪的時間；調大＝捲更慢 */
+  --switch-dur: .5s;             /* 兩個階段之間轉場的時間 */
+}
+
+/* Part 3.4.3 — PaddleOCR：左側文字、右側可調寬度圖片畫廊 */
+#part-3-paddleocr {
+  /* 只改 --paddleocr-photo-width，即可調整右側圖片寬度；高度會按原圖比例自動變化。
+     --paddleocr-photo-max-width 設定畫廊不可超過的 Part 3 寬度百分比。
+     --paddleocr-card-width 固定文字卡欄位，避免圖片寬度變更時文字卡跟著變。 */
+  --paddleocr-card-width: 75ch;
+  --paddleocr-photo-width: 50%;
+  --paddleocr-photo-max-width: 100%;
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+  --paddleocr-visual-width: 42%;
+}
+
+/* Part 3.4.4 — 運用 Agentic AI 使用 PaddleOCR */
+#part-3-agentic-ocr {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+}
+
+/* Part 3.4.5 — OCR 前的材料準備 */
+#part-3-material {
+  /* 右側單張圖片畫廊：改這些變數即可調整尺寸、裁切及圖片位置。 */
+  --part3-material-gallery-width: 48%;
+  --part3-material-gallery-height: 620px;
+  --part3-material-gallery-height-mobile: 520px;
+  --part3-material-gallery-fit: contain;
+  --part3-material-gallery-left: 50%;
+  --part3-material-gallery-top: 50%;
+  --part3-material-gallery-zoom: 1;
+  --part3-material-gallery-body-max-h: 48%;
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+}
+
+/* Part 3.4.5.1 — OCR 前的材料準備（文字卡與書籍掃描器畫廊） */
+#part-3-material-card {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+}
+
+#part-3-content #part-3-material-card .body > p.part3-material-copyright-note {
+  margin-top: 18px;
+  color: #c45d38;
+  font: 600 calc(12px * var(--font-scale))/1.7 var(--sans);
+  letter-spacing: .01em;
+}
+
+#part-3-material .part3-material-photo-gallery {
+  --gallery-fit: var(--part3-material-gallery-fit, contain);
+  --gallery-left: var(--part3-material-gallery-left, 50%);
+  --gallery-top: var(--part3-material-gallery-top, 50%);
+  --gallery-body-max-h: var(--part3-material-gallery-body-max-h, 48%);
+}
+
+#part-3-material .part3-material-photo-gallery .photo-gallery-frame:nth-of-type(1) {
+  --photo-fit: var(--part3-material-gallery-fit, contain);
+  --photo-left: var(--part3-material-gallery-left, 50%);
+  --photo-top: var(--part3-material-gallery-top, 50%);
+  --photo-zoom: var(--part3-material-gallery-zoom, 1);
+}
+
+/* Part 3.4.6 — 檢視史料的版面及格式：滿版文字、無卡片背景 */
+#part-3-format {
+  --part3-card-width: 100%;
+  --part3-card-max-width: none;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+}
+#part-3-format .lay-stack > .blk {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+}
+#part-3-format .lay-stack > .blk .title-row h2 {
+  font-size: var(--part3-title-size, clamp(27px, 3.4vw, 46px));
+  line-height: var(--part3-title-line-height, 1.12);
+}
+#part-3-format .lay-stack > .blk .body {
+  width: 100%;
+  max-width: none;
+}
+#part-3-format .lay-stack > .blk .body > p {
+  font-size: var(--part3-body-size, calc(16px * var(--font-scale)));
+  line-height: var(--part3-body-line-height, 1.9);
+}
+
+/* Part 3.4.7 — 辨識印刷字 */
+#part-3-content #part-3-printed {
+  background: #fff;
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+  --part3-visual-width: 100%;
+  --part3-visual-min-height: 360px;
+  --part3-visual-padding: clamp(20px, 2.4vw, 34px);
+  --part3-chart-body-size: calc(15px * var(--font-scale));
+}
+
+/* Part 3.4.7.1 — 辨識印刷字（文字卡） */
+#part-3-printed-card {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+}
+
+/* Part 3.4.7.2 — 辨識印刷字（圖表） */
+#part-3-printed-chart {
+  --part3-visual-width: 100%;
+  --part3-visual-min-height: 360px;
+  --part3-visual-padding: clamp(20px, 2.4vw, 34px);
+  --part3-chart-body-size: calc(15px * var(--font-scale));
+}
+
+/* Part 3.4.8 — 辨識手寫字 */
+#part-3-handwritten {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+}
+
+/* Part 3.8：手寫字說明文字展開至整個網站內容寬度。 */
+#part-3-content #part-3-handwritten-card {
+  width: 100%;
+  max-width: none;
+}
+#part-3-content #part-3-handwritten-card .body,
+#part-3-content #part-3-handwritten-card .body > p {
+  width: 100%;
+  max-width: none;
+}
+
+/* ===========================================================================
+   Part 3.4.9 — 版面特徵標籤與標示區（7 辨識印刷字 / 8 辨識手寫字）
+   ---------------------------------------------------------------------------
+   7、8 的每一個特徵標籤位置都由下面這一組變數控制，
+   改數字即可，不必碰 storymap.css、storymap.js 或 storymap-example.html。
+   7 辨識印刷字和 8 辨識手寫字都改用 data-part3-feature-data 內的 annotated PNG，
+   點擊標籤時直接替換原件圖片，不再需要在這裡調整色塊位置與大小。
+
+   --fx-color       標籤顏色
+     --fx-tag-left    標籤距原件「左」邊多遠；負值＝移到原件左外側
+     --fx-tag-right   標籤距原件「右」邊多遠；負值＝移到原件右外側
+     --fx-tag-top     標籤的垂直位置（百分比，0% 是原件頂端）
+     --fx-tag-w       標籤的寬度；預設 max-content（跟文字一樣寬、不換行）。
+                      設定固定寬度（例如 120px）後文字會自動換行，
+                      適合做成較窄的直式標籤。
+     --fx-tag-font    標籤文字的字級；預設跟隨網站右上角的字級設定。
+
+   注意：--fx-tag-left 與 --fx-tag-right 只用其中一個，另一個要留 auto，
+   否則標籤會被兩邊同時拉扯。
+
+   --fx-explorer-h    整個遊戲視窗（原件＋右側資訊面板）的高度上限，
+                       預設「瀏覽器可視高度的 95%，扣掉頂部導覽列」。
+                       原件圖片會依比例縮放置中（不裁切、不變形），
+                       右側資訊面板放不下時在內部捲動，兩欄一起套用
+                       同一個高度，整個區塊不會把頁面往下撐得很長。
+
+   ── 怎麼「編輯」一個標籤 ─────────────────────────────────
+   找到下面對應的 [data-fx-feature="..."] 區塊，直接改數值即可。
+
+   ── 怎麼「移除」一個標籤 ─────────────────────────────────
+   到 storymap-example.html 該節的 data-part3-feature-data JSON 裡，
+   刪掉那一個 { "key": ... } 物件（標籤、標示、右側三個視窗會一起消失），
+   再把下面對應的區塊一併刪掉。
+
+   ── 怎麼「新增」一個標籤 ─────────────────────────────────
+   1. 在同一個 JSON 陣列裡加一個新物件，必須有 key、title、desc、
+      prompt、py、json；印刷字要寫 page（第幾頁，0 起算），
+      手寫字要寫 panel（第幾摺，0 起算）。
+   2. 在下面照樣加一個 [data-fx-feature="你的 key"] 區塊設定位置。
+      （JSON 內也可以寫 colour／box／tag 當預設值，但以這裡的設定為準。）
+   ========================================================================= */
+
+/* 7／8 辨識印刷字、辨識手寫字 — widen the combined visual + text box,
+   and cap the whole game window's height so it fits the viewport. */
+#part-3-printed-explorer,
+#part-3-handwritten-explorer {
+  --fx-explorer-h: calc(98svh - var(--bar-h, 62px));
+  width: 96vw;
+  max-width: 96vw;
+  margin-left: calc(50% - 48vw);
+  margin-right: calc(50% - 48vw);
+}
+
+/* 7 辨識印刷字：左側 backdrop 依 PDF 內容收合，
+   不再沿用右側資訊面板的整體高度。 */
+#part-3-printed-explorer {
+  --fx-pdf-pad-y: clamp(24px, 2.4vw, 38px);
+  --fx-pdf-max-h: calc(var(--fx-explorer-h) - (2 * var(--fx-pdf-pad-y)) - 58px);
+  --fx-pdf-backdrop-h: calc(var(--fx-pdf-max-h) + (2 * var(--fx-pdf-pad-y)) + 18px);
+}
+
+/* 8 辨識手寫字 — 標籤的位置仍可在 CSS 逐項調整。 */
+#part-3-handwritten-explorer [data-fx-feature="vertical"] {
+  --fx-color: #7fb5b1;
+  --fx-tag-left: auto; --fx-tag-right: -142px; --fx-tag-top: 17%;
+}
+#part-3-handwritten-explorer [data-fx-feature="regular-script"] {
+  --fx-color: #a28ca8;
+  --fx-tag-left: auto; --fx-tag-right: -142px; --fx-tag-top: 28%;
+}
+#part-3-handwritten-explorer [data-fx-feature="author"] {
+  --fx-color: #c88f8a;
+  --fx-tag-left: auto; --fx-tag-right: -142px; --fx-tag-top: 38%;
+}
+#part-3-handwritten-explorer [data-fx-feature="minister"] {
+  --fx-color: #6e98d0;
+  --fx-tag-left: auto; --fx-tag-right: -142px; --fx-tag-top: 52%;
+}
+#part-3-handwritten-explorer [data-fx-feature="respect"] {
+  --fx-color: #d97967;
+  --fx-tag-left: auto; --fx-tag-right: -142px; --fx-tag-top: 17%;
+}
+#part-3-handwritten-explorer [data-fx-feature="rescript"] {
+  --fx-color: #c86f62;
+  --fx-tag-left: auto; --fx-tag-right: -142px; --fx-tag-top: 28%;
+}
+#part-3-handwritten-explorer [data-fx-feature="watermark"] {
+  --fx-color: #d7c47d;
+  --fx-tag-left: auto; --fx-tag-right: -142px; --fx-tag-top: 54%;
+}
+#part-3-handwritten-explorer [data-fx-feature="stamp"] {
+  --fx-color: #d89a7e;
+  --fx-tag-left: auto; --fx-tag-right: -142px; --fx-tag-top: 72%;
+}
+
+/* 8 辨識手寫字 — 標籤以錯落的固定垂直位置分布整個 PDF 高度，
+   並與可見的兩摺 PDF 邊緣保持 4px 間距；位置穩定，不會每次重新整理都跳動。
+   風琴摺左側的收摺紙邊以半個 sliver 寬度向左校正，讓可見 PDF 本身置中。 */
+#part-3-handwritten-explorer .part3-fx-doc-folded {
+  --part3-handwritten-doc-padding: clamp(78px, 7vw, 120px);
+  --part3-handwritten-fold-slivers: 60px;
+  --part3-handwritten-fold-offset: -30px;
+  --part3-handwritten-label-anchor: 26px;
+  --part3-handwritten-label-gap: 4px;
+  box-sizing: border-box;
+  padding-inline: var(--part3-handwritten-doc-padding);
+}
+#part-3-handwritten-explorer .part3-fx-striparea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#part-3-handwritten-explorer .part3-fx-strip {
+  --fold-slivers: var(--part3-handwritten-fold-slivers);
+  align-self: center;
+  margin-inline: auto;
+  transform: translateX(var(--part3-handwritten-fold-offset));
+}
+#part-3-handwritten-explorer [data-fx-feature="vertical"],
+#part-3-handwritten-explorer [data-fx-feature="regular-script"],
+#part-3-handwritten-explorer [data-fx-feature="author"],
+#part-3-handwritten-explorer [data-fx-feature="minister"] {
+  --fx-tag-left: auto;
+  --fx-tag-right: var(--part3-handwritten-label-anchor);
+  --fx-tag-shift: translateX(100%);
+}
+#part-3-handwritten-explorer [data-fx-feature="respect"],
+#part-3-handwritten-explorer [data-fx-feature="rescript"],
+#part-3-handwritten-explorer [data-fx-feature="stamp"] {
+  --fx-tag-left: var(--part3-handwritten-label-anchor);
+  --fx-tag-right: auto;
+  --fx-tag-shift: translateX(-100%);
+}
+#part-3-handwritten-explorer [data-fx-feature="watermark"] {
+  --fx-tag-left: var(--part3-handwritten-label-anchor);
+  --fx-tag-right: auto;
+  --fx-tag-shift: translateX(-100%);
+}
+#part-3-handwritten-explorer .part3-fx-tag.is-floating {
+  transform: var(--fx-tag-shift, none);
+}
+@media (max-width: 1040px) {
+  #part-3-handwritten-explorer .part3-fx-doc-folded {
+    --part3-handwritten-doc-padding: clamp(18px, 3vw, 30px);
+  }
+  #part-3-handwritten-explorer [data-fx-feature] {
+    --fx-tag-left: auto;
+    --fx-tag-right: auto;
+    --fx-tag-top: auto;
+    --fx-tag-shift: none;
+  }
+  #part-3-handwritten-explorer .part3-fx-tag.is-floating {
+    transform: none;
+  }
+}
+
+/* Part 3.4.9 — 輸出格式：JSON */
+#part-3-json {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+  --part3-visual-width: 100%;
+  --part3-visual-min-height: 360px;
+  --part3-visual-padding: clamp(20px, 2.4vw, 34px);
+  --part3-chart-body-size: calc(15px * var(--font-scale));
+}
+
+/* Part 3.4.9.1 — 輸出格式：JSON（文字卡） */
+#part-3-json-card {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+}
+
+/* Part 3.4.9.2 — 輸出格式：JSON（圖表） */
+#part-3-json-chart {
+  --json-window-max-w: none;     /* 整個視窗（含上方標籤列）的寬度上限 */
+  --json-window-w: 100%;         /* VS Code 視窗本身的寬度 */
+  --json-labels-gap: 10px;       /* 標籤列與下方視窗的間距 */
+  --json-label-font-size: 25px;  /* 標籤文字字級 */
+  --json-file-font-size: 0px;   /* 標題列「硃25.ocr.json」檔名字級 */
+  --json-body-h: 600px;          /* JSON 視窗固定高度 */
+  --json-body-font-size: 20px;   /* JSON 文字字級 */
+  --json-body-line-height: 1.7;  /* JSON 文字行距 */
+  --part3-visual-width: 100%;
+  --part3-visual-min-height: 400px;
+  --part3-visual-padding: clamp(20px, 2.4vw, 34px);
+  --part3-chart-body-size: calc(15px * var(--font-scale));
+}
+
+/* Part 3.4.10 — OCR測試 */
+#part-3-test {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+}
+
+/* Part 3.4.11 — 輸入結構化史料至平台 */
+#part-3-import {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+}
+
+/* Part 3.5.2 — Section defaults: 修改、建立 AI Skills (#part-3-ai-skills) */
+#part-3-ai-skills {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+}
+
+/* Part 3.5.3 — Section defaults: 執行 AI Skills 的方法 (#part-3-ai-chain) */
+#part-3-ai-chain {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+  --part3-flow-width: 100%;
+  --part3-flow-min-height: 0;
+  --part3-flow-padding: clamp(18px, 2.4vw, 32px);
+  --part3-flow-node-size: calc(15px * var(--font-scale));
+}
+
+#part-3-ai-chain .part3-flow-frame {
+  width: var(--part3-flow-width, 100%);
+  min-height: var(--part3-flow-min-height, 0);
+  padding: var(--part3-flow-padding, clamp(18px, 2.4vw, 32px));
+}
+#part-3-ai-chain .part3-flow-frame .workflow-node {
+  font-size: var(--part3-flow-node-size, calc(15px * var(--font-scale)));
+}
+
+/* Part 3.5.4 — Single-card section: 選用的 AI Model (#part-3-model) */
+#part-3-model {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+}
+
+/* Part 3.5.5 — Single-card section: Google Cloud (#part-3-cloud) */
+#part-3-cloud {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+  --part3-cloud-gallery-width: 48%;
+  --part3-cloud-gallery-height: clamp(360px, 34vw, 520px);
+}
+
+/* Part 3.5.5.1 — Google Cloud: text card left, free-trial gallery right */
+#part-3-cloud .part3-cloud-layout {
+  display: grid;
+  grid-template-columns: minmax(0, calc(100% - var(--part3-cloud-gallery-width) - var(--col-gap))) minmax(280px, var(--part3-cloud-gallery-width));
+  align-items: stretch;
+  gap: var(--col-gap);
+}
+#part-3-cloud .part3-cloud-layout > .copybox {
+  width: 100%;
+  max-width: none;
+}
+#part-3-cloud .part3-cloud-visual {
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+#part-3-cloud .part3-cloud-photo-gallery {
+  width: 100%;
+  height: var(--part3-cloud-gallery-height);
+  min-height: 0;
+  --gallery-fit: contain;
+}
+
+/* Part 3.6.2–3.6.4 — Section defaults: LLM Wiki */
+#part-3-wiki-intro,
+#part-3-wiki-data,
+#part-3-wiki-analysis {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+}
+
+/* Part 3.0.2 — Shared chart, workflow, and question-gallery layer */
+/* Part 3 的特殊視覺卡片同樣由各自所在區塊的變數控制。 */
+#part-3-content .part3-chart-frame {
+  width: var(--part3-visual-width, 100%);
+  min-height: var(--part3-visual-min-height, 360px);
+  padding: var(--part3-visual-padding, clamp(20px, 2.4vw, 34px));
+}
+#part-3-content .part3-chart-copy {
+  font-size: var(--part3-chart-body-size, calc(15px * var(--font-scale)));
+}
+#part-3-content .part3-qgallery {
+  width: var(--part3-visual-width, 100%);
+}
+
+/* ====================== Part 3.1–3.6 card-level controls ==================
+   Part 3 實際卡片的獨立設定
+   --------------------------------------------------------------------------
+   以下每一個 ID 只控制一張卡。要調整某一張卡，只改該 ID 區塊的數值；
+   不要改另一張卡的區塊，也不會連帶改到同一部分的其他卡片。
+*/
+
+/* Part 3.1.2 — Text card: #part-3-research-card */
+#part-3-research-card {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+}
+
+/* Part 3.1.3 — Relationship chart: #part-3-research-chart */
+#part-3-research-chart {
+  --part3-visual-width: 100%;
+}
+
+/* Part 3.2.2 — Tool card: #part-3-tools-card */
+#part-3-tools-card {
+  --part3-tools-width: 100%;
+  --part3-tools-list-width: 25%;
+  --part3-tools-height: 1000px;
+  --part3-tools-photo-height: 0px;
+  --part3-tools-info-height: auto;
+  --part3-tools-title-size: clamp(21px, 1.8vw, 25px);
+  --part3-tools-subtitle-size: 13px;
+  --part3-tools-info-title-size: clamp(36px, 4.8vw, 66px);
+  --part3-tools-info-body-size: clamp(20px, 1.8vw, 27px);
+  --part3-tools-info-padding: clamp(24px, 4vw, 48px);
+
+  /* Agentic AI 四個視窗：每個視窗均可獨立調整寬、高、左／上位置、
+     內容字級和傾斜角度。位置用百分比，傾斜角度用 deg。 */
+  --agentic-terminal-width: 45%;
+  --agentic-terminal-height: 43%;
+  --agentic-terminal-left: 2%;
+  --agentic-terminal-top: 5%;
+  --agentic-terminal-font-size: 10px;
+  --agentic-terminal-angle: -5deg;
+  --agentic-html-width: 43%;
+  --agentic-html-height: 46%;
+  --agentic-html-left: 54%;
+  --agentic-html-top: 3%;
+  --agentic-html-font-size: 10px;
+  --agentic-html-angle: 4deg;
+  --agentic-ocr-width: 43%;
+  --agentic-ocr-height: 39%;
+  --agentic-ocr-left: 5%;
+  --agentic-ocr-top: 51%;
+  --agentic-ocr-font-size: 10px;
+  --agentic-ocr-angle: 3deg;
+  --agentic-skills-width: 43%;
+  --agentic-skills-height: 39%;
+  --agentic-skills-left: 54%;
+  --agentic-skills-top: 51%;
+  --agentic-skills-font-size: 10px;
+  --agentic-skills-angle: -4deg;
+
+  /* Codex pet size: fixed pixels so changing the screen width does not resize it. */
+  --agentic-pet-width: 235px;
+  --agentic-pet-height: 256px;
+  --agentic-pet-face-font-size: 22px;
+  --agentic-pet-body-font-size: 12px;
+}
+
+/* Part 3.2.2.1 — 自己的 GitHub Repository：雲端上傳動畫
+   （#part-3-tools-card 內「備份、管理與協作」資訊面板） */
+#part-3-tools-card .cloud-scene {
+  --scene-bg-1: #0c1730;         /* 背景漸層深色端 */
+  --scene-bg-2: #142449;         /* 背景漸層淺色端 */
+  --circuit-color: rgba(140, 170, 255, .16); /* 電路紋理線條顏色 */
+  --circuit-size: 46px;          /* 電路紋理格線間距 */
+  --cloud-color: #7fa4f2;        /* 雲朵顏色 */
+  --cloud-glow: rgba(127, 164, 242, .55); /* 雲朵發光顏色 */
+  --cloud-w: 58%;                /* 雲朵寬度（相對舞台） */
+  --gh-right: 12%;               /* GitHub 頭像距右邊的距離；數字越小越貼近雲朵中央 */
+  --gh-top: 2%;                  /* GitHub 頭像距頂部的距離 */
+  --gh-w: 20%;                   /* GitHub 頭像大小 */
+  --arrow-w: 16%;                /* 上傳箭頭寬度 */
+  --card-bg: #12213f;            /* 飄浮卡片底色 */
+  --card-border: rgba(140, 170, 255, .35); /* 飄浮卡片邊框顏色 */
+}
+
+/* Part 3.4.4 — 運用 Agentic AI 使用 PaddleOCR：Codex 對話視窗＋PaddleOCR Python 視窗
+   #part-3-agentic-ocr-chart */
+#part-3-agentic-ocr-chart {
+  --agentic-frame-height: clamp(560px, 52vw, 680px);
+  --visual-h: var(--agentic-frame-height);
+  --agentic-pyocr-width: 72%;
+  --agentic-pyocr-height: 54%;
+  --agentic-pyocr-left: 28%;
+  --agentic-pyocr-top: 2%;
+  --agentic-pyocr-font-size: 11px;
+  --agentic-pyocr-angle: 0deg;
+  --agentic-codex-width: 82%;
+  --agentic-codex-height: 84%;
+  --agentic-codex-left: 0%;
+  --agentic-codex-top: 14%;
+  --agentic-codex-font-size: 20px;
+  --agentic-codex-text-size: 20px;
+  --agentic-codex-angle: 0deg;
+}
+
+/* Part 3.3.2 — Text block: #part-3-basic-flow-card */
+#part-3-basic-flow-card {
+  --part3-card-width: 100%;
+  --part3-card-max-width: none;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: 0;
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+}
+
+#part-3-basic-flow .lay-stack > #part-3-basic-flow-card {
+  width: var(--part3-card-width, 100%);
+  max-width: var(--part3-card-max-width, none);
+  height: var(--part3-card-height, auto);
+  min-height: var(--part3-card-min-height, 0);
+  padding: var(--part3-card-padding, 0);
+}
+
+/* Part 3.3.3 — Workflow: #part-3-basic-flow-chart */
+#part-3-basic-flow-chart {
+  --part3-flow-width: 100%;
+  --part3-flow-min-height: 0;
+  --part3-flow-padding: clamp(18px, 2.4vw, 32px);
+  --part3-flow-node-size: calc(15px * var(--font-scale));
+  --part3-flow-step-height: 170px;
+  --part3-flow-step-number-gap: 22px;
+}
+
+/* Part 3.5.2.1 — Card 1: #part-3-ai-skills-card-1 */
+#part-3-ai-skills-card-1 {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+}
+
+/* Part 3.5.2.2 — Card 2: #part-3-ai-skills-card-2 */
+#part-3-ai-skills-card-2 {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+}
+
+/* Part 3.5.3.1 — Card 1: #part-3-ai-chain-card-1 */
+#part-3-ai-chain-card-1 {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+}
+
+/* Part 3.5.3.2 — Card 2: #part-3-ai-chain-card-2 */
+#part-3-ai-chain-card-2 {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+}
+
+/* Part 3.5.3.3 — Workflow: #part-3-ai-chain-chart */
+#part-3-ai-chain-chart {
+  --part3-flow-width: 100%;
+  --part3-flow-min-height: 0;
+  --part3-flow-padding: clamp(18px, 2.4vw, 32px);
+  --part3-flow-node-size: calc(15px * var(--font-scale));
+}
+
+/* Part 3.6.2 — Card: #part-3-wiki-intro-card */
+#part-3-wiki-intro-card {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+}
+
+/* Part 3.6.3 — Card: #part-3-wiki-data-card */
+#part-3-wiki-data-card {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+}
+
+/* Part 3.6.4 — Card: #part-3-wiki-analysis-card */
+#part-3-wiki-analysis-card {
+  --part3-card-width: 100%;
+  --part3-card-max-width: 74ch;
+  --part3-card-height: auto;
+  --part3-card-min-height: 0;
+  --part3-card-padding: clamp(18px, 1.8vw, 26px);
+  --part3-title-size: clamp(27px, 3.4vw, 46px);
+  --part3-body-size: calc(16px * var(--font-scale));
+  --part3-body-line-height: 1.9;
+}
+
+/* Part 3.7.1 — Accent colours: OCR sections */
+#part-3-ocr-definition,
+#part-3-paddleocr,
+#part-3-agentic-ocr,
+#part-3-material,
+#part-3-format,
+#part-3-printed,
+#part-3-handwritten,
+#part-3-json,
+#part-3-test,
+#part-3-import { --card-accent: #b66d48; }
+
+/* Part 3.7.2 — Accent colours: AI sections */
+#part-3-ai-skills { --card-accent: #ad7a35; }
+#part-3-ai-chain { --card-accent: #c7543f; }
+#part-3-model,
+#part-3-cloud { --card-accent: #7e6a39; }
+
+/* Part 3.7.3 — Accent colours: LLM Wiki */
+#part-3-wiki-intro,
+#part-3-wiki-data,
+#part-3-wiki-analysis { --card-accent: #a45e4c; }
+
+/* =========================================================================
+   Part 3.4.10 — 試一試（#part-3-try）
+   ─────────────────────────────────────────────────────────────────────────
+   這一節所有可以手動調整的東西都集中在下面。只改這裡就好，
+   不用動 storymap.css、storymap.js 或 storymap-example.html。
+
+   一、整體尺寸與版面
+       在 #part-3-try-explorer 區塊裡改：
+
+         --try-explorer-h      整個遊戲視窗（原件＋資訊面板）的高度，
+                                預設是「瀏覽器可視高度的 95%，扣掉頂部導覽列」，
+                                左右兩欄都會跟著這個高度走，各自在內部捲動，
+                                不會把頁面往下撐得很長。
+         --try-explorer-cols   左右兩半的比例，例如 48% 52%
+         --try-doc-pad         左半（史料）的內邊距
+         --try-doc-gap         史料與翻頁按鈕之間的距離
+         --try-page-w          史料圖片的寬度，例如 100%、86%
+                                （圖片依比例縮放；PDF backdrop 會跟著
+                                史料內容收合，不會沿用右側視窗的高度）
+         --try-hl-opacity      標示區的透明度，0 全透明、1 全不透明
+         --try-panel-pad       右半（資訊面板）的內邊距
+         --try-progress-gap    進度圓點列下面的留白，以及它跟目前視窗
+                                之間那條分隔線的間距
+         --try-guide-gap       目前視窗跟底部引導對話框之間的留白，
+                                以及它們之間那條分隔線的間距
+         --try-chat-max-h      第二步聊天視窗最高多少
+         --try-chat-max-h-final 全部完成、顯示完整 prompt 那一刻，
+                                聊天視窗改長高多少（預設 none＝不設上限，
+                                視內容自然長高，仍在 --try-explorer-h
+                                的範圍內用外層面板捲動）
+         --try-chatfoot-top-pad 完成 prompt 後，底部「複製全部」面板
+                                上方的留白
+         --try-cmp-area-h      第三步貼上結果的輸入框高度
+         --try-diff-h          第三步比對結果那一欄的高度
+
+   二、字級（全部會再乘上網站的字級設定 --font-scale）
+         --try-switch-font-size   進度列最右側「印刷字／手寫字」切換鈕
+         --try-dot-size           進度圓點的直徑
+         --try-dot-font-size      進度圓點裡數字的字級
+         --try-rpg-font-size      底部引導對話框的內文
+         --try-bubble-font-size   第二步每一句 prompt 的字級
+         --try-cmp-font-size      第三步的等寬字（貼上的結果與比對結果）
+         --try-score-font-size    吻合度百分比的數字
+
+   三、顏色
+         --try-rpg-bg       引導對話框的底色（可寫漸層）
+         --try-rpg-border   引導對話框的外框與四角小方塊
+         --try-ok           進度圓點「已完成／目前」、完成打勾、
+                             比對「多出來」共用的綠色（進度圓點只用這一種顏色，
+                             不再使用橘色強調色）
+
+   四、標示區（左半史料上那幾塊半透明色塊）
+       這一節「不顯示標籤」，只顯示標示區。每一塊寫成一個區塊：
+
+         #part-3-try-explorer[data-try-mode="印刷字或手寫字"]
+         [data-try-feature="名稱"] {
+           --fx-color: #cfe3d4;    標示區顏色
+           --fx-left: 12%;         距離圖片左邊
+           --fx-top: 20%;          距離圖片上面
+           --fx-width: 56%;        寬度
+           --fx-height: 62%;       高度
+         }
+
+       data-try-mode 只有兩個值：printed（印刷字）、handwritten（手寫字）。
+       data-try-feature 的名稱要和 storymap-example.html 裡
+       <script type="application/json" data-part3-try-data> 的 features 一致：
+
+         印刷字 printed：info（文本資訊）、column（直排單欄）、
+                          para（分段）、punctuation（標點符號）、
+                          signoff（落款與尾批）、page（頁碼）
+         手寫字 handwritten：column（直排單欄）、author（上奏官員）、
+                          minor（臣字款）、rescript（硃批）、stamp（印章與浮水印）
+
+       要新增一塊標示區：先在 HTML 的 features 裡加一項（要寫 page 第幾頁），
+       再到某個 step 的 "feature" 指向它，最後在這裡加一個對應的區塊調位置。
+       要移除一塊：把 HTML features 裡那一項和用到它的 step 刪掉即可。
+
+   五、PDF 檔案
+       檔名與下載連結寫在 storymap-example.html 的 data-part3-try-data 裡：
+       "pdf" 是顯示的檔名，"href" 是實際下載路徑（目前留空＝只記錄已下載）。
+   ========================================================================= */
+
+#part-3-try-explorer {
+  /* 版面 */
+  --try-explorer-h: calc(95svh - var(--bar-h, 62px));
+  --try-explorer-cols: 48% 52%;
+  --try-doc-pad: clamp(24px, 2.4vw, 38px);
+  --try-doc-gap: 18px;
+  --try-page-w: 100%;
+  --try-hl-opacity: .45;
+  --try-panel-pad: 24px 26px;
+  --try-progress-gap: 16px;
+  --try-guide-gap: 16px;
+  --try-chat-max-h: 420px;
+  --try-chat-max-h-final: none;
+  --try-chatfoot-top-pad: 24px;
+  --try-cmp-area-h: 96px;
+  --try-diff-h: 180px;
+
+  /* 字級 */
+  --try-switch-font-size: 12.5px;
+  --try-dot-size: 30px;
+  --try-dot-font-size: 14px;
+  --try-rpg-font-size: 13px;
+  --try-bubble-font-size: 13.5px;
+  --try-cmp-font-size: 12px;
+  --try-score-font-size: 30px;
+
+  /* 顏色 */
+  --try-rpg-bg: linear-gradient(160deg, #12363a 0%, #1b464a 100%);
+  --try-rpg-border: #6f9a90;
+  --try-ok: #2e7d5b;
+
+  /* 與 7／8 一樣加寬，跳出內容欄的左右留白 */
+  width: 96vw;
+  max-width: 96vw;
+  margin-left: calc(50% - 48vw);
+  margin-right: calc(50% - 48vw);
+  grid-template-columns: var(--try-explorer-cols, 48% 52%);
+  /* 印刷字 PDF 的高度上限；左側 backdrop 會隨圖片內容收合。 */
+  --try-pdf-max-h: calc(var(--try-explorer-h) - (2 * var(--try-doc-pad)) - 58px);
+  --try-pdf-backdrop-h: calc(var(--try-pdf-max-h) + (2 * var(--try-doc-pad)) + 18px);
+}
+
+/* 試一試：綠色原件區填滿左欄，不在上方／下方留下透明白邊。
+   進度列的模式切換固定在 1／2／3 數字列最右側。 */
+#part-3-try-explorer .part3-try-doc {
+  background-size: 100% 100%, 100% 100%;
+}
+#part-3-try-explorer .part3-try-progress {
+  justify-content: flex-start;
+}
+#part-3-try-explorer .part3-try-progress .part3-try-switch {
+  margin-left: auto;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+/* ── 標示區：印刷字 ─────────────────────────────────────────────── */
+#part-3-try-explorer[data-try-mode="printed"] [data-try-feature="info"] {
+  --fx-color: #cfe0ef;
+  --fx-left: 70%; --fx-top: 9%; --fx-width: 24%; --fx-height: 28%;
+}
+#part-3-try-explorer[data-try-mode="printed"] [data-try-feature="column"] {
+  --fx-color: #cfe3d4;
+  --fx-left: 12%; --fx-top: 20%; --fx-width: 56%; --fx-height: 62%;
+}
+#part-3-try-explorer[data-try-mode="printed"] [data-try-feature="para"] {
+  --fx-color: #f5e6bd;
+  --fx-left: 14%; --fx-top: 44%; --fx-width: 50%; --fx-height: 26%;
+}
+#part-3-try-explorer[data-try-mode="printed"] [data-try-feature="page"] {
+  --fx-color: #ddd6ea;
+  --fx-left: 6%; --fx-top: 88%; --fx-width: 14%; --fx-height: 7%;
+}
+#part-3-try-explorer[data-try-mode="printed"] [data-try-feature="punctuation"] {
+  --fx-color: #f3bdd4;
+  --fx-left: 10%; --fx-top: 20%; --fx-width: 60%; --fx-height: 62%;
+}
+#part-3-try-explorer[data-try-mode="printed"] [data-try-feature="signoff"] {
+  --fx-color: #d3e5e2;
+  --fx-left: 14%; --fx-top: 70%; --fx-width: 60%; --fx-height: 20%;
+}
+
+/* ── 標示區：手寫字 ─────────────────────────────────────────────── */
+#part-3-try-explorer[data-try-mode="handwritten"] [data-try-feature="column"] {
+  --fx-color: #cfe3d4;
+  --fx-left: 14%; --fx-top: 12%; --fx-width: 62%; --fx-height: 70%;
+}
+#part-3-try-explorer[data-try-mode="handwritten"] [data-try-feature="author"] {
+  --fx-color: #cfe0ef;
+  --fx-left: 68%; --fx-top: 10%; --fx-width: 20%; --fx-height: 20%;
+}
+#part-3-try-explorer[data-try-mode="handwritten"] [data-try-feature="minor"] {
+  --fx-color: #f5e6bd;
+  --fx-left: 30%; --fx-top: 40%; --fx-width: 12%; --fx-height: 14%;
+}
+#part-3-try-explorer[data-try-mode="handwritten"] [data-try-feature="rescript"] {
+  --fx-color: #f0d6d0;
+  --fx-left: 20%; --fx-top: 16%; --fx-width: 26%; --fx-height: 34%;
+}
+#part-3-try-explorer[data-try-mode="handwritten"] [data-try-feature="stamp"] {
+  --fx-color: #ddd6ea;
+  --fx-left: 50%; --fx-top: 60%; --fx-width: 22%; --fx-height: 22%;
+}
+
+@media (max-width: 980px) {
+  #part-3-cloud .part3-cloud-layout {
+    grid-template-columns: 1fr;
+  }
+  #part-3-cloud .part3-cloud-photo-gallery {
+    height: var(--part3-cloud-gallery-height-mobile, 420px);
+  }
+}

@@ -1,0 +1,252 @@
+/* ============================================================================
+   第三部分「適合的研究問題」— 四線關係圖表 互動圖庫
+
+   取代原先的兩個文字框，改以兩張可切換的圖表說明「適合本平台的研究問題」。
+   四條線的顏色沿用 Part 1 複本已定案的配色（見 part-1-interface.css），
+   保持全站一致：戰場事件 #b5462e／官員上奏 #2f75b5／
+   皇帝硃批下旨 #c46a2b／皇帝行動 #7d4ab8。
+   ========================================================================== */
+
+.part3-qgallery {
+  position: relative;
+  background: #f6f1e6;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  box-shadow: 0 12px 30px rgba(22, 61, 63, .13);
+  overflow: hidden;
+  font-family: var(--sans);
+}
+
+.part3-qgallery-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 10px 14px 8px;
+  background: linear-gradient(#fffdf8, #f0e7d6);
+  border-bottom: 1px solid #ddd1bc;
+}
+
+.part3-qgallery-head h4 {
+  margin: 0;
+  color: var(--ink);
+  font: 700 calc(13px * var(--font-scale))/1.4 var(--sans);
+}
+
+.part3-qgallery-head span {
+  color: #9a8d79;
+  font: 500 calc(11px * var(--font-scale))/1.4 var(--sans);
+}
+
+.part3-qgallery-stage { position: relative; min-height: 0; }
+
+.part3-qslide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease;
+}
+
+.part3-qslide.is-active { position: relative; opacity: 1; pointer-events: auto; }
+
+/* 四線圖表本體 ------------------------------------------------------------ */
+
+.part3-qchart { padding: 14px 16px 10px; }
+
+.part3-qlane-heads {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.part3-qlane-heads span {
+  padding: 3px 0;
+  text-align: center;
+  border-bottom: 2px solid currentColor;
+  font: 700 calc(11px * var(--font-scale))/1.4 var(--sans);
+}
+
+.part3-qplot { position: relative; min-height: 300px; }
+
+.part3-qlane-lines {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  pointer-events: none;
+}
+
+.part3-qlane-lines span {
+  display: block;
+  width: 1px;
+  height: 100%;
+  margin: 0 auto;
+  background: repeating-linear-gradient(currentColor 0 4px, transparent 4px 9px);
+  opacity: .34;
+}
+
+.part3-qarrows { position: absolute; inset: 0; z-index: 2; }
+
+.part3-qarrow-path {
+  fill: none;
+  stroke-width: 2;
+  opacity: .82;
+  transition: opacity .2s, stroke-width .2s;
+}
+
+.part3-qgroup.is-dim .part3-qarrow-path { opacity: .18; }
+.part3-qgroup.is-hot .part3-qarrow-path { opacity: 1; stroke-width: 3; }
+
+.part3-qdot {
+  position: absolute;
+  z-index: 3;
+  width: 13px;
+  height: 13px;
+  margin: -6.5px 0 0 -6.5px;
+  border: 2px solid #fffaf2;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(22, 61, 63, .3);
+  cursor: pointer;
+  transition: transform .18s, box-shadow .18s;
+}
+
+.part3-qdot:hover,
+.part3-qdot:focus-visible,
+.part3-qdot.is-hot { transform: scale(1.35); box-shadow: 0 0 0 5px rgba(196, 93, 56, .28); }
+
+.part3-qgroup.is-dim .part3-qdot:not(.part3-qdot-shared) { opacity: .3; }
+
+.part3-qdot-date {
+  position: absolute;
+  z-index: 3;
+  transform: translate(-50%, 0);
+  white-space: nowrap;
+  color: #8d8171;
+  pointer-events: none;
+  font: 600 calc(9.5px * var(--font-scale))/1 var(--sans);
+}
+
+/* 浮動 Text 標籤 ----------------------------------------------------------- */
+
+.part3-qtext {
+  position: absolute;
+  z-index: 5;
+  max-width: 200px;
+  padding: 7px 10px;
+  color: #fffaf2;
+  background: var(--callout-color, var(--accent));
+  border-radius: 3px;
+  box-shadow: 0 8px 18px rgba(22, 61, 63, .22);
+  cursor: pointer;
+  font: 700 calc(11px * var(--font-scale))/1.5 var(--sans);
+  transition: transform .18s, box-shadow .18s;
+}
+
+.part3-qtext:hover,
+.part3-qtext:focus-visible,
+.part3-qtext.is-hot { transform: translateY(-2px); box-shadow: 0 12px 22px rgba(22, 61, 63, .3); }
+
+.part3-qgroup.is-dim .part3-qtext { opacity: .5; }
+
+/* 說明卡（每張圖下方的圖例 / 說明） ------------------------------------------ */
+
+.part3-qlegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  padding: 10px 16px 14px;
+  border-top: 1px solid #e6dccb;
+}
+
+.part3-qlegend-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  max-width: 320px;
+  padding: 6px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color .18s;
+}
+
+.part3-qlegend-item:hover,
+.part3-qlegend-item.is-hot { background: rgba(196, 93, 56, .1); }
+
+.part3-qlegend-swatch {
+  flex: 0 0 auto;
+  width: 10px; height: 10px; margin-top: 4px;
+  border-radius: 50%;
+  background: var(--swatch-color, var(--accent));
+}
+
+.part3-qlegend-item p {
+  margin: 0;
+  color: var(--text);
+  font: var(--body-weight) calc(12px * var(--font-scale))/1.55 var(--serif);
+}
+
+.part3-qlegend-item strong { color: var(--ink); }
+
+/* 時間差標註（第二張圖專用） ------------------------------------------------- */
+
+.part3-qgap {
+  position: absolute;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 5px 9px;
+  color: #6b4a2c;
+  text-align: center;
+  background: #fdf4e2;
+  border: 1px solid #ecd9b6;
+  border-radius: 3px;
+  font: 700 calc(10.5px * var(--font-scale))/1.4 var(--sans);
+}
+
+.part3-qgap span { display: block; color: #a08a63; font-weight: 600; }
+
+/* 導覽（上一張／下一張／圓點） ----------------------------------------------- */
+
+.part3-qnav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 9px 12px;
+  background: #ece3d3;
+  border-top: 1px solid #ddd1bc;
+}
+
+.part3-qnav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  color: #6f6352;
+  background: #fffaf2;
+  border: 1px solid #ded2bd;
+  border-radius: 999px;
+  cursor: pointer;
+  font: 700 calc(11.5px * var(--font-scale))/1.4 var(--sans);
+}
+
+.part3-qnav-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.part3-qnav-dots { display: flex; gap: 7px; }
+
+.part3-qnav-dot {
+  width: 8px; height: 8px; padding: 0; border: 0; border-radius: 50%;
+  background: #ded2bd;
+  cursor: pointer;
+}
+
+.part3-qnav-dot.is-active { background: var(--accent); transform: scale(1.2); }
+
+@media (max-width: 720px) {
+  .part3-qplot { min-height: 360px; }
+  .part3-qtext { max-width: 150px; font-size: calc(10px * var(--font-scale)); }
+}
