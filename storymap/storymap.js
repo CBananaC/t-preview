@@ -266,7 +266,7 @@ const refreshSourceFlowConnectors = () => {
         bubble.hidden = !markIsVisible;
         bubble.setAttribute('aria-hidden', String(!markIsVisible));
         if (!markIsVisible) {
-          bubble.style.removeProperty('top');
+          bubble.style.removeProperty('--source-bubble-top');
           return;
         }
         const markRect = visibleMarks[0].rect;
@@ -275,7 +275,7 @@ const refreshSourceFlowConnectors = () => {
         const maxBubbleTop = Math.max(8, height - bubbleHeight - 8);
         let bubbleTop = Math.max(8, Math.min(maxBubbleTop, targetY - bubbleHeight / 2));
         if (bubbleTop < previousBottom + 10) bubbleTop = Math.min(maxBubbleTop, previousBottom + 10);
-        bubble.style.top = `${Math.round(bubbleTop)}px`;
+        bubble.style.setProperty('--source-bubble-top', `${Math.round(bubbleTop)}px`);
         previousBottom = bubbleTop + bubbleHeight;
 
         const bubbleRect = bubble.getBoundingClientRect();
@@ -322,127 +322,6 @@ document.querySelectorAll('[data-source-flow]').forEach((visual) => {
   if ('ResizeObserver' in window) new ResizeObserver(scheduleSourceFlowConnectorRefresh).observe(visual);
 });
 scheduleSourceFlowConnectorRefresh();
-
-/* 引言 01：手機／窄螢幕把每一列改成「標題 → 視覺 → 內文」。
-   保留原本的三頁畫廊，並把第 2 頁複製到第 2 列，讓「研究價值」有自己的圖像。
-   捲到某列標題時自動展開；點擊標題仍可手動開關。 */
-const initIntroResearchValueInlineList = () => {
-  const responsiveQuery = window.matchMedia('(pointer: coarse) and (hover: none), (max-width: 1040px)');
-
-  const section = document.getElementById('intro-1-1');
-  const split = section?.querySelector(':scope > .story-inner > .lay-split');
-  const stack = split?.querySelector(':scope > .lay-copy-stack');
-  const visual = split?.querySelector(':scope > .lay-visual');
-  const gallery = visual?.querySelector('[data-photo-gallery]');
-  const cards = stack ? [...stack.children].filter((item) => item.matches('[data-intro-card]')) : [];
-  const dataScript = gallery?.querySelector('[data-photo-gallery-data]');
-  if (!split || !gallery || cards.length < 2 || !dataScript) return;
-
-  let pages = [];
-  try {
-    pages = JSON.parse(dataScript.textContent);
-  } catch (error) {
-    return;
-  }
-  if (!Array.isArray(pages) || !pages.length) return;
-
-  const list = document.createElement('div');
-  list.className = 'intro-inline-list';
-  list.dataset.introInlineList = '';
-  const rows = [];
-
-  cards.forEach((card, index) => {
-    const titleRow = card.querySelector('.title-row');
-    const number = titleRow?.querySelector('.option-number');
-    const title = titleRow?.querySelector('h2');
-    const body = card.querySelector('.body');
-    if (!number || !title || !body) return;
-
-    const row = document.createElement('article');
-    row.className = 'intro-inline-row';
-    row.dataset.introInlineRow = String(index + 1);
-    row.dataset.introCard = '';
-    row.dataset.tab = card.dataset.tab || '';
-    row.dataset.nav = card.dataset.nav || '';
-    if (card.id) row.id = card.id;
-
-    const heading = document.createElement('button');
-    heading.type = 'button';
-    heading.className = 'intro-inline-title';
-    heading.dataset.introInlineTarget = String(index + 1);
-    heading.setAttribute('aria-expanded', 'false');
-    heading.setAttribute('aria-controls', `intro-inline-body-${index + 1}`);
-    heading.append(number.cloneNode(true), title.cloneNode(true));
-    const arrow = document.createElement('span');
-    arrow.className = 'intro-inline-arrow';
-    arrow.setAttribute('aria-hidden', 'true');
-    arrow.textContent = '▾';
-    heading.appendChild(arrow);
-
-    const rowVisual = gallery.cloneNode(true);
-    rowVisual.dataset.photoGalleryId = index === 0 ? 'intro-1-1' : 'intro-1-2';
-    if (index === 1) {
-      const rowData = rowVisual.querySelector('[data-photo-gallery-data]');
-      rowData.textContent = JSON.stringify([pages[1] || pages[0]]);
-    }
-    const visualBox = document.createElement('div');
-    visualBox.className = 'intro-inline-visual';
-    visualBox.appendChild(rowVisual);
-
-    const rowBody = body.cloneNode(true);
-    rowBody.classList.add('intro-inline-text');
-    rowBody.id = `intro-inline-body-${index + 1}`;
-    row.append(heading, visualBox, rowBody);
-    list.appendChild(row);
-    rows.push(row);
-  });
-
-  if (rows.length < 2) return;
-  split.after(list);
-
-  const setOpen = (row, open) => {
-    rows.forEach((item) => {
-      const active = open && item === row;
-      item.classList.toggle('is-open', active);
-      item.querySelector('.intro-inline-title')?.setAttribute('aria-expanded', String(active));
-    });
-  };
-  rows.forEach((row) => {
-    const heading = row.querySelector('.intro-inline-title');
-    heading?.addEventListener('click', () => setOpen(row, !row.classList.contains('is-open')));
-  });
-
-  let scrollFrame = 0;
-  const updateFromScroll = () => {
-    scrollFrame = 0;
-    if (!responsiveQuery.matches) return;
-    const threshold = window.innerHeight * 0.62;
-    const candidates = rows.filter((row) => {
-      const rect = row.querySelector('.intro-inline-title')?.getBoundingClientRect();
-      return rect && rect.bottom > window.innerHeight * 0.08 && rect.top < threshold;
-    });
-    if (candidates.length) setOpen(candidates[candidates.length - 1], true);
-  };
-  const requestScrollUpdate = () => {
-    if (!scrollFrame) scrollFrame = window.requestAnimationFrame(updateFromScroll);
-  };
-  const syncLayout = () => {
-    const inline = responsiveQuery.matches;
-    split.classList.toggle('intro-inline-source-hidden', inline);
-    list.classList.toggle('intro-inline-list-hidden', !inline);
-    if (inline) requestScrollUpdate();
-  };
-  window.addEventListener('scroll', requestScrollUpdate, { passive: true });
-  window.addEventListener('resize', requestScrollUpdate, { passive: true });
-  const introPanel = document.getElementById('intro-panel');
-  if (introPanel && 'MutationObserver' in window) {
-    new MutationObserver(requestScrollUpdate).observe(introPanel, { attributes: true, attributeFilter: ['hidden'] });
-  }
-  if (responsiveQuery.addEventListener) responsiveQuery.addEventListener('change', syncLayout);
-  else responsiveQuery.addListener(syncLayout);
-  syncLayout();
-};
-initIntroResearchValueInlineList();
 
 /* 小卡（點擊展開）＋對應視覺元素。
    行為：初始全部收合；點標題展開／收合，不影響其他已展開的卡；
@@ -506,6 +385,67 @@ document.querySelectorAll('[data-acc]').forEach((group) => {
 
   showPanel(cards[0].dataset.accCard);
 });
+
+/* 手機／窄螢幕：清單列進入閱讀區時，以動畫展開對應的視覺面板。
+   Part 3 的硃113／硃119兩列是完整通信示意，維持固定展開，不套用這個收合動畫。 */
+const initResponsiveSequentialRows = () => {
+  const responsiveQuery = window.matchMedia('(pointer: coarse) and (hover: none), (max-width: 1040px)');
+  document.querySelectorAll('[data-sequential-scroll]').forEach((group) => {
+    const cards = [...group.querySelectorAll('[data-acc-card]')];
+    const panels = [...group.querySelectorAll('[data-acc-panel]')];
+    const panelById = new Map(panels.map((panel) => [panel.dataset.accPanel, panel]));
+    const rows = cards
+      .map((card) => ({ card, panel: panelById.get(card.dataset.accCard) }))
+      .filter(({ panel }) => panel);
+    if (!rows.length) return;
+
+    const isFixedSourceRow = (panel) => (
+      group.closest('#intro-1-3-a')
+      && ['difficulty-relations', 'difficulty-network'].includes(panel.dataset.accPanel)
+    );
+    let scrollFrame = 0;
+    const updateRows = () => {
+      scrollFrame = 0;
+      if (!responsiveQuery.matches) return;
+      if (!group.getClientRects().length) return;
+      const triggerLine = window.innerHeight * 0.68;
+      rows.forEach(({ card, panel }) => {
+        if (isFixedSourceRow(panel) || panel.classList.contains('is-scroll-open')) return;
+        const rect = card.getBoundingClientRect();
+        if (rect.top <= triggerLine) {
+          card.classList.add('is-scroll-open');
+          panel.classList.add('is-scroll-open');
+        }
+      });
+    };
+    const requestRowUpdate = () => {
+      if (!responsiveQuery.matches || scrollFrame) return;
+      scrollFrame = window.requestAnimationFrame(updateRows);
+    };
+    const resetRows = () => {
+      rows.forEach(({ card, panel }) => {
+        card.classList.remove('is-scroll-open');
+        panel.classList.remove('is-scroll-open');
+      });
+      if (responsiveQuery.matches) requestRowUpdate();
+    };
+
+    window.addEventListener('scroll', requestRowUpdate, { passive: true });
+    window.addEventListener('resize', requestRowUpdate, { passive: true });
+    const tabPanel = group.closest('[data-tab-panel]');
+    if (tabPanel && 'MutationObserver' in window) {
+      new MutationObserver(requestRowUpdate).observe(tabPanel, {
+        attributes: true,
+        attributeFilter: ['hidden']
+      });
+    }
+    if (responsiveQuery.addEventListener) responsiveQuery.addEventListener('change', resetRows);
+    else responsiveQuery.addListener(resetRows);
+    requestRowUpdate();
+  });
+};
+initResponsiveSequentialRows();
+
 document.addEventListener('click', (event) => {
   if (!introDropdown.contains(event.target)) setIntroDropdownOpen(false);
 });
@@ -663,15 +603,14 @@ document.querySelectorAll('[data-photo-gallery]').forEach((gallery) => {
   const body = gallery.querySelector('.photo-gallery-body');
   if (!stage || !body) return;
 
-  /* 手機／窄螢幕電腦：先保持「圖片＋收合標題列」，頁面向下捲到
-     圖片頂端越過螢幕中線後才自動展開。這裡只負責加／移除狀態 class，
-     展開高度與過渡仍由 storymap.css 控制。 */
+/* 手機／窄螢幕電腦：先保持「圖片＋收合標題列」。只要圖片頂端已經
+   到達或越過螢幕中線，就立即展開，不要求一定要先經歷一次越線捲動。
+   這裡只負責加／移除狀態 class，展開高度與過渡仍由 storymap.css 控制。 */
   let scrollFrame = 0;
-  let hasScrolled = false;
   let previousScrollY = window.scrollY;
   const updateMobileScrollExpansion = () => {
     scrollFrame = 0;
-    if (!PHOTO_GALLERY_MOBILE_MQ.matches || !hasScrolled || !body.getClientRects().length) return;
+    if (!PHOTO_GALLERY_MOBILE_MQ.matches || !body.getClientRects().length) return;
     const currentScrollY = window.scrollY;
     const scrollingDown = currentScrollY >= previousScrollY;
     const photoTop = stage.getBoundingClientRect().top;
@@ -683,7 +622,6 @@ document.querySelectorAll('[data-photo-gallery]').forEach((gallery) => {
   };
   const requestMobileScrollExpansion = () => {
     if (!PHOTO_GALLERY_MOBILE_MQ.matches) return;
-    hasScrolled = true;
     if (!scrollFrame) scrollFrame = window.requestAnimationFrame(updateMobileScrollExpansion);
   };
   window.addEventListener('scroll', requestMobileScrollExpansion, { passive: true });
@@ -693,11 +631,21 @@ document.querySelectorAll('[data-photo-gallery]').forEach((gallery) => {
   }, { passive: true });
   const resetMobileScrollExpansion = () => {
     body.classList.remove('is-expanded');
-    hasScrolled = false;
     previousScrollY = window.scrollY;
+    if (PHOTO_GALLERY_MOBILE_MQ.matches) requestMobileScrollExpansion();
   };
   if (PHOTO_GALLERY_MOBILE_MQ.addEventListener) PHOTO_GALLERY_MOBILE_MQ.addEventListener('change', resetMobileScrollExpansion);
   else PHOTO_GALLERY_MOBILE_MQ.addListener(resetMobileScrollExpansion);
+
+  /* 當引言／其他分頁剛變為可見時，圖片可能已經位於中線上方；立即重算，
+     不必等待下一次捲動事件。 */
+  const tabPanel = gallery.closest('[data-tab-panel]');
+  if (tabPanel && 'MutationObserver' in window) {
+    new MutationObserver(requestMobileScrollExpansion).observe(tabPanel, {
+      attributes: true,
+      attributeFilter: ['hidden']
+    });
+  }
 
   stage.innerHTML = '';
   pages.forEach((page, i) => {
@@ -797,6 +745,9 @@ document.querySelectorAll('[data-photo-gallery]').forEach((gallery) => {
     if (event.target.closest('a')) return;
     if (window.matchMedia('(hover: none)').matches) body.classList.toggle('is-expanded');
   });
+
+  /* 初次建立畫廊後也檢查目前位置，涵蓋圖片一開始已在螢幕中線上方的情況。 */
+  requestMobileScrollExpansion();
 });
 
 /* OCR PDF page previews use one delegated listener so the click remains active

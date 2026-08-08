@@ -303,76 +303,60 @@
 /* 研究價值卡片與制度卡片之間保留額外上方留白 */
 #intro-1-2 { margin-top: clamp(24px, 2.2vw, 40px) !important; }
 
-/* 引言 01 的手機／窄螢幕排列：每一列依序顯示標題、視覺元素、原文。 */
-#intro-1-1 .intro-inline-list {
+/* 引言 01：桌面版把兩張文字卡放在左欄，原有三頁畫廊放在右欄。
+   窄螢幕改為「卡片 1 → 原有畫廊 → 卡片 2」，三者保持獨立。 */
+#intro-1-1 .intro-1-1-layout {
   display: grid;
-  gap: 12px;
-  width: 100%;
+  grid-template-columns: minmax(0, 1fr) minmax(0, var(--vis-w, 50%));
+  grid-template-rows: auto auto;
+  align-items: start;
+  gap: var(--col-gap, clamp(22px, 4vw, 72px));
 }
-#intro-1-1 .intro-inline-list.intro-inline-list-hidden { display: none; }
-#intro-1-1 .intro-inline-source-hidden { display: none !important; }
-#intro-1-1 .intro-inline-row {
-  overflow: hidden;
-  background: var(--card);
-  border: 1px solid var(--line);
-  scroll-margin-top: calc(var(--bar-h) + 18px);
+#intro-1-1 .intro-1-1-layout > #intro-1-1-card {
+  grid-column: 1;
+  grid-row: 1;
 }
-#intro-1-1 .intro-inline-title {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 14px;
-  width: 100%;
-  padding: 14px 17px;
-  color: var(--ink);
-  background: transparent;
-  border: 0;
-  cursor: pointer;
-  text-align: left;
-  font: inherit;
-}
-#intro-1-1 .intro-inline-title .option-number {
-  min-width: 42px;
-  height: 42px;
-  font-size: 16px;
-}
-#intro-1-1 .intro-inline-title h2 {
-  margin: 0;
+#intro-1-1 .intro-1-1-layout > .lay-visual {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  position: sticky;
+  top: calc(var(--bar-h) + 18px);
   min-width: 0;
-  font: 600 clamp(20px, 2.4vw, 30px)/1.25 var(--serif);
 }
-#intro-1-1 .intro-inline-title:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: -4px;
+#intro-1-1 .intro-1-1-layout > #intro-1-2 {
+  grid-column: 1;
+  grid-row: 2;
+  margin-top: 0 !important;
 }
-#intro-1-1 .intro-inline-arrow {
-  color: var(--accent);
-  font: 600 20px/1 var(--sans);
-  transition: transform .22s ease;
-}
-#intro-1-1 .intro-inline-row.is-open .intro-inline-arrow { transform: rotate(180deg); }
-#intro-1-1 .intro-inline-visual,
-#intro-1-1 .intro-inline-text { display: none; }
-#intro-1-1 .intro-inline-row.is-open .intro-inline-visual {
-  display: block;
-  padding: 0 clamp(12px, 2vw, 22px);
-}
-#intro-1-1 .intro-inline-row.is-open .intro-inline-text {
-  display: block;
-  margin: 0;
-  padding: clamp(18px, 2.5vw, 28px) clamp(18px, 2.8vw, 32px);
-  border-top: 1px solid var(--line);
-}
-#intro-1-1 .intro-inline-visual .photo-gallery {
-  height: min(60vh, 560px);
-  min-height: 300px;
-}
-/* 第 2 列使用原畫廊的第 2 頁（遞送奏摺），不再留在整組列表最下方。 */
-#intro-1-1 .intro-inline-row[data-intro-inline-row="2"] .photo-gallery-frame {
-  --photo-fit: contain;
-  --photo-left: 70%;
-  --photo-top: 42%;
-  --photo-zoom: 1.2;
+
+@media (pointer: coarse) and (hover: none), (max-width: 1040px) {
+  #intro-1-1 .intro-1-1-layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    gap: clamp(16px, 3vh, 28px);
+  }
+  #intro-1-1 .intro-1-1-layout > #intro-1-1-card,
+  #intro-1-1 .intro-1-1-layout > .lay-visual,
+  #intro-1-1 .intro-1-1-layout > #intro-1-2 {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  #intro-1-1 .intro-1-1-layout > #intro-1-1-card { order: 1; }
+  #intro-1-1 .intro-1-1-layout > .lay-visual {
+    order: 2;
+    position: relative;
+    top: auto;
+    width: 100%;
+  }
+  #intro-1-1 .intro-1-1-layout > #intro-1-2 {
+    order: 3;
+    margin-top: 0 !important;
+  }
+  #intro-1-1 .intro-1-1-layout > .lay-visual .photo-gallery {
+    width: 100%;
+    height: min(70vh, 720px);
+    min-height: 360px;
+  }
 }
 
 /* 引言 01・第 2 張圖片（遞送奏摺／路線圖）：原圖是一整頁掃描，地圖本身只佔
@@ -543,6 +527,170 @@
 }
 #intro-1-6-a-source > .story-inner > .blk { width: 100%; max-width: none !important; }
 
+/* 引言 03／06 的手機與窄螢幕排列：依序顯示完整文字卡及其視覺元素。
+   一般列會在捲動進入時平滑展開；Part 3 的 02／03 通信面板維持較大的固定區域。 */
+@media (pointer: coarse) and (hover: none), (max-width: 1040px) {
+  #intro-1-3-a,
+  #intro-1-6-a-source {
+    /* 卡片、視覺及展開後的說明區合計約佔頂欄以下 97%；視覺框本身
+       扣除卡片與間距，圖片會由 contain 按比例縮放。 */
+    --responsive-short-panel-h: max(320px, calc(97svh - var(--bar-h) - 230px));
+    --responsive-tall-panel-h: max(560px, calc(130svh - var(--bar-h) - 175px));
+  }
+
+  #intro-1-3-a .lay-acc,
+  #intro-1-6-a-source .lay-acc {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(18px, 3vh, 30px);
+    align-items: stretch;
+  }
+  #intro-1-3-a .lay-acc > .acc-visual,
+  #intro-1-3-a .lay-acc > .acc-track,
+  #intro-1-3-a .acc-panels,
+  #intro-1-6-a-source .lay-acc > .acc-visual,
+  #intro-1-6-a-source .lay-acc > .acc-track,
+  #intro-1-6-a-source .acc-panels {
+    display: contents;
+  }
+  #intro-1-3-a .acc-card,
+  #intro-1-6-a-source .acc-card {
+    display: block;
+    grid-column: 1;
+    margin: 0;
+    min-width: 0;
+  }
+  #intro-1-3-a .acc-card .acc-body,
+  #intro-1-6-a-source .acc-card .acc-body {
+    display: block !important;
+    max-height: none;
+    overflow: visible;
+  }
+  #intro-1-3-a .acc-heading,
+  #intro-1-6-a-source .acc-heading {
+    cursor: default;
+    pointer-events: none;
+  }
+  #intro-1-3-a .acc-arrow,
+  #intro-1-6-a-source .acc-arrow {
+    visibility: hidden;
+  }
+  #intro-1-3-a .acc-panel,
+  #intro-1-6-a-source .acc-panel {
+    display: flex !important;
+    grid-area: auto;
+    grid-column: 1;
+    flex-direction: column;
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0;
+    min-height: 0 !important;
+    margin: 0;
+    overflow: visible;
+  }
+
+  #intro-1-3-a .acc-card[data-acc-card="difficulty-quantity"],
+  #intro-1-6-a-source .acc-card[data-acc-card="case-background"] { order: 1; }
+  #intro-1-3-a .acc-panel[data-acc-panel="difficulty-quantity"],
+  #intro-1-6-a-source .acc-panel[data-acc-panel="case-background"] {
+    order: 2;
+    height: var(--responsive-short-panel-h) !important;
+  }
+  #intro-1-3-a .acc-card[data-acc-card="difficulty-relations"],
+  #intro-1-6-a-source .acc-card[data-acc-card="case-route"] { order: 3; }
+  #intro-1-3-a .acc-panel[data-acc-panel="difficulty-relations"],
+  #intro-1-3-a .acc-panel[data-acc-panel="difficulty-network"] {
+    order: 4;
+    height: var(--responsive-tall-panel-h) !important;
+  }
+  #intro-1-3-a .acc-card[data-acc-card="difficulty-network"] { order: 5; }
+  #intro-1-3-a .acc-panel[data-acc-panel="difficulty-network"] {
+    order: 6;
+    height: var(--responsive-tall-panel-h) !important;
+  }
+
+  #intro-1-6-a-source .acc-card[data-acc-card="case-route"] { order: 3; }
+  #intro-1-6-a-source .acc-panel[data-acc-panel="case-route"] {
+    order: 4;
+    height: var(--responsive-short-panel-h) !important;
+  }
+  #intro-1-6-a-source .acc-card[data-acc-card="case-sources"] { order: 5; }
+  #intro-1-6-a-source .acc-panel[data-acc-panel="case-sources"] {
+    order: 6;
+    height: var(--responsive-short-panel-h) !important;
+  }
+
+  /* 普通清單列先保留標題卡，捲到列的閱讀位置後再平滑伸展視覺框。
+     Part 3 的 02／03 硃113／硃119通信面板不收合。 */
+  #intro-1-3-a .acc-panel[data-acc-panel="difficulty-quantity"],
+  #intro-1-6-a-source .acc-panel {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transform: translateY(-16px);
+    transition: max-height .72s cubic-bezier(.22, .72, .24, 1),
+                opacity .28s ease,
+                transform .72s cubic-bezier(.22, .72, .24, 1);
+    will-change: max-height, opacity, transform;
+  }
+  #intro-1-3-a .acc-panel[data-acc-panel="difficulty-quantity"].is-scroll-open,
+  #intro-1-6-a-source .acc-panel.is-scroll-open {
+    max-height: var(--responsive-short-panel-h) !important;
+    opacity: 1;
+    overflow: visible;
+    transform: translateY(0);
+  }
+
+  #intro-1-3-a .acc-panel > .photo-gallery,
+  #intro-1-6-a-source .acc-panel > .photo-gallery {
+    width: 100%;
+    height: 100% !important;
+    min-height: 0;
+  }
+  #intro-1-3-a .source-flow-panel,
+  #intro-1-3-a .source-flow-visual {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  #intro-1-3-a .source-flow-document {
+    width: min(78%, 760px) !important;
+    max-width: none !important;
+    margin-right: auto !important;
+    margin-left: auto !important;
+  }
+  /* 硃113／硃119：兩側標籤維持在視覺框邊緣，文件視窗縮窄並置中，
+     讓標籤可以疊在文件上；窄螢幕也保留左右兩側的定位。 */
+  #intro-1-3-a .source-flow-visual {
+    --source-panel-source-space: clamp(86px, 17%, 150px);
+  }
+  #intro-1-3-a .source-callouts {
+    position: absolute;
+    top: 0;
+    right: auto;
+    bottom: 0;
+    left: 0;
+    display: block;
+    width: clamp(76px, calc(18% - 6px), 148px);
+    padding: 0;
+  }
+  #intro-1-3-a .source-callouts-right {
+    right: 0;
+    left: auto;
+    margin-top: 0;
+  }
+  #intro-1-3-a .source-callout {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    top: var(--source-bubble-top, auto) !important;
+  }
+  #intro-1-3-a .source-callout-detail {
+    display: none !important;
+  }
+}
+
 /* 編號方塊沿用各節的強調色作漸層底（一般不需修改） */
 .story .option-number {
   background:
@@ -606,11 +754,13 @@
 
 /* Part 3.0 — Shared section accents */
 #part-3 {
-  /* 手機版／窄螢幕：封面與第 1 節合計佔滿頂欄以下的視窗高度。 */
+  /* 手機版／窄螢幕：封面與第 1 節以頂欄以下 60% 為目標總高度。 */
+  --part3-narrow-group-height: calc((100svh - var(--bar-h)) * .6);
   --part3-narrow-section-height: clamp(220px, 34svh, 306px);
 }
 #part-3-research-questions {
-  --part3-narrow-section-height: calc(100svh - var(--bar-h) - clamp(220px, 34svh, 306px));
+  --part3-narrow-group-height: calc((100svh - var(--bar-h)) * .6);
+  --part3-narrow-section-height: calc(var(--part3-narrow-group-height) - clamp(220px, 34svh, 306px));
 }
 #part-3-tools {
   /* 工具與資源是獨立的一個滿版區段。 */
@@ -774,9 +924,11 @@
   --part3-card-max-width: 74ch;
   --part3-card-height: auto;
   --part3-card-min-height: 0;
-  /* 手機／窄螢幕：卡片＋OCR視覺元素共用頂欄以下的一個視窗。 */
-  --part3-narrow-section-height: calc(100svh - var(--bar-h));
-  --part3-narrow-visual-height: clamp(220px, 38svh, 360px);
+  /* 手機／窄螢幕：1＋2＋OCR視覺元素共用頂欄以下 150% 的高度。 */
+  --part3-narrow-section-height: auto;
+  --part3-narrow-visual-height: clamp(260px, 40svh, 420px);
+  --part3-narrow-visual-width: 80%;
+  --part3-narrow-visual-aspect: 1.05 / 1;
   --part3-card-padding: clamp(18px, 1.8vw, 26px);
   --part3-title-size: clamp(27px, 3.4vw, 46px);
   --part3-body-size: calc(16px * var(--font-scale));
@@ -1256,9 +1408,9 @@
   --part3-card-max-width: 74ch;
   --part3-card-height: auto;
   --part3-card-min-height: 0;
-  /* 手機／窄螢幕：10號卡片＋批次視覺元素共用一個視窗。 */
-  --part3-narrow-section-height: calc(100svh - var(--bar-h));
-  --part3-narrow-visual-height: clamp(210px, 36svh, 340px);
+  /* 手機／窄螢幕：10＋批次視覺元素按內容自然決定整節高度。 */
+  --part3-narrow-section-height: auto;
+  --part3-narrow-visual-height: clamp(240px, 34svh, 380px);
   --part3-card-padding: clamp(18px, 1.8vw, 26px);
   --part3-title-size: clamp(27px, 3.4vw, 46px);
   --part3-body-size: calc(16px * var(--font-scale));
@@ -2002,6 +2154,8 @@
      --fxdoc-origin   縮放基準點，預設 center center；
                       想「以右上角為準放大」就寫 right top
      --fxdoc-h        高度倍率（1 = 抽屜高度）；通常不用動，用 --fxdoc-scale 就好
+     --fxdoc-focus-x / --fxdoc-focus-y
+                      高亮區中心的位置（百分比）；會把該位置移到抽屜中央。
 
    ── 11 試一試：視窗裡的史料圖 ──────────────────────────
    選擇器：用目前顯示的圖檔名（storymap.js 會寫進 data-try-visual）；
@@ -2020,32 +2174,31 @@
      --trydoc-justify  水平：flex-start / center（預設）/ flex-end
      --trydoc-overflow hidden（預設）；想讓放大後可以捲動就寫 auto
 
-   下面全部是「範例」，數值都設成不改變現狀（scale: 1、位移 0）。
-   要調整就改數字；不需要的整條刪掉即可。
+   下面是 7／8 各個高亮區的預設對位；要調整個別特徵，只改該行數值即可。
    ========================================================================= */
 
 /* 7 辨識印刷字：抽屜裡的每一張標示圖 */
-#part-3-printed-explorer [data-fx-visual="辨識印刷字Label/文本資訊.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
-#part-3-printed-explorer [data-fx-visual="辨識印刷字Label/直排單欄.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
-#part-3-printed-explorer [data-fx-visual="辨識印刷字Label/分段.png"]     { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
-#part-3-printed-explorer [data-fx-visual="辨識印刷字Label/頁碼.png"]     { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
-#part-3-printed-explorer [data-fx-visual="辨識印刷字Label/標題符號.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
-#part-3-printed-explorer [data-fx-visual="辨識印刷字Label/夾批.png"]     { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
-#part-3-printed-explorer [data-fx-visual="辨識印刷字Label/落款與尾批.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
+#part-3-printed-explorer [data-fx-visual="辨識印刷字Label/文本資訊.png"] { --fxdoc-scale: 1.12; --fxdoc-focus-x: 87%; --fxdoc-focus-y: 31%; }
+#part-3-printed-explorer [data-fx-visual="辨識印刷字Label/直排單欄.png"] { --fxdoc-scale: 1.02; --fxdoc-focus-x: 50%; --fxdoc-focus-y: 50%; }
+#part-3-printed-explorer [data-fx-visual="辨識印刷字Label/分段.png"]     { --fxdoc-scale: 1.18; --fxdoc-focus-x: 69%; --fxdoc-focus-y: 15%; }
+#part-3-printed-explorer [data-fx-visual="辨識印刷字Label/頁碼.png"]     { --fxdoc-scale: 1.25; --fxdoc-focus-x: 92%; --fxdoc-focus-y: 95%; }
+#part-3-printed-explorer [data-fx-visual="辨識印刷字Label/標題符號.png"] { --fxdoc-scale: 1.03; --fxdoc-focus-x: 50%; --fxdoc-focus-y: 50%; }
+#part-3-printed-explorer [data-fx-visual="辨識印刷字Label/夾批.png"]     { --fxdoc-scale: 1.18; --fxdoc-focus-x: 86%; --fxdoc-focus-y: 47%; }
+#part-3-printed-explorer [data-fx-visual="辨識印刷字Label/落款與尾批.png"] { --fxdoc-scale: 1.16; --fxdoc-focus-x: 28%; --fxdoc-focus-y: 48%; }
 
 /* 7 的整頁（沒有選特徵、或該特徵不在這一頁時顯示的原始頁面） */
 #part-3-printed-explorer [data-fx-visual="ocr-zhu25-printed-1-enhanced.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
 #part-3-printed-explorer [data-fx-visual="ocr-zhu25-printed-2-enhanced.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
 
 /* 8 辨識手寫字：抽屜裡的每一張標示圖 */
-#part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/上奏官員.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
-#part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/印章.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
-#part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/抬頭.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
-#part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/正文字體.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
-#part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/浮水印.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
-#part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/直排單欄.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
-#part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/硃批.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
-#part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/臣字款.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
+#part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/上奏官員.png"] { --fxdoc-scale: 1.12; --fxdoc-focus-x: 50%; --fxdoc-focus-y: 43%; }
+#part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/印章.png"] { --fxdoc-scale: 1.35; --fxdoc-focus-x: 7%; --fxdoc-focus-y: 12%; }
+#part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/抬頭.png"] { --fxdoc-scale: 1.2; --fxdoc-focus-x: 57%; --fxdoc-focus-y: 15%; }
+#part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/正文字體.png"] { --fxdoc-scale: 1.05; --fxdoc-focus-x: 60%; --fxdoc-focus-y: 50%; }
+#part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/浮水印.png"] { --fxdoc-scale: 1.12; --fxdoc-focus-x: 50%; --fxdoc-focus-y: 58%; }
+#part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/直排單欄.png"] { --fxdoc-scale: 1.05; --fxdoc-focus-x: 60%; --fxdoc-focus-y: 50%; }
+#part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/硃批.png"] { --fxdoc-scale: 1.25; --fxdoc-focus-x: 10%; --fxdoc-focus-y: 45%; }
+#part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/臣字款.png"] { --fxdoc-scale: 1.3; --fxdoc-focus-x: 52%; --fxdoc-focus-y: 58%; }
 
 /* 11 試一試 — 印刷字 */
 #part-3-try-explorer[data-try-mode="printed"] { --trydoc-align: center; --trydoc-justify: center; }

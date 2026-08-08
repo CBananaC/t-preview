@@ -7,11 +7,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Serif+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="storymap.css?v=20260808-intro-inline-01">
-  <link rel="stylesheet" href="storymap-cards.css?v=20260808-intro-inline-01">
+  <link rel="stylesheet" href="storymap.css?v=20260808-sequential-scroll-04">
+  <link rel="stylesheet" href="storymap-cards.css?v=20260808-sequential-scroll-04">
   <link rel="stylesheet" href="part-1-interface.css">
   <link rel="stylesheet" href="part-3-question-gallery.css">
-  <script src="storymap.js?v=20260808-intro-inline-01" defer></script>
+  <script src="storymap.js?v=20260808-sequential-scroll-04" defer></script>
   <!-- 第一部分的介面複本：資料模組先載入，行為模組再依它組裝畫面。 -->
   <script src="part-1-interface-data.js" defer></script>
   <script src="part-1-interface.js" defer></script>
@@ -105,22 +105,14 @@
       <div id="intro-content">
         <section class="story surface-a" id="intro-1-1" data-tab="1.1" data-nav="#intro-1-1">
           <div class="story-inner">
-            <div class="lay-split text-left">
-              <div class="lay-copy lay-copy-stack">
-                <article class="copybox blk" id="intro-1-1-card" data-intro-card data-tab="1.1" data-nav="#intro-1-1">
-                  <div class="title-row"><span class="option-number">1</span><h2>清代奏折制度</h2></div>
-                  <div class="body">
-                    <p>奏摺是清代上行官方文書之一。有別於題本及奏本，奏摺送抵中央後，無需經內閣票擬，便可直送御前，由皇帝親自審閱及硃批。雍正朝設立軍機處後，批閱完成的奏摺會交由軍機處處理。如需另行頒旨，則由軍機大臣擬寫上諭，經皇帝閱定後，再由內閣明發或軍機處廷寄地方。<a class="inline-reference" href="../references.html#ref-zhuang-1979">(莊吉發，《清代奏摺制度》，1979年)</a></p>
-                    <p>學界普遍認為，奏摺制度省去內閣票擬等中間程序，使皇帝能夠直接與地方官員溝通，強化了中央集權，可以說是清代最重要的官方文書制度。</p>
-                  </div>
-                </article>
-                <article class="copybox blk" id="intro-1-2" data-intro-card data-tab="1.2" data-nav="#intro-1-2" style="margin-top: clamp(24px, 2.2vw, 40px);">
-                  <div class="title-row"><span class="option-number">2</span><h2>清代奏折的研究價值</h2></div>
-                  <div class="body">
-                    <p>在清史研究中，奏摺、硃批和上諭都是極為重要的第一手史料，是中央與地方在政治決策過程中的原始通信記錄，有助研究者重構特定議題的決策過程。</p>
-                  </div>
-                </article>
-              </div>
+            <div class="intro-1-1-layout">
+              <article class="copybox blk" id="intro-1-1-card" data-intro-card data-tab="1.1" data-nav="#intro-1-1">
+                <div class="title-row"><span class="option-number">1</span><h2>清代奏折制度</h2></div>
+                <div class="body">
+                  <p>奏摺是清代上行官方文書之一。有別於題本及奏本，奏摺送抵中央後，無需經內閣票擬，便可直送御前，由皇帝親自審閱及硃批。雍正朝設立軍機處後，批閱完成的奏摺會交由軍機處處理。如需另行頒旨，則由軍機大臣擬寫上諭，經皇帝閱定後，再由內閣明發或軍機處廷寄地方。<a class="inline-reference" href="../references.html#ref-zhuang-1979">(莊吉發，《清代奏摺制度》，1979年)</a></p>
+                  <p>學界普遍認為，奏摺制度省去內閣票擬等中間程序，使皇帝能夠直接與地方官員溝通，強化了中央集權，可以說是清代最重要的官方文書制度。</p>
+                </div>
+              </article>
               <div class="lay-visual">
                 <div class="photo-gallery visual-frame" data-photo-gallery>
                   <div class="photo-gallery-stage"></div>
@@ -158,6 +150,12 @@
                   </script>
                 </div>
               </div>
+              <article class="copybox blk" id="intro-1-2" data-intro-card data-tab="1.2" data-nav="#intro-1-2" style="margin-top: clamp(24px, 2.2vw, 40px);">
+                <div class="title-row"><span class="option-number">2</span><h2>清代奏折的研究價值</h2></div>
+                <div class="body">
+                  <p>在清史研究中，奏摺、硃批和上諭都是極為重要的第一手史料，是中央與地方在政治決策過程中的原始通信記錄，有助研究者重構特定議題的決策過程。</p>
+                </div>
+              </article>
             </div>
           </div>
         </section>
@@ -167,7 +165,7 @@
           <div class="blk" style="margin-bottom:var(--head-gap)">
             <div class="title-row"><span class="option-number">3</span><h2>研究清代奏折的主要困難</h2></div>
           </div>
-          <div class="lay-acc" data-acc>
+          <div class="lay-acc" data-acc data-sequential-scroll>
             <div class="acc-visual" aria-label="研究困難固定示範面板">
               <div class="acc-panels visual-frame" aria-live="polite">
                 <figure class="acc-panel is-active" data-acc-panel="difficulty-quantity">
@@ -515,7 +513,7 @@
             <div class="title-row"><span class="option-number">6</span><h2>示範案例：林爽文民變（1786-1788）</h2></div>
             <div class="body"><p>為展示本網站的研究方法及各項功能，網站會以乾隆朝的林爽文民變作為示範案例。</p></div>
           </div>
-          <div class="lay-acc" data-acc>
+          <div class="lay-acc" data-acc data-sequential-scroll>
             <div class="acc-visual" aria-label="林爽文事件固定示範面板">
               <div class="acc-panels visual-frame" aria-live="polite">
                 <figure class="acc-panel is-active" data-acc-panel="case-background">

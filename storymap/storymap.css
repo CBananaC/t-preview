@@ -704,8 +704,8 @@ img { max-width: 100%; }
 }
 
 @media (pointer: coarse) and (hover: none), (max-width: 1040px) {
-  /* 手機與窄螢幕電腦先保持收合；由 storymap.js 的捲動判斷，或觸控點擊，
-     在圖片頂端越過螢幕中線後切換 is-expanded。 */
+  /* 手機與窄螢幕電腦先保持收合；由 storymap.js 依目前位置判斷，或觸控點擊，
+     在圖片頂端到達／越過螢幕中線後切換 is-expanded。 */
   .photo-gallery-body:not(.is-expanded) {
     max-height: none;
     overflow: hidden;
@@ -3601,10 +3601,10 @@ img { max-width: 100%; }
   }
   .mdrawer-scrim.is-on { opacity: 1; pointer-events: auto; }
 
-  /* --- 抽屜本體：預設只比底部四顆鈕寬一點 --- */
+  /* --- 抽屜本體：預設留出史料閱讀空間 --- */
   .mdrawer {
     display: flex; position: fixed; left: 0; top: 0; bottom: 0; z-index: 70;
-    width: var(--mdrawer-w, 172px);
+    width: var(--mdrawer-w, min(74vw, 300px));
     transform: translateX(-101%);
     transition: transform .3s cubic-bezier(.4, 0, .2, 1);
     background: linear-gradient(160deg, #123336, #1c4a4a);
@@ -3654,7 +3654,10 @@ img { max-width: 100%; }
   .mdrawer .part3-fx-page img, .mdrawer [data-try-img] {
     display: block; height: calc(100% * var(--fxdoc-h, 1)); width: auto; max-width: none; margin: auto;
     pointer-events: none; user-select: none;
-    transform: translate(var(--fxdoc-x, 0px), var(--fxdoc-y, 0px)) scale(var(--fxdoc-scale, 1));
+    transform: translate(
+      calc(var(--fxdoc-x, 0px) + (50% - var(--fxdoc-focus-x, 50%))),
+      calc(var(--fxdoc-y, 0px) + (50% - var(--fxdoc-focus-y, 50%)))
+    ) scale(var(--fxdoc-scale, 1));
     transform-origin: var(--fxdoc-origin, center center);
   }
   /* 展開後：PDF 置中，並可單獨縮放（不影響整個網頁） */
@@ -3677,28 +3680,28 @@ img { max-width: 100%; }
 
   /* 右邊界中間的寬度調整鈕 */
   .mdrawer-grip {
-    display: grid; position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+    display: grid; position: absolute; right: -1px; top: 50%; transform: translateY(-50%);
     z-index: 75; appearance: none; cursor: ew-resize; border: 0; padding: 0;
-    width: 26px; height: 52px; border-radius: 8px;
+    width: 32px; height: 64px; border-radius: 9px 0 0 9px;
     background: linear-gradient(160deg, #1d4a4d, #2c6360); color: rgba(247, 243, 234, .85);
     place-items: center; box-shadow: 3px 3px 12px rgba(12, 30, 32, .4); touch-action: none;
   }
   .mdrawer-grip svg { width: 15px; height: 15px; }
   .mdrawer.is-full .mdrawer-grip { display: none; }
 
-  /* 底部四顆鈕：連在一起、置中 */
+  /* 底部四顆鈕：連在一起、置中；加大觸控面積 */
   .mdrawer-foot {
     display: flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 0;
     padding: 9px 6px; border-top: 1px solid rgba(255, 255, 255, .14);
   }
   .mdrawer-foot button {
-    appearance: none; cursor: pointer; width: 34px; height: 34px; border-radius: 0;
+    appearance: none; cursor: pointer; width: 48px; height: 46px; border-radius: 0;
     border: 1px solid rgba(247, 243, 234, .3); border-right-width: 0;
     background: transparent; color: #f4efe6; display: grid; place-items: center; padding: 0;
   }
   .mdrawer-foot button:first-child { border-radius: 8px 0 0 8px; }
   .mdrawer-foot button:last-child { border-radius: 0 8px 8px 0; border-right-width: 1px; }
-  .mdrawer-foot button svg { width: 16px; height: 16px; }
+  .mdrawer-foot button svg { width: 21px; height: 21px; }
   .mdrawer-foot button:disabled { opacity: .28; }
 
   /* PDF 縮放：只用雙指／雙擊／ctrl+滾輪，不放 ＋－ 按鈕 */
@@ -3912,8 +3915,8 @@ img { max-width: 100%; }
 .part3-tools-mnav { display: none; }
 
 @media (pointer: coarse) and (hover: none), (max-width: 1040px) {
-  /* 第三部分封面＋適合的研究問題合計佔滿頂欄以下的一個視窗高度；
-     所需的工具與資源則獨立佔滿下一個視窗。 */
+  /* 第三部分封面＋適合的研究問題以頂欄以下 60% 為目標；
+     若研究卡內容較高，研究區可按內容最低高度增長。 */
   #part-3,
   #part-3-research-questions,
   #part-3-tools {
@@ -3923,11 +3926,14 @@ img { max-width: 100%; }
   #part-3-research-questions {
     display: flex;
     align-items: stretch;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
   }
   #part-3-research-questions > .story-inner {
     display: flex;
     align-items: center;
-    height: 100%;
+    height: auto;
   }
   #part-3-research-questions .lay-split { width: 100%; }
 
@@ -3942,8 +3948,8 @@ img { max-width: 100%; }
     min-height: 0;
   }
 
-  /* OCR 定義：1、2 號卡片與掃描視覺元素全部放進一個頂欄以下的視窗；
-     視覺元素縮短並置中，避免手機／窄電腦需要再捲動才能看完整組。 */
+  /* OCR 定義與 OCR測試都按文字與視覺內容自然決定整節高度；
+     OCR 定義的視覺寬度為 80%，並按比例縮放高度。 */
   #part-3-ocr-definition,
   #part-3-test {
     display: flex;
@@ -3951,16 +3957,31 @@ img { max-width: 100%; }
     min-height: 0;
     overflow: hidden;
   }
-  #part-3-ocr > #part-3-ocr-definition,
-  #part-3-ocr > #part-3-test {
-    padding-block: clamp(12px, 2svh, 18px);
-  }
   #part-3-ocr-definition > .story-inner,
   #part-3-test > .story-inner {
     display: flex;
     align-items: center;
     height: 100%;
     min-height: 0;
+  }
+  #part-3-test {
+    height: auto;
+    overflow: visible;
+  }
+  #part-3-ocr-definition {
+    height: auto;
+    overflow: visible;
+  }
+  #part-3-ocr-definition > .story-inner {
+    height: auto;
+  }
+  #part-3-ocr-definition .part3-ocr-def-layout {
+    height: auto;
+    justify-content: flex-start;
+    gap: clamp(8px, 1.2vh, 14px);
+  }
+  #part-3-test > .story-inner {
+    height: auto;
   }
   #part-3-ocr-definition .part3-ocr-def-layout,
   #part-3-test .lay-split {
@@ -3980,16 +4001,40 @@ img { max-width: 100%; }
   }
   #part-3-ocr-definition .ocr-scan-scene,
   #part-3-test .batch-scene {
-    flex: 0 0 var(--part3-narrow-visual-height, 280px);
+    flex: 1 1 auto;
+    min-height: var(--part3-narrow-visual-height, 280px);
     align-self: center;
-    width: min(100%, var(--ocr-scene-max-w, 1000px));
+    width: min(var(--part3-narrow-visual-width, 70%), var(--ocr-scene-max-w, 1000px));
     max-width: 100%;
     margin: 0 auto;
   }
+  #part-3-ocr-definition .ocr-scan-scene {
+    flex: 0 0 auto;
+    min-height: 0;
+    aspect-ratio: var(--part3-narrow-visual-aspect, 1.05 / 1);
+  }
+  #part-3-test .lay-split {
+    height: auto;
+    justify-content: flex-start;
+    gap: clamp(8px, 1.2vh, 14px);
+  }
+  #part-3-test .lay-visual {
+    flex: 0 0 auto;
+  }
   #part-3-test .batch-scene {
     width: min(90%, 560px);
-    height: var(--part3-narrow-visual-height, 280px);
-    aspect-ratio: auto;
+    flex: 0 0 auto;
+    height: auto;
+    min-height: 0;
+    aspect-ratio: var(--batch-aspect, 1 / 1);
+  }
+  #part-3-test .lay-visual {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    align-items: stretch;
+    justify-content: center;
+    min-height: 0;
   }
 
   /* OCR 視覺元素內部也跟著縮短：頁面與輸出視窗分配剩餘高度，
@@ -3997,7 +4042,7 @@ img { max-width: 100%; }
   #part-3-ocr-definition .ocr-scan-scene {
     display: flex;
     flex-direction: column;
-    height: var(--part3-narrow-visual-height, 280px);
+    height: auto;
     overflow: hidden;
   }
   #part-3-ocr-definition .ocr-pages {
