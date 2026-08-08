@@ -21,42 +21,6 @@
   <title>清代奏摺與上諭分析平台</title>
 </head>
 <body>
-  <!-- 螢幕尺寸／裝置守門：這個網站還沒有做手機版面。以下兩個守門畫面純粹靠
-       CSS media query 判斷，不需要 JavaScript：
-       1. 用滑鼠／觸控板的裝置（電腦、筆電）視窗太窄 → 請求放寬視窗；門檻對齊
-          「辨識印刷字」等 .part3-feature-explorer 版面改為上下堆疊的寬度（1040px）。
-       2. 用觸控的裝置（手機、平板）→ 不分直向橫向，整個擋下，請改用電腦瀏覽。
-       兩個判斷條件互斥，不會同時出現；視覺沿用封面／分頁帶的深色漸層＋
-       serif 大標題風格，門檻與文案可在 storymap.css 的
-       「螢幕尺寸／方向守門」區塊調整。 -->
-  <div class="viewport-gate viewport-gate-widen" aria-hidden="true">
-    <div class="viewport-gate-backdrop"></div>
-    <div class="viewport-gate-card">
-      <span class="viewport-gate-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
-        </svg>
-      </span>
-      <p class="viewport-gate-eyebrow">視窗提示</p>
-      <h2 class="viewport-gate-title">請放大瀏覽器視窗</h2>
-      <p class="viewport-gate-note">為獲得最佳瀏覽效果，請將瀏覽器視窗放大，或改用較大螢幕的裝置。</p>
-    </div>
-  </div>
-  <div class="viewport-gate viewport-gate-rotate" aria-hidden="true">
-    <div class="viewport-gate-backdrop"></div>
-    <div class="viewport-gate-card">
-      <span class="viewport-gate-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="7" y="2" width="10" height="20" rx="2"/>
-          <path d="M11 18h2"/>
-          <path d="M9.5 7.5l5 5m0-5l-5 5"/>
-        </svg>
-      </span>
-      <p class="viewport-gate-eyebrow">手機版開發中</p>
-      <h2 class="viewport-gate-title">手機版仍在開發中</h2>
-      <p class="viewport-gate-note">這個網站的手機版面還在開發中，請改用電腦瀏覽，以獲得完整的瀏覽體驗。</p>
-    </div>
-  </div>
   <header class="topbar">
     <a class="brand" href="#cover">清代奏摺與上諭分析平台</a>
     <nav class="tabs" aria-label="網站章節">
@@ -1894,7 +1858,20 @@
 
           <section class="story surface-c" id="part-3-model" data-tab="part-3" data-nav="#part-3-model">
             <div class="story-inner">
-              <article class="copybox blk"><div class="title-row"><span class="option-number">3</span><h2>選用的AI Model</h2></div><div class="body"><p>然而，由於 AI Skills 鏈（Chain）需要對每份史料逐步執行多項的分析，因此需要消耗大量 Token，提高了使用 API 的成本。因此，建議研究者選擇成本較低，但仍具備足夠分析能力的 AI Model，以兼顧研究成本和分析品質。</p><p>目前推薦 Gemini Flash 系列及 DeepSeek 的模型。兩者的 API 成本較低，亦能大致正確理解奏摺、上諭中的文言文，因此適合用來批次執行 AI Skills，分析大量文書。</p></div></article>
+              <article class="copybox blk" id="part-3-model-card"><div class="title-row"><span class="option-number">3</span><h2>選用的AI Model</h2></div><div class="body"><p>然而，由於 AI Skills 鏈（Chain）需要對每份史料逐步執行多項的分析，因此需要消耗大量 Token，提高了使用 API 的成本。因此，建議研究者選擇成本較低，但仍具備足夠分析能力的 AI Model，以兼顧研究成本和分析品質。</p><p>目前推薦 Gemini Flash 系列及 DeepSeek 的模型。兩者的 API 成本較低，亦能大致正確理解奏摺、上諭中的文言文，因此適合用來批次執行 AI Skills，分析大量文書。</p></div></article>
+              <div class="table-wrap part3-model-table-wrap">
+                <table class="method-table part3-model-table">
+                  <thead>
+                    <tr><th scope="col">AI 模型</th><th scope="col">優點</th><th scope="col">適合的工作</th><th scope="col">缺點</th><th scope="col">建議使用方法</th><th scope="col">是否推薦使用</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>Claude Opus</td><td>推理能力最強</td><td>複雜程式、系統設計、檢查和修正關鍵錯誤</td><td>使用成本最高；可讓其他 AI 按照 Opus 的方案負責實作</td><td>App、CLI</td><td>視乎經濟能力</td></tr>
+                    <tr><td>GPT（5.6）</td><td>推理能力僅次於 Opus，但成本遠遠低於 Opus</td><td>大部分 Agentic AI 工作：程式設計和撰寫、一般文字工作和各種疑難雜症</td><td>推理能力不及 Opus，處理速度亦可能較慢</td><td>App、CLI</td><td>推薦使用</td></tr>
+                    <tr><td>DeepSeek Flash／Pro</td><td>成本較低，推理能力足以理解大部分奏摺文本</td><td>按照 AI Skills 分析大量文本，抽取特定資訊</td><td>未必適用於複雜推理</td><td>API</td><td>必須使用</td></tr>
+                    <tr><td>Gemini Flash</td><td>成本較低、處理速度較快，推理能力足以理解大部分奏摺文本</td><td>按照 AI Skills 分析大量文本，抽取特定資訊</td><td>未必適用於複雜推理</td><td>API</td><td>必須使用</td></tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </section>
 

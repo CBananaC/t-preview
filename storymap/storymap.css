@@ -63,61 +63,6 @@ a { color: inherit; }
 img { max-width: 100%; }
 
 /* ============================================================================
-   0 · 螢幕尺寸／方向守門（草稿階段：還沒有手機版面）
-   兩片守門畫面預設都是 display:none，各自只在對應的 media query 下顯示，
-   兩個條件互斥，純 CSS 判斷、不需要 JavaScript：
-   - pointer:fine（滑鼠／觸控板，即電腦或筆電）且視窗寬度低於門檻 → 請放寬視窗。
-     門檻對齊 .part3-feature-explorer（辨識印刷字／辨識手寫字等）從左右並排
-     改為上下堆疊（PDF 在上、資訊面板在下）的斷點，見下方 3466 行附近的
-     `.part3-feature-explorer { grid-template-columns: 1fr; }`，兩處要一起改。
-   - pointer:coarse（觸控，即手機或平板）→ 直接整個擋下，不分直向橫向，
-     請改用電腦瀏覽（手機版還沒做，與其顯示跑版的畫面，不如先擋住）。
-   視覺沿用封面／分頁帶（.story.hero／.section-hero）的深色漸層＋
-   serif 大標題＋黃色眉標風格，維持全站一致的視覺語言。
-   ========================================================================== */
-.viewport-gate {
-  display: none;
-  position: fixed; inset: 0; z-index: 9999;
-  align-items: center; justify-content: center;
-  padding: 32px; text-align: center; overflow: hidden; isolation: isolate;
-  color: #f7f3ea;
-}
-.viewport-gate-backdrop {
-  position: absolute; inset: 0; z-index: -1;
-  background:
-    radial-gradient(circle at 78% 22%, rgba(199, 84, 63, .58), transparent 32%),
-    radial-gradient(circle at 20% 86%, rgba(92, 142, 133, .38), transparent 32%),
-    linear-gradient(120deg, #173b3f 5%, #274e4f 50%, #a56c56 145%);
-}
-.viewport-gate-card { position: relative; max-width: 460px; }
-.viewport-gate-icon {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 60px; height: 60px; margin-bottom: 22px; border-radius: 50%;
-  border: 1.5px solid rgba(247, 243, 234, .45); color: var(--yellow);
-}
-.viewport-gate-icon svg { width: 28px; height: 28px; }
-.viewport-gate-eyebrow {
-  display: flex; align-items: center; justify-content: center; gap: 14px;
-  margin: 0 0 16px; color: var(--yellow);
-  font: 800 calc(12px * var(--font-scale))/1.35 var(--sans); letter-spacing: .18em;
-}
-.viewport-gate-eyebrow::before, .viewport-gate-eyebrow::after { content: ""; width: 30px; height: 1px; flex: 0 0 auto; background: currentColor; }
-.viewport-gate-title {
-  margin: 0; color: #fff;
-  font: 500 clamp(26px, 4.4vw, 40px)/1.16 var(--serif); letter-spacing: -.03em;
-}
-.viewport-gate-note {
-  max-width: 44ch; margin: 18px auto 0; color: rgba(247, 243, 234, .82);
-  font: var(--body-weight) calc(15.5px * var(--font-scale))/1.85 var(--serif);
-}
-@media (pointer: fine) and (max-width: 1040px) {
-  .viewport-gate-widen { display: flex; }
-}
-@media (pointer: coarse) {
-  .viewport-gate-rotate { display: flex; }
-}
-
-/* ============================================================================
    1 · 頂欄：品牌置左、分頁置中、設定置右
    ========================================================================== */
 .topbar {
@@ -530,7 +475,7 @@ img { max-width: 100%; }
 .photo-lightbox-figure img {
   display: block; max-width: min(1400px, 92vw); max-height: min(78vh, calc(100vh - 190px));
   width: auto; height: auto; object-fit: contain;
-  background: #e8e1d6; box-shadow: 0 30px 70px rgba(0, 0, 0, .4);
+  background: transparent; box-shadow: 0 30px 70px rgba(0, 0, 0, .4);
 }
 .photo-lightbox-caption {
   margin: 12px 2px 0; color: rgba(247, 243, 234, .82);
@@ -1666,12 +1611,12 @@ img { max-width: 100%; }
   height: 100%; width: fit-content; max-width: 100%;
   border: 1px solid rgba(22, 61, 63, .18); box-shadow: 0 14px 30px rgba(22, 61, 63, .16);
 }
-.part3-fx-page img { display: block; width: auto; height: 100%; max-width: 100%; object-fit: contain; }
+.part3-fx-page img { display: block; width: auto; height: 100%; max-width: 100%; object-fit: contain; cursor: zoom-in; }
 .part3-fx-turn {
   position: absolute; inset: 0; z-index: 7; overflow: hidden; background: #fff;
   box-shadow: -14px 0 26px rgba(22, 61, 63, .22); will-change: transform;
 }
-.part3-fx-turn img { display: block; width: auto; height: 100%; max-width: 100%; object-fit: contain; }
+.part3-fx-turn img { display: block; width: auto; height: 100%; max-width: 100%; object-fit: contain; cursor: zoom-in; }
 
 /* 7 辨識印刷字：右側仍保持整個遊戲視窗的高度，左側 backdrop 則依
    PDF 與翻頁列的實際內容收合，避免深綠背景比紙張多出一大截。 */
@@ -1720,7 +1665,7 @@ img { max-width: 100%; }
   position: relative; flex: 0 1 auto; width: 7px; min-width: 2px; height: 100%;
   background-color: #cdb894;
   background-image: var(--src); background-size: 300% 100%; background-position: var(--posx) 0;
-  background-repeat: no-repeat; cursor: pointer; transform-style: preserve-3d;
+  background-repeat: no-repeat; cursor: zoom-in; transform-style: preserve-3d;
   transition: width .55s cubic-bezier(.4, .85, .3, 1), aspect-ratio .55s cubic-bezier(.4, .85, .3, 1),
               transform .55s cubic-bezier(.4, .85, .3, 1), filter .35s;
 }
@@ -1893,28 +1838,6 @@ img { max-width: 100%; }
 }
 .part3-fx-caret-chat { width: 2px; height: 1.05em; background: var(--ink); vertical-align: -.18em; }
 
-@media (max-width: 1040px) {
-  .part3-feature-explorer { grid-template-columns: 1fr; }
-  /* 窄螢幕改上下堆疊，固定高度／內部捲動沒有意義，改回自然高度。 */
-  #part-3-printed-explorer,
-  #part-3-handwritten-explorer { height: auto; grid-template-rows: none; overflow: visible; }
-  .part3-fx-doc { height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
-  .part3-fx-pagestack { height: auto; }
-  .part3-fx-page { height: auto; }
-  .part3-fx-page img { width: 100%; height: auto; }
-  .part3-fx-striparea { height: auto; }
-  .part3-fx-out { height: auto; max-height: none; overflow: visible; }
-  .part3-fx-win { flex: 0 0 auto; min-height: 0; }
-  .part3-fx-win-body { flex: 0 0 auto; max-height: none; overflow-y: visible; }
-  /* 窄螢幕：改回原件下方的標籤列，避免浮貼標籤擠壓版面 */
-  .part3-fx-doc { padding-inline: clamp(18px, 3vw, 30px); }
-  .part3-fx-doc .part3-fx-tag.is-floating {
-    position: static; left: auto; right: auto; top: auto;
-  }
-  .part3-fx-doc [data-part3-fx-tags] {
-    display: flex; flex-wrap: wrap; justify-content: center; gap: 9px; margin-top: 14px;
-  }
-}
 
 .part3-chart-frame {
   display: grid;
@@ -2993,8 +2916,11 @@ img { max-width: 100%; }
 }
 
 @media (max-width: 820px) {
-  .topbar { grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; }
-  .tabs { gap: 14px; overflow-x: auto; }
+  .topbar { grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto; gap: 12px; }
+  /* 窄螢幕：站名可以被截斷，否則 nowrap 的站名會把分頁列擠到重疊 */
+  .brand { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .tabs { gap: 14px; overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
   .workflow-chain { flex-direction: column; align-items: stretch; }
   .workflow-link { flex: 0 0 16px; width: 1px; height: 16px; margin: 0 auto; }
   .workflow-link::after {
@@ -3006,7 +2932,7 @@ img { max-width: 100%; }
 }
 
 @media (max-width: 620px) {
-  .brand { font-size: calc(12px * var(--font-scale)); }
+  .brand { display: none; }
   .title-row { gap: 11px; }
   .option-number { min-width: 38px; height: 38px; font-size: 15px; }
   .hero-content { padding: 0 20px; }
@@ -3485,55 +3411,361 @@ img { max-width: 100%; }
 .part3-try-scroll.is-cmp .part3-try-cmp { flex: 1 1 auto; min-height: 0; }
 .part3-try-guidehost[hidden] { display: none; }
 
-@media (max-width: 1040px) {
-  /* 窄螢幕時左右兩欄改成上下堆疊，固定高度沒有意義，改回自然高度。 */
-  .part3-try-explorer { height: auto; grid-template-rows: none; overflow: visible; }
-  .part3-try-doc { height: auto; }
-  .part3-try-pagestack { height: auto; }
-  .part3-try-explorer .part3-fx-page { height: auto; max-height: none; }
-  .part3-try-explorer .part3-fx-page img { width: 100%; height: auto; }
-  .part3-try-panel { height: auto; min-height: 0; max-height: none; }
-}
 @media (prefers-reduced-motion: reduce) {
   .part3-try-rpg .caret { animation: none; }
   .part3-try-blank.is-bad { animation: none; }
 }
 
-/* 7／11：窄視窗改為上下堆疊時，清除桌面版的 PDF 高度上限。
-   否則較高的桌面 PDF 規則會壓住自然高度，令 backdrop 與頁面錯位。 */
-@media (max-width: 1040px) {
-  #part-3-printed-explorer .part3-fx-doc,
+/* 註：舊的 ≤1040px 上下堆疊規則已移除——7／8／11 在 ≤1040px 一律改用
+   下方「10 · 手機版：史料抽屜」。舊規則用 ID 選擇器，權重高於抽屜規則，
+   留著會把抽屜裡的史料欄重新撐成 95svh，導致抽屜破版。 */
+
+/* ============================================================================
+   10 · 手機版：史料抽屜（7 辨識印刷字 / 8 辨識手寫字 / 11 試一試）
+   手機上不再左右並排。資訊面板（右半欄）變成頁面主體，史料圖收進一個
+   從左邊拉出來的抽屜；版面特徵改用面板上方可橫向滑動的膠囊按鈕選擇。
+   DOM 由 storymap.js 的 initMobileDocDrawers() 包起來：
+     <aside class="mdrawer">
+       .mdrawer-bar（數字圓圈＋特徵名稱）
+       .part3-fx-doc      ← 原本的史料欄，直接搬進來當抽屜內容
+       .mdrawer-foot / .mdrawer-grip
+     </aside>
+   桌面版把 aside 設成 display:contents，外框整個消失，
+   .part3-fx-doc 便回到原本 grid 的直接子元素位置，桌面版完全不受影響。
+   ========================================================================== */
+.mdrawer { display: contents; }
+/* 桌面版：抽屜的所有零件都必須關掉。特別注意 .mdrawer-edge——
+   因為外框是 display:contents，任何沒有關掉的子元素都會直接變成
+   explorer grid 的子項目，把左右兩欄的版面整個擠掉。 */
+.mdrawer-bar, .mdrawer-foot, .mdrawer-grip, .mdrawer-edge,
+.mdrawer-puller, .mdrawer-scrim, .mfilter { display: none; }
+
+/* 判斷條件說明：優先用「裝置」而不是「寬度」——
+   (pointer: coarse) and (hover: none) 表示主要輸入是手指且沒有滑鼠指標，
+   只有手機／平板成立，桌機把視窗縮窄不會誤判。
+   但 iPad 外接觸控板會回報 pointer: fine，所以再用 max-width 取聯集當保險，
+   讓桌機縮窄視窗時也還有可用版面。 */
+@media (pointer: coarse) and (hover: none), (max-width: 1040px) {
+  /* --- 外框：資訊面板單獨成為主體（11 試一試不在此列，它有自己的版面） --- */
+  .part3-feature-explorer,
+  #part-3-printed-explorer,
+  #part-3-handwritten-explorer {
+    display: block; width: auto; max-width: none; margin-left: 0; margin-right: 0;
+    height: auto; grid-template-rows: none; overflow: visible;
+  }
+  .part3-fx-out, .part3-try-panel {
+    height: auto; min-height: 0; max-height: none; overflow: visible;
+    padding: 4px clamp(14px, 4vw, 20px) 34px;
+  }
+  .part3-try-scroll { overflow: visible; }
+  /* 桌面版兩個代碼視窗是 flex:1 1 0（平分剩餘高度）。手機版容器高度改為 auto，
+     flex-basis:0 會讓它們塌成 0 高、看起來「終端機裡沒有字」。
+     手機版一律改成由內容決定高度。 */
+  .part3-fx-win { flex: 0 0 auto; min-height: 0; }
+  .part3-fx-win-body {
+    flex: 0 0 auto; height: auto; min-height: 0; max-height: none; overflow: visible;
+  }
+
+  /* --- 特徵篩選列（取代浮在圖上的標籤） --- */
+  .mfilter {
+    display: block; position: sticky; top: 0; z-index: 22;
+    margin: 0 0 10px; padding: 8px 0 9px; background: var(--paper);
+    border-bottom: 1px solid var(--line);
+  }
+  .mfilter-lab {
+    display: block; padding: 0 clamp(14px, 4vw, 20px) 6px; color: var(--muted);
+    font: 600 calc(10px * var(--font-scale)) var(--sans); letter-spacing: .06em;
+  }
+  /* 兩側淡出，暗示還可以往左右滑 */
+  .mfilter-row {
+    display: flex; gap: 6px; overflow-x: auto;
+    padding: 1px clamp(14px, 4vw, 20px) 2px; scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);
+  }
+  .mfilter-row::-webkit-scrollbar { display: none; }
+  .mchip {
+    flex: 0 0 auto; appearance: none; cursor: pointer;
+    border: 1px solid transparent; background: rgba(22, 61, 63, .06); color: var(--text);
+    border-radius: 7px; padding: 6px 11px;
+    font: 600 calc(12px * var(--font-scale)) var(--sans); white-space: nowrap;
+    transition: background-color .16s, color .16s;
+  }
+  .mchip[aria-pressed="true"] { background: var(--ink); color: #fff; }
+
+  /* --- 左側拉手：位置在畫面高度 72%，靠近拇指 --- */
+  .mdrawer-puller {
+    display: flex; position: fixed; left: 0; top: 72%; transform: translateY(-50%);
+    z-index: 60; appearance: none; cursor: pointer; border: 0; padding: 0;
+    width: 30px; height: 118px; border-radius: 0 13px 13px 0;
+    background: linear-gradient(160deg, #1d4a4d, #2c6360); color: #fff;
+    box-shadow: 4px 6px 18px rgba(22, 61, 63, .32);
+    flex-direction: column; align-items: center; justify-content: center; gap: 7px;
+    opacity: 0; pointer-events: none; transition: opacity .2s;
+  }
+  .mdrawer-puller.is-on { opacity: 1; pointer-events: auto; }
+  .mdrawer-puller .lab {
+    writing-mode: vertical-rl; font: 700 calc(12px * var(--font-scale)) var(--sans); letter-spacing: .16em;
+  }
+  .mdrawer-puller .arw { font-size: 12px; color: var(--yellow); }
+
+  .mdrawer-scrim {
+    display: block; position: fixed; inset: 0; z-index: 68;
+    background: rgba(12, 30, 32, .5); opacity: 0; pointer-events: none; transition: opacity .28s;
+  }
+  .mdrawer-scrim.is-on { opacity: 1; pointer-events: auto; }
+
+  /* --- 抽屜本體：預設只比底部四顆鈕寬一點 --- */
+  .mdrawer {
+    display: flex; position: fixed; left: 0; top: 0; bottom: 0; z-index: 70;
+    width: var(--mdrawer-w, 172px);
+    transform: translateX(-101%);
+    transition: transform .3s cubic-bezier(.4, 0, .2, 1);
+    background: linear-gradient(160deg, #123336, #1c4a4a);
+    flex-direction: column; box-shadow: 0 0 34px rgba(12, 30, 32, .45);
+    overflow: hidden; /* 沒有這行，史料圖會溢出抽屜，看起來像標題列與底列「沒有滿版」 */
+  }
+  .mdrawer.is-open { transform: translateX(0); visibility: visible; }
+  .mdrawer.is-resizing { transition: none; }
+  .mdrawer.is-full { width: 100% !important; }
+  /* 關起來時除了移出畫面，另外用 visibility 徹底藏起來：
+     只靠 transform 的話，一旦有別的規則覆蓋 transform，抽屜就會賴在畫面上
+     蓋住其他章節。visibility 是第二道保險。 */
+  .mdrawer:not(.is-open) { visibility: hidden; pointer-events: none; }
+  /* 抽屜、拉手、遮罩只在自己那一節捲到畫面內時才存在，
+     絕不跨到別的章節上面。is-inview 由 storymap.js 的 IntersectionObserver 掛上。 */
+  .part3-feature-explorer:not(.is-inview) .mdrawer,
+  .part3-feature-explorer:not(.is-inview) .mdrawer-puller,
+  .part3-feature-explorer:not(.is-inview) .mdrawer-scrim { display: none; }
+
+  .mdrawer-bar { display: flex; flex: 0 0 auto; align-items: center; gap: 9px; padding: 12px 12px 9px; }
+  .mdrawer-no {
+    flex: 0 0 auto; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--yellow); color: #3b2a0c; font: 800 calc(13px * var(--font-scale)) var(--sans);
+  }
+  .mdrawer-no:empty { display: none; }
+  .mdrawer-bar .t { color: #fff; font: 700 calc(19px * var(--font-scale))/1.3 var(--serif); }
+
+  /* 史料欄本身變成抽屜裡的捲動區 */
+  .mdrawer > .part3-fx-doc {
+    flex: 1 1 auto; min-height: 0; width: auto; height: auto; max-height: none;
+    padding: 8px; margin: 0; border: 0; background: none;
+    overflow: auto; touch-action: pan-y;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .mdrawer > .part3-fx-doc .part3-fx-nav,
+  .mdrawer > .part3-fx-doc [data-part3-fx-tags],
+  .mdrawer > .part3-fx-doc .part3-fx-caption { display: none; }
+  .mdrawer .part3-fx-pagestack, .mdrawer .part3-try-pagestack,
+  .mdrawer .part3-fx-page, .mdrawer .part3-fx-striparea {
+    height: 100%; max-height: none; min-height: 0; width: auto; margin: auto;
+  }
+  .mdrawer .part3-fx-page img, .mdrawer [data-try-img] {
+    display: block; height: 100%; width: auto; max-width: none; margin: auto;
+    pointer-events: none; user-select: none;
+  }
+  /* 展開後：PDF 置中，並可單獨縮放（不影響整個網頁） */
+  .mdrawer.is-full > .part3-fx-doc { padding: 14px; }
+  .mdrawer.is-full .part3-fx-pagestack, .mdrawer.is-full .part3-try-pagestack,
+  .mdrawer.is-full .part3-fx-page, .mdrawer.is-full .part3-fx-striparea { height: auto; width: 100%; }
+  .mdrawer.is-full .part3-fx-page img, .mdrawer.is-full [data-try-img] {
+    width: calc(var(--z, 1) * 100%); height: auto;
+  }
+
+  /* 拖到最左／最右再繼續拖 → 換頁 */
+  .mdrawer-edge {
+    display: block; position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
+    padding: 8px 6px; border-radius: 8px; background: rgba(243, 201, 103, .92); color: #3b2a0c;
+    font: 800 calc(11px * var(--font-scale))/1.35 var(--sans); writing-mode: vertical-rl;
+    letter-spacing: .1em; opacity: 0; transition: opacity .15s; pointer-events: none;
+  }
+  .mdrawer-edge.l { left: 6px; } .mdrawer-edge.r { right: 6px; }
+  .mdrawer-edge.is-on { opacity: 1; }
+
+  /* 右邊界中間的寬度調整鈕 */
+  .mdrawer-grip {
+    display: grid; position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+    z-index: 75; appearance: none; cursor: ew-resize; border: 0; padding: 0;
+    width: 26px; height: 52px; border-radius: 8px;
+    background: linear-gradient(160deg, #1d4a4d, #2c6360); color: rgba(247, 243, 234, .85);
+    place-items: center; box-shadow: 3px 3px 12px rgba(12, 30, 32, .4); touch-action: none;
+  }
+  .mdrawer-grip svg { width: 15px; height: 15px; }
+  .mdrawer.is-full .mdrawer-grip { display: none; }
+
+  /* 底部四顆鈕：連在一起、置中 */
+  .mdrawer-foot {
+    display: flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 0;
+    padding: 9px 6px; border-top: 1px solid rgba(255, 255, 255, .14);
+  }
+  .mdrawer-foot button {
+    appearance: none; cursor: pointer; width: 34px; height: 34px; border-radius: 0;
+    border: 1px solid rgba(247, 243, 234, .3); border-right-width: 0;
+    background: transparent; color: #f4efe6; display: grid; place-items: center; padding: 0;
+  }
+  .mdrawer-foot button:first-child { border-radius: 8px 0 0 8px; }
+  .mdrawer-foot button:last-child { border-radius: 0 8px 8px 0; border-right-width: 1px; }
+  .mdrawer-foot button svg { width: 16px; height: 16px; }
+  .mdrawer-foot button:disabled { opacity: .28; }
+
+  /* PDF 縮放：只用雙指／雙擊／ctrl+滾輪，不放 ＋－ 按鈕 */
+
+  /* 手機上其他區塊：視覺元素一律排在文字卡下方。
+     研究問題／JSON／OCR測試 三節在桌面版是用 #part-3-content 開頭的高權重規則
+     指定兩欄（minmax(0,1fr) minmax(0,--vis-w)），所以這裡必須用同樣的
+     #part-3-content 前綴才蓋得過去；否則文字卡會被壓成一個字寬的直條，
+     視覺元素再溢出蓋在它上面。 */
+  /* 這三節的 .lay-visual 在桌面版被
+       #part-3-content #part-3-json .lay-visual { grid-column: 2 }
+     指定（兩個 ID，權重 2-0-1）。用 .part3-json-split（1-0-2）蓋不過去——
+     結果就是欄數被我改成 1fr、但視覺元素仍被丟進第 2 欄，於是長出一個隱含欄，
+     文字卡被擠成一個字寬、JSON 視窗再溢出蓋在它上面。
+     因此這裡必須用同樣的兩個 ID 選擇器。 */
+  #part-3-content #part-3-research-questions .lay-split,
+  #part-3-content #part-3-json .lay-split,
+  #part-3-content #part-3-test .lay-split { grid-template-columns: minmax(0, 1fr); }
+  #part-3-content #part-3-research-questions .lay-copy,
+  #part-3-content #part-3-json .lay-copy,
+  #part-3-content #part-3-test .lay-copy {
+    order: 1; grid-column: 1; min-width: 0;
+  }
+  #part-3-content #part-3-research-questions .lay-visual,
+  #part-3-content #part-3-json .lay-visual,
+  #part-3-content #part-3-test .lay-visual {
+    order: 2; grid-column: 1; min-width: 0; position: relative; top: auto;
+  }
+  /* JSON 檢視器本身也要能縮：不能讓等寬長行把欄位撐爆再蓋到文字卡上 */
+  .part3-json-viewer-wrap, .part3-json-window, .part3-json-label-carousel {
+    max-width: 100%; min-width: 0;
+  }
+  .part3-json-body { overflow: auto; }
+  .lay-split, .lay-split.text-left, .lay-acc,
+  .paddleocr-layout, .part3-material-layout, .part3-ocr-def-layout { grid-template-columns: 1fr; }
+  .lay-split > .lay-copy, .lay-split.text-left > .lay-copy { order: 1; grid-column: 1; }
+  .lay-split > .lay-visual, .lay-split.text-left > .lay-visual { order: 2; grid-column: 1; }
+  .paddleocr-layout > .copybox, .part3-material-layout > .copybox { order: 1; }
+  .paddleocr-layout > .paddleocr-visual-box, .part3-material-layout > * { order: 2; }
+  .visual-frame, .visual-frame-tall, .visual-frame-wide { height: auto; min-height: 0; }
+  .part3-json-body { height: 340px; }
+  .part3-tools-checklist { grid-template-columns: 1fr; }
+}
+
+/* ============================================================================
+   11 · 手機版：試一試（#part-3-try-explorer）
+   整節剛好一個螢幕高（扣掉頂欄）：進度列與引導對話框固定，只有視窗內部捲動。
+   視窗內容依階段切換（狀態 class 由 storymap.js 的 initMobileTryLayout() 掛上）：
+     .is-mtry-p1        PDF ＋ 底部細長下載列
+     .is-mtry-steps     只有 PDF（下載列與聊天串都收起來）
+     .is-mtry-overview  只有累積的全部 prompt
+     .is-mtry-p3        只有比對區
+   ========================================================================== */
+.mtry-win, .mtry-winbar { display: none; }
+
+@media (pointer: coarse) and (hover: none), (max-width: 1040px) {
+  #part-3-try-explorer {
+    display: flex; flex-direction: column;
+    height: calc(100svh - var(--bar-h, 62px));
+    width: auto; max-width: none; margin-left: 0; margin-right: 0;
+    overflow: hidden;
+  }
+  #part-3-try-explorer .part3-try-panel {
+    flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column;
+    height: auto; max-height: none; padding: 10px clamp(12px, 4vw, 16px) 10px;
+  }
+  #part-3-try-explorer .part3-try-scroll {
+    flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column;
+    overflow: hidden; gap: 9px;
+  }
+  #part-3-try-explorer [data-try-todo] { flex: 0 0 auto; }
+  #part-3-try-explorer .part3-try-progress { margin: 0; padding-bottom: 9px; }
+  /* 引導對話框固定在最下面，內容多時自己捲 */
+  #part-3-try-explorer .part3-try-guidehost {
+    flex: 0 0 auto; max-height: 46%; overflow-y: auto;
+    margin-top: 9px; padding-top: 0; border-top: 0;
+  }
+
+  /* 視窗外框：由這裡提供邊框與標題列 */
+  .mtry-win {
+    display: flex; flex: 1 1 auto; min-height: 0; flex-direction: column;
+    border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--card);
+  }
+  .mtry-winbar {
+    display: flex; flex: 0 0 auto; align-items: center; gap: 6px;
+    padding: 8px 11px; background: #e9e4da; border-bottom: 1px solid var(--line);
+  }
+  .mtry-winbar .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .mtry-winbar .dot.red { background: #ff5f57; }
+  .mtry-winbar .dot.yellow { background: #febc2e; }
+  .mtry-winbar .dot.green { background: #28c840; }
+  .mtry-winbar .ttl {
+    margin-left: 5px; font: 700 calc(11.5px * var(--font-scale)) var(--sans); color: #4d5a58;
+  }
+
+  /* 史料：整頁縮到視窗內，不裁切 */
   #part-3-try-explorer .part3-try-doc {
-    height: auto;
-    max-height: none;
-    align-self: start;
-    background-size: 100% 100%, 100% 100%;
+    flex: 1 1 auto; min-height: 0; height: auto; max-height: none; width: auto;
+    display: flex; align-items: center; justify-content: center;
+    padding: 8px; margin: 0; border: 0; background: #123336; overflow: hidden;
   }
-  #part-3-printed-explorer .part3-fx-doc {
-    min-height: var(--fx-explorer-h, calc(95svh - var(--bar-h, 62px)));
+  #part-3-try-explorer .part3-try-pagestack,
+  #part-3-try-explorer .part3-try-doc .part3-fx-page {
+    height: 100%; width: 100%; max-height: none; min-height: 0;
+    display: flex; align-items: center; justify-content: center;
   }
-  #part-3-try-explorer .part3-try-doc {
-    min-height: var(--try-explorer-h, calc(95svh - var(--bar-h, 62px)));
+  #part-3-try-explorer [data-try-img] {
+    max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain;
+    border-radius: 3px; box-shadow: 0 6px 18px rgba(0, 0, 0, .3);
   }
-  #part-3-printed-explorer .part3-fx-pagestack,
-  #part-3-try-explorer .part3-try-pagestack {
-    height: auto;
-    max-height: none;
-    flex: 0 0 auto;
+  /* 翻頁鍵縮小、疊在圖片下緣 */
+  #part-3-try-explorer .part3-fx-nav {
+    position: absolute; left: 0; right: 0; bottom: 6px;
+    display: flex; align-items: center; justify-content: center; gap: 9px; padding: 0;
   }
-  #part-3-printed-explorer .part3-fx-page,
-  #part-3-try-explorer .part3-fx-page {
-    height: auto;
-    max-height: none;
-    display: block;
+  #part-3-try-explorer .part3-try-doc { position: relative; }
+  #part-3-try-explorer .part3-fx-nav button {
+    width: 26px; height: 26px; border-radius: 50%;
+    border: 1px solid rgba(247, 243, 234, .4); background: rgba(12, 30, 32, .55); color: #f4efe6;
   }
-  #part-3-printed-explorer .part3-fx-page img,
-  #part-3-try-explorer .part3-fx-page img,
-  #part-3-printed-explorer .part3-fx-turn img {
-    width: 100%;
-    height: auto;
-    max-width: 100%;
-    max-height: none;
-    object-fit: contain;
+
+  /* stage：外框已經有邊框與標題列，內層那一層視窗殼收起來 */
+  #part-3-try-explorer [data-try-stage] { min-height: 0; }
+  #part-3-try-explorer [data-try-stage] .part3-try-win {
+    border: 0; border-radius: 0; margin: 0; height: 100%; min-height: 0;
+    display: flex; flex-direction: column;
   }
+  #part-3-try-explorer [data-try-stage] .part3-try-winbar { display: none; }
+
+  /* 第一步：PDF ＋ 底部細長下載列 */
+  #part-3-try-explorer.is-mtry-p1 [data-try-stage] { flex: 0 0 auto; }
+  #part-3-try-explorer.is-mtry-p1 .part3-try-dl {
+    display: flex; align-items: center; gap: 9px; padding: 7px 10px;
+    background: #fff; border: 0; border-top: 1px solid var(--line); border-radius: 0;
+  }
+  #part-3-try-explorer.is-mtry-p1 .part3-try-dl .meta { flex: 1 1 auto; min-width: 0; }
+  #part-3-try-explorer.is-mtry-p1 .part3-try-dl .name {
+    font: 600 calc(11px * var(--font-scale)) var(--sans);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  #part-3-try-explorer.is-mtry-p1 .part3-try-dl .sub { display: none; }
+  #part-3-try-explorer.is-mtry-p1 .part3-try-dl-actions { gap: 7px; }
+  #part-3-try-explorer.is-mtry-p1 .part3-try-dlbtn,
+  #part-3-try-explorer.is-mtry-p1 .part3-try-already {
+    padding: 6px 13px; font-size: calc(11.5px * var(--font-scale)); border-radius: 7px;
+  }
+
+  /* 作答中：只留 PDF，下載列與聊天串都不顯示 */
+  #part-3-try-explorer.is-mtry-steps [data-try-stage] { display: none; }
+
+  /* 完成／比對：改成 stage 佔滿，史料收起來 */
+  #part-3-try-explorer.is-mtry-overview .part3-try-doc,
+  #part-3-try-explorer.is-mtry-p3 .part3-try-doc { display: none; }
+  #part-3-try-explorer.is-mtry-overview [data-try-stage],
+  #part-3-try-explorer.is-mtry-p3 [data-try-stage] {
+    flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column;
+  }
+  #part-3-try-explorer.is-mtry-overview .part3-try-chat {
+    flex: 1 1 auto; min-height: 0; max-height: none; overflow-y: auto;
+  }
+  #part-3-try-explorer.is-mtry-overview .part3-try-chatfoot { flex: 0 0 auto; }
+  #part-3-try-explorer.is-mtry-p3 .part3-try-cmp { flex: 1 1 auto; min-height: 0; }
 }
