@@ -80,6 +80,7 @@ img { max-width: 100%; }
 }
 .tabs { grid-column: 2; justify-self: center; display: flex; align-items: center; gap: clamp(16px, 2.2vw, 32px); height: 100%; }
 .settings-wrap { grid-column: 3; justify-self: end; position: relative; }
+.site-settings-control { position: relative; display: grid; place-items: center; }
 
 .tabs > a,
 .nav-dropdown-trigger {
@@ -170,7 +171,6 @@ img { max-width: 100%; }
   border: 1px solid rgba(22, 61, 63, .24); box-shadow: 0 16px 40px rgba(18, 43, 44, .26);
 }
 .settings-panel[hidden] { display: none; }
-.settings-panel-title { margin-bottom: 11px; color: var(--muted); font: 700 calc(10.5px * var(--font-scale)) var(--sans); letter-spacing: .13em; }
 .settings-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; font: calc(13.5px * var(--font-scale)) var(--sans); }
 .font-size-controls { display: inline-flex; align-items: center; gap: 6px; }
 .font-size-button { min-width: 32px; padding: 4px 6px; color: var(--ink); background: transparent; border: 1px solid rgba(22, 61, 63, .28); font: calc(13px * var(--font-scale)) var(--sans); line-height: 1; cursor: pointer; }
@@ -178,6 +178,114 @@ img { max-width: 100%; }
 .font-size-button:disabled { opacity: .4; cursor: default; }
 #font-size-value { min-width: 44px; color: var(--muted); font: calc(12px * var(--font-scale)) var(--sans); text-align: center; }
 .font-size-button:focus-visible, .settings-button:focus-visible { outline: 2px solid var(--yellow); outline-offset: 3px; }
+
+/* 窄螢幕網站選單：由右向左滑入；桌面寬度維持原本的頂欄導覽。 */
+.compact-menu-button,
+.compact-menu-panel,
+.compact-menu-backdrop { display: none; }
+
+@media (max-width: 1040px) {
+  html.compact-menu-open { overflow: hidden; }
+  .topbar {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+  }
+  .brand { grid-column: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .tabs { display: none; }
+  .settings-wrap {
+    grid-column: 2;
+    display: flex;
+    align-items: center;
+    justify-self: end;
+    gap: 8px;
+  }
+  .compact-menu-button {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    color: rgba(247, 243, 234, .86);
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    cursor: pointer;
+    transition: color .2s;
+  }
+  .compact-menu-button:hover,
+  .compact-menu-button[aria-expanded="true"] {
+    color: #fff;
+  }
+  .compact-menu-button:focus-visible,
+  .compact-menu-link:focus-visible {
+    outline: 2px solid var(--yellow);
+    outline-offset: 3px;
+  }
+  .compact-menu-icon { display: inline-grid; gap: 4px; width: 20px; }
+  .compact-menu-icon span { display: block; height: 1.5px; background: currentColor; border-radius: 2px; }
+  .compact-menu-backdrop {
+    position: fixed;
+    inset: var(--bar-h) 0 0;
+    z-index: 65;
+    background: rgba(7, 24, 26, .54);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .24s, visibility 0s linear .24s;
+  }
+  .compact-menu-backdrop.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition-delay: 0s;
+  }
+  .compact-menu-panel {
+    position: fixed;
+    top: var(--bar-h);
+    right: 0;
+    bottom: 0;
+    z-index: 70;
+    display: flex;
+    flex-direction: column;
+    width: min(380px, calc(100vw - 18px));
+    color: #eef4f2;
+    background: #0e3034;
+    border-left: 1px solid rgba(255, 255, 255, .24);
+    box-shadow: -18px 0 44px rgba(6, 24, 26, .32);
+    transform: translateX(100%);
+    visibility: hidden;
+    pointer-events: none;
+    transition: transform .28s ease, visibility 0s linear .28s;
+  }
+  .compact-menu-panel.is-open {
+    transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
+    transition-delay: 0s;
+  }
+  .compact-menu-links {
+    display: grid;
+    overflow-y: auto;
+    padding: 10px 14px 28px;
+  }
+  .compact-menu-link {
+    display: flex;
+    align-items: center;
+    min-height: 58px;
+    padding: 13px 10px 13px 8px;
+    color: rgba(238, 244, 242, .84);
+    border-bottom: 1px solid rgba(255, 255, 255, .12);
+    text-decoration: none;
+    font: 600 calc(16px * var(--font-scale))/1.45 var(--serif);
+    transition: color .2s, background-color .2s, padding-left .2s;
+  }
+  .compact-menu-link:hover,
+  .compact-menu-link.active {
+    padding-left: 16px;
+    color: #12363a;
+    background: var(--yellow);
+  }
+}
 
 /* ============================================================================
    2 · 封面（主頁）
@@ -595,8 +703,22 @@ img { max-width: 100%; }
   margin-top: 10px; padding-top: 0; border-top: 0;
 }
 
-@media (hover: none) {
-  /* 觸控裝置沒有 hover：改為點擊說明區展開／收合 */
+@media (pointer: coarse) and (hover: none), (max-width: 1040px) {
+  /* 手機與窄螢幕電腦先保持收合；由 storymap.js 的捲動判斷，或觸控點擊，
+     在圖片頂端越過螢幕中線後切換 is-expanded。 */
+  .photo-gallery-body:not(.is-expanded) {
+    max-height: none;
+    overflow: hidden;
+  }
+  .photo-gallery-body:not(.is-expanded) .photo-gallery-more {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+  .photo-gallery-body:not(.is-expanded) .photo-gallery-title { margin-bottom: 0; }
+  .photo-gallery-body.is-expanded {
+    max-height: var(--gallery-body-max-h, 62%);
+    overflow-y: auto;
+  }
   .photo-gallery-body.is-expanded .photo-gallery-more { grid-template-rows: 1fr; opacity: 1; }
   .photo-gallery-body.is-expanded .photo-gallery-title { margin-bottom: 12px; }
   .photo-gallery-body.is-expanded .photo-gallery-hint { opacity: 0; height: 0; margin: 0; overflow: hidden; }
@@ -2033,46 +2155,10 @@ img { max-width: 100%; }
     padding: 16px;
   }
 }
-@media (max-width: 760px) {
-  .part3-tools-checklist {
-    grid-template-columns: 1fr;
-    height: auto;
-    min-height: 0;
-  }
-  .part3-tools-list-window {
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
-  }
-  .part3-tools-info-window {
-    height: auto;
-    overflow: visible;
-  }
-  .part3-tools-list {
-    grid-auto-rows: auto;
-    flex: 0 1 auto;
-    overflow: visible;
-  }
-  .part3-tool-row {
-    height: auto;
-    min-height: var(--part3-tools-row-height, 88px);
-  }
-  .part3-tool-info-view {
-    grid-template-rows: 280px auto;
-    height: auto;
-    min-height: 0;
-  }
-  .part3-tools-info-panel {
-    height: auto;
-    min-height: 0;
-    overflow: visible;
-  }
-  .part3-tool-info-photo {
-    min-height: 280px;
-  }
-  .part3-tool-info-copy {
-    overflow: visible;
-  }
-}
+/* 註：舊的「工具清單堆疊在工具資訊上方、auto 高度」規則已移除——
+   所需的工具與資源在手機版／窄螢幕改用下方「12 · 手機版：工具與資源／
+   基本流程」的左右箭頭單頁版面（工具清單整個隱藏，工具資訊佔滿高度）。
+   舊規則的 auto 高度會和新版面的滿版高度衝突，故整段刪除。 */
 
 /* ============================================================================
    9b · 第一至第三部分：尚未改寫的舊版標記之過渡樣式
@@ -3560,9 +3646,16 @@ img { max-width: 100%; }
   .mdrawer .part3-fx-page, .mdrawer .part3-fx-striparea {
     height: 100%; max-height: none; min-height: 0; width: auto; margin: auto;
   }
+  /* 位置與放大倍數全部走 CSS 變數，實際數值在 storymap-cards.css 調
+     （見該檔「手機版史料圖微調」區塊）：
+       --fxdoc-scale   放大倍數（1 = 原本剛好塞滿抽屜高度）
+       --fxdoc-x / -y  位移
+       --fxdoc-origin  縮放的基準點 */
   .mdrawer .part3-fx-page img, .mdrawer [data-try-img] {
-    display: block; height: 100%; width: auto; max-width: none; margin: auto;
+    display: block; height: calc(100% * var(--fxdoc-h, 1)); width: auto; max-width: none; margin: auto;
     pointer-events: none; user-select: none;
+    transform: translate(var(--fxdoc-x, 0px), var(--fxdoc-y, 0px)) scale(var(--fxdoc-scale, 1));
+    transform-origin: var(--fxdoc-origin, center center);
   }
   /* 展開後：PDF 置中，並可單獨縮放（不影響整個網頁） */
   .mdrawer.is-full > .part3-fx-doc { padding: 14px; }
@@ -3646,6 +3739,16 @@ img { max-width: 100%; }
   .paddleocr-layout > .copybox, .part3-material-layout > .copybox { order: 1; }
   .paddleocr-layout > .paddleocr-visual-box, .part3-material-layout > * { order: 2; }
   .visual-frame, .visual-frame-tall, .visual-frame-wide { height: auto; min-height: 0; }
+  /* 運用 Agentic AI 使用 PaddleOCR：這個動畫的視窗由絕對定位的子視窗組成，
+     不能跟隨一般視覺框改成 auto，否則外框只剩文字卡的幾十像素，動畫便看不見。 */
+  #part-3-content #part-3-agentic-ocr #part-3-agentic-ocr-chart {
+    height: var(--agentic-frame-height, 560px);
+    min-height: 0;
+  }
+  #part-3-content #part-3-agentic-ocr #part-3-agentic-ocr-chart > .agentic-scene {
+    height: 100%;
+    min-height: 0;
+  }
   .part3-json-body { height: 340px; }
   .part3-tools-checklist { grid-template-columns: 1fr; }
 }
@@ -3712,9 +3815,26 @@ img { max-width: 100%; }
     height: 100%; width: 100%; max-height: none; min-height: 0;
     display: flex; align-items: center; justify-content: center;
   }
+  /* 每張圖都可以個別決定「照原始大小顯示」或「縮放到視窗內」，以及位置。
+     實際數值在 storymap-cards.css 調（見「手機版史料圖微調」區塊）：
+       --tryimg-fit    contain＝縮到框內（預設）；none＝原始大小
+       --tryimg-max-w / --tryimg-max-h   放 none 就可以超出視窗（配合 none 使用）
+       --tryimg-scale  放大倍數
+       --tryimg-x / -y 位移
+       --tryimg-origin 縮放基準點 */
   #part-3-try-explorer [data-try-img] {
-    max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain;
+    max-width: var(--tryimg-max-w, 100%); max-height: var(--tryimg-max-h, 100%);
+    width: var(--tryimg-w, auto); height: var(--tryimg-h, auto);
+    object-fit: var(--tryimg-fit, contain);
+    transform: translate(var(--tryimg-x, 0px), var(--tryimg-y, 0px)) scale(var(--tryimg-scale, 1));
+    transform-origin: var(--tryimg-origin, center center);
     border-radius: 3px; box-shadow: 0 6px 18px rgba(0, 0, 0, .3);
+  }
+  /* 圖片在視窗裡靠哪一邊 */
+  #part-3-try-explorer .part3-try-doc {
+    align-items: var(--trydoc-align, center);
+    justify-content: var(--trydoc-justify, center);
+    overflow: var(--trydoc-overflow, hidden);
   }
   /* 翻頁鍵縮小、疊在圖片下緣 */
   #part-3-try-explorer .part3-fx-nav {
@@ -3768,4 +3888,359 @@ img { max-width: 100%; }
   }
   #part-3-try-explorer.is-mtry-overview .part3-try-chatfoot { flex: 0 0 auto; }
   #part-3-try-explorer.is-mtry-p3 .part3-try-cmp { flex: 1 1 auto; min-height: 0; }
+}
+
+/* ============================================================================
+   12 · 手機版／窄螢幕：所需的工具與資源、重用平台的基本流程
+   （#part-3-tools-card / #part-3-basic-flow-chart）
+
+   所需的工具與資源：工具清單（左欄）整個隱藏，只留工具資訊（右欄）並佔滿
+   高度；改用疊在工具資訊上方的左右箭頭切換工具。原本每列自己的勾選章
+   （.part3-tool-tick）跟著清單一起隱藏，改用 .part3-tools-mtick 這個共用的
+   勾選章疊在目前工具的圖片右上角：每次換工具都先變回空白方框，再播放
+   「填色＋打勾」的效果（storymap.js 的 initPart3ToolsChecklist() 負責換工具
+   與播放時機）。桌面版完全不受影響——.part3-tools-mnav 預設 display:none。
+
+   重用平台的基本流程：8 個步驟原本橫向排成一列雪佛龍，手機版改排成 2 欄
+   × 4 格（寬度縮窄、置中，兩側露出背板底色）：左欄由上到下是 1-4，4 的
+   右邊接 5，然後 6、7、8 沿右欄由下往上疊回去。掀開動畫只播放一次——
+   當「重用平台的基本流程」標題／說明文字（#part-3-basic-flow-card）捲動到
+   螢幕高度 70%（以畫面最底為 0%、最頂為 100% 計）時觸發，由 storymap.js 的
+   initPart3MobileFlowUnfold() 監聽捲動位置判斷時機。桌面版的雪佛龍樣式
+   （.part3-flow-step 的 clip-path 等）都寫在本節媒體查詢之外，不受影響。
+   ========================================================================== */
+.part3-tools-mnav { display: none; }
+
+@media (pointer: coarse) and (hover: none), (max-width: 1040px) {
+  /* 第三部分封面＋適合的研究問題合計佔滿頂欄以下的一個視窗高度；
+     所需的工具與資源則獨立佔滿下一個視窗。 */
+  #part-3,
+  #part-3-research-questions,
+  #part-3-tools {
+    height: var(--part3-narrow-section-height, calc(100svh - var(--bar-h, 62px)));
+    min-height: 0;
+  }
+  #part-3-research-questions {
+    display: flex;
+    align-items: stretch;
+  }
+  #part-3-research-questions > .story-inner {
+    display: flex;
+    align-items: center;
+    height: 100%;
+  }
+  #part-3-research-questions .lay-split { width: 100%; }
+
+  #part-3-tools {
+    display: flex;
+    flex-direction: column;
+  }
+  #part-3-tools > .story-inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  /* OCR 定義：1、2 號卡片與掃描視覺元素全部放進一個頂欄以下的視窗；
+     視覺元素縮短並置中，避免手機／窄電腦需要再捲動才能看完整組。 */
+  #part-3-ocr-definition,
+  #part-3-test {
+    display: flex;
+    height: var(--part3-narrow-section-height, calc(100svh - var(--bar-h, 62px)));
+    min-height: 0;
+    overflow: hidden;
+  }
+  #part-3-ocr > #part-3-ocr-definition,
+  #part-3-ocr > #part-3-test {
+    padding-block: clamp(12px, 2svh, 18px);
+  }
+  #part-3-ocr-definition > .story-inner,
+  #part-3-test > .story-inner {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    min-height: 0;
+  }
+  #part-3-ocr-definition .part3-ocr-def-layout,
+  #part-3-test .lay-split {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    gap: clamp(10px, 1.6vh, 18px);
+  }
+  #part-3-ocr-definition .part3-two-card-grid,
+  #part-3-test .lay-copy {
+    flex: 0 0 auto;
+    min-height: 0;
+  }
+  #part-3-ocr-definition .ocr-scan-scene,
+  #part-3-test .batch-scene {
+    flex: 0 0 var(--part3-narrow-visual-height, 280px);
+    align-self: center;
+    width: min(100%, var(--ocr-scene-max-w, 1000px));
+    max-width: 100%;
+    margin: 0 auto;
+  }
+  #part-3-test .batch-scene {
+    width: min(90%, 560px);
+    height: var(--part3-narrow-visual-height, 280px);
+    aspect-ratio: auto;
+  }
+
+  /* OCR 視覺元素內部也跟著縮短：頁面與輸出視窗分配剩餘高度，
+     不讓原本的比例把整個 section 撐高。 */
+  #part-3-ocr-definition .ocr-scan-scene {
+    display: flex;
+    flex-direction: column;
+    height: var(--part3-narrow-visual-height, 280px);
+    overflow: hidden;
+  }
+  #part-3-ocr-definition .ocr-pages {
+    flex: 1 1 56%;
+    min-height: 0;
+    margin-bottom: clamp(8px, 1.2vh, 14px);
+  }
+  #part-3-ocr-definition .ocr-filestack.handwritten,
+  #part-3-ocr-definition .ocr-filestack.printed {
+    height: 100%;
+    aspect-ratio: auto;
+  }
+  #part-3-ocr-definition .ocr-output {
+    display: flex;
+    flex: 1 1 44%;
+    flex-direction: column;
+    min-height: 0;
+  }
+  #part-3-ocr-definition .ocr-output-body {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+  }
+
+  /* --- 所需的工具與資源 --- */
+  .part3-tools-checklist {
+    grid-template-columns: 1fr;
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+  }
+  .part3-tools-list-window { display: none; }
+  .part3-tools-info-window {
+    position: relative;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .part3-tools-info-panel {
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - var(--tools-bar-h, 50px));
+    min-height: 0;
+    overflow: hidden;
+  }
+  .part3-tools-window-bar { min-height: var(--tools-bar-h, 50px); padding: 12px 16px; }
+  /* 改用 flex 而不是 grid-template-rows：grid 的百分比高度鏈在「auto 列」上
+     很容易解不出定值，導致文字整個不出現；flex column＋min-height:0 這個
+     組合在本檔其他手機版版面（抽屜、試一試）已經證明可靠，這裡沿用同一寫法。 */
+  .part3-tool-info-view {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+  .part3-tool-info-photo { flex: 1 1 auto; min-height: 0; }
+  .part3-tool-info-copy {
+    flex: 0 0 auto;
+    max-height: 46%;
+    overflow-y: auto;
+  }
+  /* 保留設計裡原有的打勾樣式，但每列自己的數字方塊在手機版改由
+     .part3-tools-mtick 取代，避免和抽屜化的清單一起消失 */
+  .part3-tool-info-number { display: none; }
+
+  /* 這一層蓋在「工具資訊」整塊（標題列＋內容）上面，所以箭頭／頁碼／勾選章
+     要往下讓出標題列高度，否則會疊在「工具資訊」四個字上面。 */
+  .part3-tools-mnav {
+    display: block;
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    top: var(--tools-bar-h, 50px);
+    z-index: 4;
+    pointer-events: none;
+  }
+  .part3-tools-mtick {
+    position: absolute; top: 14px; right: 14px; pointer-events: none;
+    display: grid; place-items: center;
+    width: 36px; height: 36px;
+    background: #fffaf2; color: transparent;
+    border: 1.5px solid rgba(22, 61, 63, .5);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, .18);
+    transition: background-color .28s ease, border-color .28s ease;
+  }
+  .part3-tools-mtick .mark {
+    display: inline-block;
+    font: 800 18px/1 var(--sans);
+    transform: scale(.3) rotate(-18deg);
+    opacity: 0;
+    transition: transform .3s cubic-bezier(.34, 1.56, .64, 1), opacity .2s ease;
+  }
+  .part3-tools-mtick.is-ticked {
+    background: var(--yellow); border-color: var(--ink); color: var(--ink);
+  }
+  .part3-tools-mtick.is-ticked .mark { transform: scale(1) rotate(0deg); opacity: 1; }
+  .part3-tools-mcount {
+    position: absolute; top: 14px; left: 14px; pointer-events: none;
+    padding: 5px 10px;
+    background: rgba(18, 54, 58, .72); color: #f7f3ea;
+    font: 700 11px/1 var(--sans); letter-spacing: .06em;
+  }
+  .part3-tools-marrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    pointer-events: auto;
+    width: 38px; height: 38px;
+    display: grid; place-items: center;
+    background: rgba(18, 54, 58, .72); color: #f7f3ea;
+    border: 0; border-radius: 50%;
+    font: 600 18px/1 var(--sans);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .part3-tools-marrow:active { background: rgba(18, 54, 58, .92); }
+  .part3-tools-marrow.prev { left: 10px; }
+  .part3-tools-marrow.next { right: 10px; }
+  .part3-tools-marrow[disabled] { opacity: .25; pointer-events: none; }
+
+  /* --- 重用平台的基本流程：2 欄 × 4 格「展開紙盒」 --- */
+  /* 整節只佔螢幕（扣掉頂欄）高度的 95%，刻意留一點空白，
+     暗示下面還有內容、也不會頂到螢幕邊緣。 */
+  #part-3-basic-flow-stack {
+    height: calc((100svh - var(--bar-h, 62px)) * .95);
+    display: flex; flex-direction: column;
+  }
+  #part-3-basic-flow-card { flex: 0 0 auto; }
+  #part-3-basic-flow-chart {
+    /* 拿掉桌面版原本的卡片背景／邊框／陰影（見本檔前面
+       #part-3-basic-flow-chart 的桌面規則），讓 8 個格子直接落在
+       頁面本身的底色上，不要再多一層「灰卡片」夾在中間。 */
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    position: relative;
+    flex: 1 1 auto; min-height: 0;
+    display: flex; flex-direction: column;
+    padding: clamp(12px, 3vw, 18px);
+  }
+  #part-3-basic-flow-chart > .body { display: none; }
+  /* 格子大小＝正方形，由 storymap.js 的 initPart3MobileFlowSquare() 量出
+     目前可用寬高，取兩者較小值換算成 --flow-box-size，寫在 .part3-flow-chev
+     上；grid-template-columns/rows 兩邊都用同一個變數，寬＝高，8 格保證
+     完全等大。量測前先用 130px 這個預設值，避免變數還沒算出來時版面跳動。 */
+  .part3-flow-chev {
+    display: grid;
+    grid-template-columns: repeat(2, var(--flow-box-size, 130px));
+    grid-template-rows: repeat(4, var(--flow-box-size, 130px));
+    gap: 6px;
+    justify-content: center;
+    align-content: center;
+    width: 100%;
+    flex: 1 1 auto; min-height: 0;
+    perspective: 900px;
+  }
+  .part3-flow-step {
+    margin-left: 0;
+    clip-path: none;
+    min-width: 0;
+    min-height: 0;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 1px solid var(--line);
+    opacity: 0;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    transition: transform .5s cubic-bezier(.3, .9, .4, 1.15), opacity .25s ease,
+      background-color .18s ease, color .18s ease, box-shadow .18s ease;
+  }
+  .part3-flow-step:first-child { clip-path: none; }
+  /* 單數格（1/3/5/7）白底深字，偶數格（2/4/6/8）綠底淺字，
+     跟桌面版單雙交錯淺色不同——這裡改成兩個對比色，並蓋掉本檔前面
+     .part3-flow-step:nth-child(odd/even) 的桌面配色（權重相同，這裡
+     寫在後面所以會贏）。 */
+  .part3-flow-step:nth-child(odd) {
+    background: var(--card);
+    color: var(--ink);
+  }
+  .part3-flow-step:nth-child(odd) .part3-flow-step-no { color: var(--accent); }
+  .part3-flow-step:nth-child(even) {
+    background: var(--ink);
+    color: #f7f3ea;
+  }
+  .part3-flow-step:nth-child(even) .part3-flow-step-no { color: var(--yellow); opacity: 1; }
+  /* 手指點按／滑鼠懸停：格子微微放大＋加深陰影，維持已經掀開的角度 */
+  .part3-flow-step.is-shown:hover,
+  .part3-flow-step.is-shown:focus-visible,
+  .part3-flow-step.is-shown:active {
+    transform: rotateX(0deg) rotateY(0deg) scale(1.05);
+    box-shadow: 0 8px 18px rgba(22, 61, 63, .22);
+    z-index: 2;
+  }
+  .part3-flow-step:nth-child(odd).is-shown:hover,
+  .part3-flow-step:nth-child(odd).is-shown:focus-visible,
+  .part3-flow-step:nth-child(odd).is-shown:active {
+    background: #fffaf2;
+  }
+  .part3-flow-step:nth-child(even).is-shown:hover,
+  .part3-flow-step:nth-child(even).is-shown:focus-visible,
+  .part3-flow-step:nth-child(even).is-shown:active {
+    background: #1c464a;
+  }
+  .part3-flow-step-no {
+    font-size: calc(19px * var(--font-scale));
+    margin-bottom: 14px;
+  }
+  .part3-flow-step-label { font-size: calc(15.5px * var(--font-scale)); line-height: 1.35; }
+
+  /* 位置：左欄由上到下 1-4，右欄由下到上 5-8（5 貼著 4） */
+  .part3-flow-step:nth-child(1) { grid-column: 1; grid-row: 1; }
+  .part3-flow-step:nth-child(2) { grid-column: 1; grid-row: 2; }
+  .part3-flow-step:nth-child(3) { grid-column: 1; grid-row: 3; }
+  .part3-flow-step:nth-child(4) { grid-column: 1; grid-row: 4; }
+  .part3-flow-step:nth-child(5) { grid-column: 2; grid-row: 4; }
+  .part3-flow-step:nth-child(6) { grid-column: 2; grid-row: 3; }
+  .part3-flow-step:nth-child(7) { grid-column: 2; grid-row: 2; }
+  .part3-flow-step:nth-child(8) { grid-column: 2; grid-row: 1; }
+
+  /* 掀開方向：2-4 從自己的上緣往下掀 */
+  .part3-flow-step:nth-child(2),
+  .part3-flow-step:nth-child(3),
+  .part3-flow-step:nth-child(4) {
+    transform-origin: top center;
+    transform: rotateX(-100deg);
+  }
+  /* 5 從自己的左緣往右掀，貼著 4 展開 */
+  .part3-flow-step:nth-child(5) {
+    transform-origin: left center;
+    transform: rotateY(-100deg);
+  }
+  /* 6-8 從自己的下緣往上掀，沿右欄往上疊回去 */
+  .part3-flow-step:nth-child(6),
+  .part3-flow-step:nth-child(7),
+  .part3-flow-step:nth-child(8) {
+    transform-origin: bottom center;
+    transform: rotateX(100deg);
+  }
+  .part3-flow-step.is-shown {
+    opacity: 1;
+    transform: rotateX(0deg) rotateY(0deg);
+    /* 過場動畫（transform/opacity/background-color/color/box-shadow）已經
+       統一寫在上面 .part3-flow-step 的基礎規則，這裡不用重複宣告，
+       避免兩處 transition 值不一致、之後改一邊忘了改另一邊。 */
+  }
 }

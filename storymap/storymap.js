@@ -22,7 +22,7 @@ document.querySelectorAll('.sample-doc-panel, .source-flow-document').forEach((p
   });
 });
 const settingsPanel = document.getElementById('site-settings-panel');
-const settingsWrap = document.querySelector('.settings-wrap');
+const settingsControl = document.querySelector('.site-settings-control');
 const fontSizeDecrease = document.getElementById('font-size-decrease');
 const fontSizeIncrease = document.getElementById('font-size-increase');
 const fontSizeValue = document.getElementById('font-size-value');
@@ -61,19 +61,17 @@ let settingsCloseTimer;
 const scheduleSettingsClose = () => {
   window.clearTimeout(settingsCloseTimer);
   settingsCloseTimer = window.setTimeout(() => {
-    if (!settingsWrap.matches(':hover') && !settingsWrap.contains(document.activeElement)) setSettingsOpen(false);
+    if (!settingsControl.matches(':hover')) setSettingsOpen(false);
   }, 100);
 };
 applyFontScale(readFontScale());
-settingsWrap.addEventListener('mouseenter', () => setSettingsOpen(true));
-settingsWrap.addEventListener('mouseleave', scheduleSettingsClose);
-settingsWrap.addEventListener('focusin', () => setSettingsOpen(true));
-settingsWrap.addEventListener('focusout', scheduleSettingsClose);
-settingsButton.addEventListener('click', () => setSettingsOpen(settingsPanel.hidden || settingsWrap.matches(':hover')));
+settingsControl.addEventListener('mouseenter', () => setSettingsOpen(true));
+settingsControl.addEventListener('mouseleave', scheduleSettingsClose);
+settingsButton.addEventListener('click', () => setSettingsOpen(true));
 fontSizeDecrease.addEventListener('click', () => applyFontScale(readFontScale() - FONT_SCALE_STEP));
 fontSizeIncrease.addEventListener('click', () => applyFontScale(readFontScale() + FONT_SCALE_STEP));
 document.addEventListener('click', (event) => {
-  if (!settingsPanel.hidden && !event.target.closest('.settings-wrap')) setSettingsOpen(false);
+  if (!settingsPanel.hidden && !event.target.closest('.site-settings-control')) setSettingsOpen(false);
 });
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && !settingsPanel.hidden) {
@@ -82,7 +80,45 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
-const tabs = [...document.querySelectorAll('.main-nav-link')];
+const compactMenuButton = document.getElementById('compact-menu-button');
+const compactMenuPanel = document.getElementById('compact-menu-panel');
+const compactMenuBackdrop = document.getElementById('compact-menu-backdrop');
+let compactMenuCloseTimer;
+const scheduleCompactMenuClose = () => {
+  window.clearTimeout(compactMenuCloseTimer);
+  compactMenuCloseTimer = window.setTimeout(() => {
+    const menuHovered = compactMenuButton.matches(':hover')
+      || compactMenuPanel.matches(':hover');
+    if (!menuHovered) setCompactMenuOpen(false);
+  }, 120);
+};
+const keepCompactMenuOpen = () => {
+  window.clearTimeout(compactMenuCloseTimer);
+  setCompactMenuOpen(true);
+};
+const setCompactMenuOpen = (open) => {
+  compactMenuButton.setAttribute('aria-expanded', String(open));
+  compactMenuButton.setAttribute('aria-label', open ? '關閉網站選單' : '開啟網站選單');
+  compactMenuPanel.classList.toggle('is-open', open);
+  compactMenuPanel.setAttribute('aria-hidden', String(!open));
+  compactMenuBackdrop.classList.toggle('is-open', open);
+  compactMenuBackdrop.setAttribute('aria-hidden', String(!open));
+  document.documentElement.classList.toggle('compact-menu-open', open);
+};
+compactMenuButton.addEventListener('mouseenter', keepCompactMenuOpen);
+compactMenuButton.addEventListener('mouseleave', scheduleCompactMenuClose);
+compactMenuPanel.addEventListener('mouseenter', keepCompactMenuOpen);
+compactMenuPanel.addEventListener('mouseleave', scheduleCompactMenuClose);
+compactMenuButton.addEventListener('click', () => setCompactMenuOpen(true));
+compactMenuBackdrop.addEventListener('click', () => setCompactMenuOpen(false));
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && compactMenuButton.getAttribute('aria-expanded') === 'true') {
+    setCompactMenuOpen(false);
+    compactMenuButton.focus();
+  }
+});
+
+const tabs = [...document.querySelectorAll('.main-nav-link, .compact-menu-link')];
 const tabPanels = [...document.querySelectorAll('[data-tab-panel]')];
 const introDropdown = document.querySelector('.nav-dropdown');
 const introDropdownTrigger = introDropdown.querySelector('.nav-dropdown-trigger');
@@ -122,6 +158,7 @@ const setActiveTab = (tabName, { updateHash = true, scrollTarget = null } = {}) 
   tabs.forEach((tab) => tab.classList.toggle('active', tab.dataset.navTarget === tabName));
   introDropdown.classList.toggle('active', tabName === 'intro');
   setIntroDropdownOpen(false);
+  setCompactMenuOpen(false);
   if (updateHash) history.pushState(null, '', scrollTarget || `#${tabName}`);
   if (scrollTarget) {
     window.requestAnimationFrame(() => document.querySelector(scrollTarget)?.scrollIntoView({ block: 'start' }));
@@ -285,6 +322,127 @@ document.querySelectorAll('[data-source-flow]').forEach((visual) => {
   if ('ResizeObserver' in window) new ResizeObserver(scheduleSourceFlowConnectorRefresh).observe(visual);
 });
 scheduleSourceFlowConnectorRefresh();
+
+/* 引言 01：手機／窄螢幕把每一列改成「標題 → 視覺 → 內文」。
+   保留原本的三頁畫廊，並把第 2 頁複製到第 2 列，讓「研究價值」有自己的圖像。
+   捲到某列標題時自動展開；點擊標題仍可手動開關。 */
+const initIntroResearchValueInlineList = () => {
+  const responsiveQuery = window.matchMedia('(pointer: coarse) and (hover: none), (max-width: 1040px)');
+
+  const section = document.getElementById('intro-1-1');
+  const split = section?.querySelector(':scope > .story-inner > .lay-split');
+  const stack = split?.querySelector(':scope > .lay-copy-stack');
+  const visual = split?.querySelector(':scope > .lay-visual');
+  const gallery = visual?.querySelector('[data-photo-gallery]');
+  const cards = stack ? [...stack.children].filter((item) => item.matches('[data-intro-card]')) : [];
+  const dataScript = gallery?.querySelector('[data-photo-gallery-data]');
+  if (!split || !gallery || cards.length < 2 || !dataScript) return;
+
+  let pages = [];
+  try {
+    pages = JSON.parse(dataScript.textContent);
+  } catch (error) {
+    return;
+  }
+  if (!Array.isArray(pages) || !pages.length) return;
+
+  const list = document.createElement('div');
+  list.className = 'intro-inline-list';
+  list.dataset.introInlineList = '';
+  const rows = [];
+
+  cards.forEach((card, index) => {
+    const titleRow = card.querySelector('.title-row');
+    const number = titleRow?.querySelector('.option-number');
+    const title = titleRow?.querySelector('h2');
+    const body = card.querySelector('.body');
+    if (!number || !title || !body) return;
+
+    const row = document.createElement('article');
+    row.className = 'intro-inline-row';
+    row.dataset.introInlineRow = String(index + 1);
+    row.dataset.introCard = '';
+    row.dataset.tab = card.dataset.tab || '';
+    row.dataset.nav = card.dataset.nav || '';
+    if (card.id) row.id = card.id;
+
+    const heading = document.createElement('button');
+    heading.type = 'button';
+    heading.className = 'intro-inline-title';
+    heading.dataset.introInlineTarget = String(index + 1);
+    heading.setAttribute('aria-expanded', 'false');
+    heading.setAttribute('aria-controls', `intro-inline-body-${index + 1}`);
+    heading.append(number.cloneNode(true), title.cloneNode(true));
+    const arrow = document.createElement('span');
+    arrow.className = 'intro-inline-arrow';
+    arrow.setAttribute('aria-hidden', 'true');
+    arrow.textContent = '▾';
+    heading.appendChild(arrow);
+
+    const rowVisual = gallery.cloneNode(true);
+    rowVisual.dataset.photoGalleryId = index === 0 ? 'intro-1-1' : 'intro-1-2';
+    if (index === 1) {
+      const rowData = rowVisual.querySelector('[data-photo-gallery-data]');
+      rowData.textContent = JSON.stringify([pages[1] || pages[0]]);
+    }
+    const visualBox = document.createElement('div');
+    visualBox.className = 'intro-inline-visual';
+    visualBox.appendChild(rowVisual);
+
+    const rowBody = body.cloneNode(true);
+    rowBody.classList.add('intro-inline-text');
+    rowBody.id = `intro-inline-body-${index + 1}`;
+    row.append(heading, visualBox, rowBody);
+    list.appendChild(row);
+    rows.push(row);
+  });
+
+  if (rows.length < 2) return;
+  split.after(list);
+
+  const setOpen = (row, open) => {
+    rows.forEach((item) => {
+      const active = open && item === row;
+      item.classList.toggle('is-open', active);
+      item.querySelector('.intro-inline-title')?.setAttribute('aria-expanded', String(active));
+    });
+  };
+  rows.forEach((row) => {
+    const heading = row.querySelector('.intro-inline-title');
+    heading?.addEventListener('click', () => setOpen(row, !row.classList.contains('is-open')));
+  });
+
+  let scrollFrame = 0;
+  const updateFromScroll = () => {
+    scrollFrame = 0;
+    if (!responsiveQuery.matches) return;
+    const threshold = window.innerHeight * 0.62;
+    const candidates = rows.filter((row) => {
+      const rect = row.querySelector('.intro-inline-title')?.getBoundingClientRect();
+      return rect && rect.bottom > window.innerHeight * 0.08 && rect.top < threshold;
+    });
+    if (candidates.length) setOpen(candidates[candidates.length - 1], true);
+  };
+  const requestScrollUpdate = () => {
+    if (!scrollFrame) scrollFrame = window.requestAnimationFrame(updateFromScroll);
+  };
+  const syncLayout = () => {
+    const inline = responsiveQuery.matches;
+    split.classList.toggle('intro-inline-source-hidden', inline);
+    list.classList.toggle('intro-inline-list-hidden', !inline);
+    if (inline) requestScrollUpdate();
+  };
+  window.addEventListener('scroll', requestScrollUpdate, { passive: true });
+  window.addEventListener('resize', requestScrollUpdate, { passive: true });
+  const introPanel = document.getElementById('intro-panel');
+  if (introPanel && 'MutationObserver' in window) {
+    new MutationObserver(requestScrollUpdate).observe(introPanel, { attributes: true, attributeFilter: ['hidden'] });
+  }
+  if (responsiveQuery.addEventListener) responsiveQuery.addEventListener('change', syncLayout);
+  else responsiveQuery.addListener(syncLayout);
+  syncLayout();
+};
+initIntroResearchValueInlineList();
 
 /* 小卡（點擊展開）＋對應視覺元素。
    行為：初始全部收合；點標題展開／收合，不影響其他已展開的卡；
@@ -487,6 +645,9 @@ const photoLightbox = (() => {
    每個 [data-photo-gallery] 讀取自己的 <script type="application/json"
    data-photo-gallery-data> 作為圖片與說明來源。若只有來源而沒有段落，直接顯示完整引註；
    點擊圖片本身可開啟放大檢視。 */
+const PHOTO_GALLERY_MOBILE_MQ = window.matchMedia('(pointer: coarse) and (hover: none), (max-width: 1040px)');
+const PHOTO_GALLERY_EXPAND_RATIO = 0.5; /* 圖片頂端越過螢幕中線後展開 */
+const PHOTO_GALLERY_COLLAPSE_RATIO = 0.56; /* 向上離開後多留一點緩衝，避免來回閃動 */
 document.querySelectorAll('[data-photo-gallery]').forEach((gallery) => {
   const dataScript = gallery.querySelector('[data-photo-gallery-data]');
   if (!dataScript) return;
@@ -501,6 +662,42 @@ document.querySelectorAll('[data-photo-gallery]').forEach((gallery) => {
   const stage = gallery.querySelector('.photo-gallery-stage');
   const body = gallery.querySelector('.photo-gallery-body');
   if (!stage || !body) return;
+
+  /* 手機／窄螢幕電腦：先保持「圖片＋收合標題列」，頁面向下捲到
+     圖片頂端越過螢幕中線後才自動展開。這裡只負責加／移除狀態 class，
+     展開高度與過渡仍由 storymap.css 控制。 */
+  let scrollFrame = 0;
+  let hasScrolled = false;
+  let previousScrollY = window.scrollY;
+  const updateMobileScrollExpansion = () => {
+    scrollFrame = 0;
+    if (!PHOTO_GALLERY_MOBILE_MQ.matches || !hasScrolled || !body.getClientRects().length) return;
+    const currentScrollY = window.scrollY;
+    const scrollingDown = currentScrollY >= previousScrollY;
+    const photoTop = stage.getBoundingClientRect().top;
+    const expandLine = window.innerHeight * PHOTO_GALLERY_EXPAND_RATIO;
+    const collapseLine = window.innerHeight * PHOTO_GALLERY_COLLAPSE_RATIO;
+    if (scrollingDown && photoTop <= expandLine) body.classList.add('is-expanded');
+    else if (!scrollingDown && photoTop >= collapseLine) body.classList.remove('is-expanded');
+    previousScrollY = currentScrollY;
+  };
+  const requestMobileScrollExpansion = () => {
+    if (!PHOTO_GALLERY_MOBILE_MQ.matches) return;
+    hasScrolled = true;
+    if (!scrollFrame) scrollFrame = window.requestAnimationFrame(updateMobileScrollExpansion);
+  };
+  window.addEventListener('scroll', requestMobileScrollExpansion, { passive: true });
+  window.addEventListener('resize', () => {
+    previousScrollY = window.scrollY;
+    if (PHOTO_GALLERY_MOBILE_MQ.matches) updateMobileScrollExpansion();
+  }, { passive: true });
+  const resetMobileScrollExpansion = () => {
+    body.classList.remove('is-expanded');
+    hasScrolled = false;
+    previousScrollY = window.scrollY;
+  };
+  if (PHOTO_GALLERY_MOBILE_MQ.addEventListener) PHOTO_GALLERY_MOBILE_MQ.addEventListener('change', resetMobileScrollExpansion);
+  else PHOTO_GALLERY_MOBILE_MQ.addListener(resetMobileScrollExpansion);
 
   stage.innerHTML = '';
   pages.forEach((page, i) => {
@@ -885,22 +1082,136 @@ const initPart3ToolsChecklist = () => {
     const views = [...workbench.querySelectorAll('[data-part3-tool-info]')];
     if (!rows.length || !views.length) return;
 
+    // 手機版／窄螢幕：工具清單隱藏後改用的左右箭頭、頁碼、勾選章
+    // （桌面版沒有這些元素時，下面的查詢會拿到 null，直接安全跳過）。
+    const mnav = workbench.querySelector('[data-part3-tools-mnav]');
+    const mPrev = mnav && mnav.querySelector('[data-part3-tools-nav="prev"]');
+    const mNext = mnav && mnav.querySelector('[data-part3-tools-nav="next"]');
+    const mCount = mnav && mnav.querySelector('[data-part3-tools-count]');
+    const mTick = mnav && mnav.querySelector('[data-part3-tools-tick]');
+    let tickTimer = null;
+
     const selectTool = (id) => {
-      const row = rows.find((item) => item.dataset.part3ToolId === id);
+      const idx = rows.findIndex((item) => item.dataset.part3ToolId === id);
+      if (idx === -1) return;
+      const row = rows[idx];
       const view = views.find((item) => item.dataset.part3ToolInfo === id);
-      if (!row || !view) return;
+      if (!view) return;
       rows.forEach((item) => item.classList.toggle('is-active', item === row));
       views.forEach((item) => { item.hidden = item !== view; });
+
+      if (mCount) mCount.textContent = `${idx + 1} / ${rows.length}`;
+      if (mPrev) mPrev.disabled = idx === 0;
+      if (mNext) mNext.disabled = idx === rows.length - 1;
+      if (mTick) {
+        // 每次換到新工具都重播一次「空白 → 打勾」的效果，而不是維持已勾狀態
+        mTick.classList.remove('is-ticked');
+        if (tickTimer) window.clearTimeout(tickTimer);
+        // eslint-disable-next-line no-void
+        void mTick.offsetWidth;
+        tickTimer = window.setTimeout(() => mTick.classList.add('is-ticked'), 220);
+      }
     };
 
     rows.forEach((row) => {
       row.addEventListener('change', () => selectTool(row.dataset.part3ToolId));
       row.addEventListener('click', () => selectTool(row.dataset.part3ToolId));
     });
+
+    if (mPrev) mPrev.addEventListener('click', () => {
+      const idx = rows.findIndex((item) => item.classList.contains('is-active'));
+      if (idx > 0) selectTool(rows[idx - 1].dataset.part3ToolId);
+    });
+    if (mNext) mNext.addEventListener('click', () => {
+      const idx = rows.findIndex((item) => item.classList.contains('is-active'));
+      if (idx < rows.length - 1) selectTool(rows[idx + 1].dataset.part3ToolId);
+    });
+
     selectTool(rows[0].dataset.part3ToolId);
   });
 };
 initPart3ToolsChecklist();
+
+/* ---------------------------------------------------------------------------
+   手機版／窄螢幕：「重用平台的基本流程」8 個步驟排成 2 欄「展開紙盒」版面。
+   桌面版維持原本的橫向雪佛龍樣式（見 storymap.css），這裡只負責在手機版
+   判斷時機、播放一次掀開動畫。
+
+   時機：以「重用平台的基本流程」標題／說明文字（#part-3-basic-flow-card）
+   的位置為準——當它的頂端捲動到「螢幕高度 70%」那條線（畫面最底定義為
+   0%、最頂為 100%，所以 70% 高＝距離視窗頂端 30% 的位置）時觸發一次。
+   --------------------------------------------------------------------------- */
+const initPart3MobileFlowUnfold = () => {
+  document.querySelectorAll('.part3-flow-chev').forEach((chev) => {
+    const items = [...chev.querySelectorAll('.part3-flow-step')];
+    if (!items.length) return;
+    const card = document.getElementById('part-3-basic-flow-card') || chev;
+
+    let played = false;
+    const play = () => {
+      played = true;
+      items.forEach((el) => el.classList.remove('is-shown'));
+      let t = 100;
+      items.forEach((el, idx) => {
+        window.setTimeout(() => el.classList.add('is-shown'), t);
+        t += 260 + (idx === 3 ? 200 : 0); // 第 4 格之後多停一拍，再開始右欄
+      });
+    };
+
+    let ticking = false;
+    const checkTrigger = () => {
+      ticking = false;
+      if (played || !PHOTO_GALLERY_MOBILE_MQ.matches) return;
+      const triggerLine = window.innerHeight * 0.3; // 螢幕高度 70%（從底部算）＝頂端往下 30%
+      if (card.getBoundingClientRect().top <= triggerLine) play();
+    };
+    const requestCheck = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(checkTrigger);
+    };
+
+    window.addEventListener('scroll', requestCheck, { passive: true });
+    window.addEventListener('resize', requestCheck, { passive: true });
+    requestCheck(); // 頁面載入時若已經在觸發線之下（例如透過錨點跳入），也要立刻檢查一次
+  });
+};
+initPart3MobileFlowUnfold();
+
+/* ---------------------------------------------------------------------------
+   手機版／窄螢幕：讓「重用平台的基本流程」8 個格子維持正方形。
+   .part3-flow-chev 本身靠 flex（flex:1 1 auto ＋ 父層 flex column 的預設
+   stretch）填滿可用空間，格子大小則交給 grid-template-columns/rows 的
+   var(--flow-box-size) 決定，兩個方向用同一個變數＝正方形。這裡量測
+   .part3-flow-chev 目前的可用寬高（量測時機不受這個變數影響，因為
+   flex 已經把外框撐好了，內部格子多大不影響外框大小），取「寬度可以
+   放兩欄」「高度可以放四列」兩者較小的一個，換算成單一格子的邊長。
+   --------------------------------------------------------------------------- */
+const initPart3MobileFlowSquare = () => {
+  const GAP = 6;
+  const MIN_SIZE = 56;
+  const MAX_SIZE = 190;
+  document.querySelectorAll('.part3-flow-chev').forEach((chev) => {
+    const resize = () => {
+      if (!PHOTO_GALLERY_MOBILE_MQ.matches) {
+        chev.style.removeProperty('--flow-box-size');
+        return;
+      }
+      const rect = chev.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const byWidth = (rect.width - GAP) / 2;
+      const byHeight = (rect.height - GAP * 3) / 4;
+      const size = Math.max(MIN_SIZE, Math.min(MAX_SIZE, Math.floor(Math.min(byWidth, byHeight))));
+      chev.style.setProperty('--flow-box-size', `${size}px`);
+    };
+    resize();
+    window.addEventListener('resize', resize, { passive: true });
+    if (typeof ResizeObserver === 'function') new ResizeObserver(resize).observe(chev);
+    if (PHOTO_GALLERY_MOBILE_MQ.addEventListener) PHOTO_GALLERY_MOBILE_MQ.addEventListener('change', resize);
+    else PHOTO_GALLERY_MOBILE_MQ.addListener(resize);
+  });
+};
+initPart3MobileFlowSquare();
 
 /* ---------------------------------------------------------------------------
    版面特徵探索器（7 辨識印刷字 / 8 辨識手寫字）
@@ -1122,6 +1433,10 @@ const initPart3FeatureExplorers = () => {
         const f = features[cur];
         const selectedImage = f && (f.page || 0) === page && f.image ? f.image : pages[page];
         img.src = selectedImage;
+        /* 讓 storymap-cards.css 可以針對「目前顯示的是哪一張圖」個別調整
+           手機版抽屜裡的位置與放大倍數，例如
+           [data-fx-visual="辨識印刷字Label/文本資訊.png"] { --fxdoc-scale: 1.6; } */
+        img.dataset.fxVisual = selectedImage;
         img.alt = f && (f.page || 0) === page && f.image ? `${f.title}：人工標示頁面` : '印刷本奏摺頁面';
         indEl.textContent = `頁 ${page + 1} / ${pages.length}`;
 
@@ -2768,6 +3083,35 @@ const applyMobileTryText = () => {
 applyMobileTryText();
 
 initPart3TryIt();
+
+/* ---------------------------------------------------------------------------
+   選用的 AI Model：手機版兩頁垂直模型卡
+   桌面版維持六欄比較表；手機版先顯示 Claude／GPT，再用第一張卡的箭頭
+   切換至 DeepSeek／Gemini。
+   --------------------------------------------------------------------------- */
+const initPart3ModelMobile = () => {
+  const table = document.querySelector('#part-3-model .part3-model-table');
+  if (!table) return;
+  const buttons = [...table.querySelectorAll('[data-model-mobile-next]')];
+  if (!buttons.length) return;
+  let page = 'primary';
+  const setPage = (next) => {
+    page = next;
+    table.dataset.mobilePage = page;
+    buttons.forEach((button) => {
+      const secondary = page === 'secondary';
+      button.textContent = secondary ? '←' : '→';
+      button.setAttribute('aria-label', secondary
+        ? '返回 Claude Opus 和 GPT（5.6）'
+        : '查看 DeepSeek Flash／Pro 和 Gemini Flash');
+    });
+  };
+  buttons.forEach((button) => button.addEventListener('click', () => {
+    setPage(page === 'primary' ? 'secondary' : 'primary');
+  }));
+  setPage(page);
+};
+initPart3ModelMobile();
 
 const activateFromLocation = () => {
   const hash = window.location.hash || '#cover';

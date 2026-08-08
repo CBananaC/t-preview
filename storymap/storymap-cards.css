@@ -303,6 +303,78 @@
 /* 研究價值卡片與制度卡片之間保留額外上方留白 */
 #intro-1-2 { margin-top: clamp(24px, 2.2vw, 40px) !important; }
 
+/* 引言 01 的手機／窄螢幕排列：每一列依序顯示標題、視覺元素、原文。 */
+#intro-1-1 .intro-inline-list {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+}
+#intro-1-1 .intro-inline-list.intro-inline-list-hidden { display: none; }
+#intro-1-1 .intro-inline-source-hidden { display: none !important; }
+#intro-1-1 .intro-inline-row {
+  overflow: hidden;
+  background: var(--card);
+  border: 1px solid var(--line);
+  scroll-margin-top: calc(var(--bar-h) + 18px);
+}
+#intro-1-1 .intro-inline-title {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 17px;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+}
+#intro-1-1 .intro-inline-title .option-number {
+  min-width: 42px;
+  height: 42px;
+  font-size: 16px;
+}
+#intro-1-1 .intro-inline-title h2 {
+  margin: 0;
+  min-width: 0;
+  font: 600 clamp(20px, 2.4vw, 30px)/1.25 var(--serif);
+}
+#intro-1-1 .intro-inline-title:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -4px;
+}
+#intro-1-1 .intro-inline-arrow {
+  color: var(--accent);
+  font: 600 20px/1 var(--sans);
+  transition: transform .22s ease;
+}
+#intro-1-1 .intro-inline-row.is-open .intro-inline-arrow { transform: rotate(180deg); }
+#intro-1-1 .intro-inline-visual,
+#intro-1-1 .intro-inline-text { display: none; }
+#intro-1-1 .intro-inline-row.is-open .intro-inline-visual {
+  display: block;
+  padding: 0 clamp(12px, 2vw, 22px);
+}
+#intro-1-1 .intro-inline-row.is-open .intro-inline-text {
+  display: block;
+  margin: 0;
+  padding: clamp(18px, 2.5vw, 28px) clamp(18px, 2.8vw, 32px);
+  border-top: 1px solid var(--line);
+}
+#intro-1-1 .intro-inline-visual .photo-gallery {
+  height: min(60vh, 560px);
+  min-height: 300px;
+}
+/* 第 2 列使用原畫廊的第 2 頁（遞送奏摺），不再留在整組列表最下方。 */
+#intro-1-1 .intro-inline-row[data-intro-inline-row="2"] .photo-gallery-frame {
+  --photo-fit: contain;
+  --photo-left: 70%;
+  --photo-top: 42%;
+  --photo-zoom: 1.2;
+}
+
 /* 引言 01・第 2 張圖片（遞送奏摺／路線圖）：原圖是一整頁掃描，地圖本身只佔
    頁面一小部分，因此改用 cover 裁切並放大，讓地圖填滿整個框，而不是縮成
    小圖飄在大片空白中。 */
@@ -533,6 +605,17 @@
 */
 
 /* Part 3.0 — Shared section accents */
+#part-3 {
+  /* 手機版／窄螢幕：封面與第 1 節合計佔滿頂欄以下的視窗高度。 */
+  --part3-narrow-section-height: clamp(220px, 34svh, 306px);
+}
+#part-3-research-questions {
+  --part3-narrow-section-height: calc(100svh - var(--bar-h) - clamp(220px, 34svh, 306px));
+}
+#part-3-tools {
+  /* 工具與資源是獨立的一個滿版區段。 */
+  --part3-narrow-section-height: calc(100svh - var(--bar-h));
+}
 #part-3-research-questions { --card-accent: #c7543f; }
 #part-3-tools {
   --card-accent: #7e6a39;
@@ -691,6 +774,9 @@
   --part3-card-max-width: 74ch;
   --part3-card-height: auto;
   --part3-card-min-height: 0;
+  /* 手機／窄螢幕：卡片＋OCR視覺元素共用頂欄以下的一個視窗。 */
+  --part3-narrow-section-height: calc(100svh - var(--bar-h));
+  --part3-narrow-visual-height: clamp(220px, 38svh, 360px);
   --part3-card-padding: clamp(18px, 1.8vw, 26px);
   --part3-title-size: clamp(27px, 3.4vw, 46px);
   --part3-body-size: calc(16px * var(--font-scale));
@@ -1170,6 +1256,9 @@
   --part3-card-max-width: 74ch;
   --part3-card-height: auto;
   --part3-card-min-height: 0;
+  /* 手機／窄螢幕：10號卡片＋批次視覺元素共用一個視窗。 */
+  --part3-narrow-section-height: calc(100svh - var(--bar-h));
+  --part3-narrow-visual-height: clamp(210px, 36svh, 340px);
   --part3-card-padding: clamp(18px, 1.8vw, 26px);
   --part3-title-size: clamp(27px, 3.4vw, 46px);
   --part3-body-size: calc(16px * var(--font-scale));
@@ -1269,6 +1358,9 @@
 #part-3-model .part3-model-table th:nth-child(6),
 #part-3-model .part3-model-table td:nth-child(6) {
   min-width: 136px;
+}
+#part-3-model .part3-model-mobile-next {
+  display: none;
 }
 
 /* Part 3.5.5 — Single-card section: Google Cloud (#part-3-cloud) */
@@ -1784,3 +1876,196 @@
     height: var(--part3-cloud-gallery-height-mobile, 420px);
   }
 }
+
+@media (max-width: 1040px) {
+  /* Part 3.5.4.2 — Mobile model cards: two vertical pages */
+  #part-3-model .part3-model-table-wrap {
+    overflow: visible;
+  }
+  #part-3-model .part3-model-table {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+  }
+  #part-3-model .part3-model-table thead {
+    display: none;
+  }
+  #part-3-model .part3-model-table tbody {
+    display: block;
+  }
+  #part-3-model .part3-model-table tr {
+    display: block;
+    margin: 0 0 16px;
+    padding: 0;
+    border: 1px solid rgba(22, 61, 63, .18);
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 8px 20px rgba(22, 61, 63, .08);
+    overflow: hidden;
+  }
+  #part-3-model .part3-model-table tr[data-mobile-model-page="secondary"] {
+    display: none;
+  }
+  #part-3-model .part3-model-table[data-mobile-page="secondary"] tr[data-mobile-model-page="primary"] {
+    display: none;
+  }
+  #part-3-model .part3-model-table[data-mobile-page="secondary"] tr[data-mobile-model-page="secondary"] {
+    display: block;
+  }
+  #part-3-model .part3-model-table td,
+  #part-3-model .part3-model-table td:first-child {
+    display: grid;
+    grid-template-columns: minmax(86px, 25%) minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
+    width: auto;
+    min-width: 0;
+    padding: 11px 14px;
+    border: 0;
+    border-bottom: 1px solid rgba(22, 61, 63, .1);
+    background: transparent;
+    color: var(--ink);
+    white-space: normal;
+  }
+  #part-3-model .part3-model-table td:last-child {
+    border-bottom: 0;
+  }
+  #part-3-model .part3-model-table td::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font: 700 calc(12px * var(--font-scale)) / 1.45 var(--sans);
+    letter-spacing: .04em;
+  }
+  #part-3-model .part3-model-table td:first-child {
+    display: block;
+    padding: 14px;
+    color: var(--accent);
+    background: linear-gradient(135deg, rgba(196, 93, 56, .1), rgba(22, 61, 63, .035));
+    font: 700 calc(19px * var(--font-scale)) / 1.35 var(--sans);
+  }
+  #part-3-model .part3-model-table td:first-child::before {
+    display: block;
+    margin-bottom: 5px;
+  }
+  #part-3-model .part3-model-mobile-name {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  #part-3-model .part3-model-mobile-next {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 32px;
+    border: 1px solid rgba(196, 93, 56, .35);
+    border-radius: 999px;
+    color: var(--accent);
+    background: rgba(255, 255, 255, .72);
+    cursor: pointer;
+    font: 700 22px/1 var(--sans);
+    transition: background-color .18s, color .18s, transform .18s;
+  }
+  #part-3-model .part3-model-mobile-next:hover,
+  #part-3-model .part3-model-mobile-next:focus-visible {
+    color: #fff;
+    background: var(--accent);
+    outline: none;
+    transform: translateX(2px);
+  }
+  #part-3-model .part3-model-table td:not(:first-child) {
+    font-size: calc(14px * var(--font-scale));
+    line-height: 1.65;
+  }
+}
+
+/* =========================================================================
+   手機版史料圖微調（只影響手機／窄視窗，桌面版完全不受影響）
+
+   這一區是「手動對位」用的。7／8 的史料抽屜與 11 試一試的視窗，圖片預設都是
+   自動縮到框內置中；如果某一張標示圖想放大一點、或想把重點欄位挪到畫面中央，
+   就在下面加一條規則，改幾個數字即可，不需要動 storymap.js。
+
+   ── 7／8：抽屜裡的史料圖 ────────────────────────────────
+   選擇器：用目前顯示的圖檔名（storymap.js 會寫進 data-fx-visual）
+     #part-3-printed-explorer     [data-fx-visual="辨識印刷字Label/文本資訊.png"]
+     #part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/硃批.png"]
+   可調變數：
+     --fxdoc-scale    放大倍數，1 = 剛好塞滿抽屜高度（例：1.8 = 放大到 1.8 倍）
+     --fxdoc-x        水平位移，正值往右（例：-40px 往左挪）
+     --fxdoc-y        垂直位移，正值往下
+     --fxdoc-origin   縮放基準點，預設 center center；
+                      想「以右上角為準放大」就寫 right top
+     --fxdoc-h        高度倍率（1 = 抽屜高度）；通常不用動，用 --fxdoc-scale 就好
+
+   ── 11 試一試：視窗裡的史料圖 ──────────────────────────
+   選擇器：用目前顯示的圖檔名（storymap.js 會寫進 data-try-visual）；
+   整頁的話是 page1、page2…（沒有副檔名）
+     #part-3-try-explorer[data-try-mode="printed"]     [data-try-visual="直排單欄.png"]
+     #part-3-try-explorer[data-try-mode="handwritten"] [data-try-visual="page2"]
+   可調變數：
+     --tryimg-fit     contain＝縮到視窗內（預設）；none＝照圖片原始大小顯示
+     --tryimg-max-w   預設 100%；要讓圖超出視窗（配合 none 用）就寫 none
+     --tryimg-max-h   同上
+     --tryimg-scale   放大倍數
+     --tryimg-x / -y  位移
+     --tryimg-origin  縮放基準點
+   圖片要靠哪一邊（寫在 explorer 或個別 mode 上）：
+     --trydoc-align    垂直：flex-start / center（預設）/ flex-end
+     --trydoc-justify  水平：flex-start / center（預設）/ flex-end
+     --trydoc-overflow hidden（預設）；想讓放大後可以捲動就寫 auto
+
+   下面全部是「範例」，數值都設成不改變現狀（scale: 1、位移 0）。
+   要調整就改數字；不需要的整條刪掉即可。
+   ========================================================================= */
+
+/* 7 辨識印刷字：抽屜裡的每一張標示圖 */
+#part-3-printed-explorer [data-fx-visual="辨識印刷字Label/文本資訊.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
+#part-3-printed-explorer [data-fx-visual="辨識印刷字Label/直排單欄.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
+#part-3-printed-explorer [data-fx-visual="辨識印刷字Label/分段.png"]     { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
+#part-3-printed-explorer [data-fx-visual="辨識印刷字Label/頁碼.png"]     { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
+#part-3-printed-explorer [data-fx-visual="辨識印刷字Label/標題符號.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
+#part-3-printed-explorer [data-fx-visual="辨識印刷字Label/夾批.png"]     { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
+#part-3-printed-explorer [data-fx-visual="辨識印刷字Label/落款與尾批.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
+
+/* 7 的整頁（沒有選特徵、或該特徵不在這一頁時顯示的原始頁面） */
+#part-3-printed-explorer [data-fx-visual="ocr-zhu25-printed-1-enhanced.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
+#part-3-printed-explorer [data-fx-visual="ocr-zhu25-printed-2-enhanced.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
+
+/* 8 辨識手寫字：抽屜裡的每一張標示圖 */
+#part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/上奏官員.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
+#part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/印章.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
+#part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/抬頭.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
+#part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/正文字體.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
+#part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/浮水印.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
+#part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/直排單欄.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
+#part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/硃批.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
+#part-3-handwritten-explorer [data-fx-visual="辨識手寫字Label/臣字款.png"] { --fxdoc-scale: 1; --fxdoc-x: 0px; --fxdoc-y: 0px; }
+
+/* 11 試一試 — 印刷字 */
+#part-3-try-explorer[data-try-mode="printed"] { --trydoc-align: center; --trydoc-justify: center; }
+#part-3-try-explorer[data-try-mode="printed"] [data-try-visual="page1"]      { --tryimg-fit: contain; --tryimg-scale: 1; }
+#part-3-try-explorer[data-try-mode="printed"] [data-try-visual="page2"]      { --tryimg-fit: contain; --tryimg-scale: 1; }
+#part-3-try-explorer[data-try-mode="printed"] [data-try-visual="文本資訊.png"] { --tryimg-fit: contain; --tryimg-scale: 1; }
+#part-3-try-explorer[data-try-mode="printed"] [data-try-visual="直排單欄.png"] { --tryimg-fit: contain; --tryimg-scale: 1; }
+#part-3-try-explorer[data-try-mode="printed"] [data-try-visual="分段.png"]     { --tryimg-fit: contain; --tryimg-scale: 1; }
+#part-3-try-explorer[data-try-mode="printed"] [data-try-visual="標點.png"]     { --tryimg-fit: contain; --tryimg-scale: 1; }
+#part-3-try-explorer[data-try-mode="printed"] [data-try-visual="尾批.png"]     { --tryimg-fit: contain; --tryimg-scale: 1; }
+#part-3-try-explorer[data-try-mode="printed"] [data-try-visual="頁數.png"]     { --tryimg-fit: contain; --tryimg-scale: 1; }
+
+/* 11 試一試 — 手寫字 */
+#part-3-try-explorer[data-try-mode="handwritten"] { --trydoc-align: center; --trydoc-justify: center; }
+#part-3-try-explorer[data-try-mode="handwritten"] [data-try-visual="page1"]     { --tryimg-fit: contain; --tryimg-scale: 1; }
+#part-3-try-explorer[data-try-mode="handwritten"] [data-try-visual="page2"]     { --tryimg-fit: contain; --tryimg-scale: 1; }
+#part-3-try-explorer[data-try-mode="handwritten"] [data-try-visual="page3"]     { --tryimg-fit: contain; --tryimg-scale: 1; }
+#part-3-try-explorer[data-try-mode="handwritten"] [data-try-visual="直欄.png"]   { --tryimg-fit: contain; --tryimg-scale: 1; }
+#part-3-try-explorer[data-try-mode="handwritten"] [data-try-visual="作者.png"]   { --tryimg-fit: contain; --tryimg-scale: 1; }
+#part-3-try-explorer[data-try-mode="handwritten"] [data-try-visual="臣字.png"]   { --tryimg-fit: contain; --tryimg-scale: 1; }
+#part-3-try-explorer[data-try-mode="handwritten"] [data-try-visual="硃批.png"]   { --tryimg-fit: contain; --tryimg-scale: 1; }
+#part-3-try-explorer[data-try-mode="handwritten"] [data-try-visual="奏報日期.png"] { --tryimg-fit: contain; --tryimg-scale: 1; }
+#part-3-try-explorer[data-try-mode="handwritten"] [data-try-visual="水印.png"]   { --tryimg-fit: contain; --tryimg-scale: 1; }

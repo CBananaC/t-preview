@@ -7,11 +7,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Serif+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="storymap.css?v=20260807-part3-handwritten-try-assets-01">
-  <link rel="stylesheet" href="storymap-cards.css?v=20260807-part3-handwritten-try-assets-01">
+  <link rel="stylesheet" href="storymap.css?v=20260808-intro-inline-01">
+  <link rel="stylesheet" href="storymap-cards.css?v=20260808-intro-inline-01">
   <link rel="stylesheet" href="part-1-interface.css">
   <link rel="stylesheet" href="part-3-question-gallery.css">
-  <script src="storymap.js?v=20260807-part3-handwritten-try-assets-01" defer></script>
+  <script src="storymap.js?v=20260808-intro-inline-01" defer></script>
   <!-- 第一部分的介面複本：資料模組先載入，行為模組再依它組裝畫面。 -->
   <script src="part-1-interface-data.js" defer></script>
   <script src="part-1-interface.js" defer></script>
@@ -50,25 +50,39 @@
       <a class="main-nav-link" href="#part-3" data-nav-target="part-3">運用平台研究其他問題</a>
     </nav>
     <div class="settings-wrap">
-      <button class="settings-button" id="settings-button" type="button" aria-expanded="false" aria-controls="site-settings-panel" aria-label="開啟網站設定" title="網站設定">
+      <div class="site-settings-control">
+        <button class="settings-button" id="settings-button" type="button" aria-expanded="false" aria-controls="site-settings-panel" aria-label="開啟網站設定" title="網站設定">
         <svg class="settings-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="3"/>
           <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
         </svg>
-      </button>
-      <div class="settings-panel" id="site-settings-panel" role="dialog" aria-label="網站設定" hidden>
-        <div class="settings-panel-title">網站設定</div>
-        <div class="settings-row">
-          <span>字體</span>
-          <div class="font-size-controls" role="group" aria-label="調整字體">
-            <button class="font-size-button" id="font-size-decrease" type="button" aria-label="縮小字體" title="縮小字體">A−</button>
-            <output id="font-size-value" for="font-size-decrease font-size-increase">100%</output>
-            <button class="font-size-button" id="font-size-increase" type="button" aria-label="放大字體" title="放大字體">A＋</button>
+        </button>
+        <div class="settings-panel" id="site-settings-panel" role="dialog" aria-label="網站設定" hidden>
+          <div class="settings-row">
+            <span>字體</span>
+            <div class="font-size-controls" role="group" aria-label="調整字體">
+              <button class="font-size-button" id="font-size-decrease" type="button" aria-label="縮小字體" title="縮小字體">−</button>
+              <output id="font-size-value" for="font-size-decrease font-size-increase">100%</output>
+              <button class="font-size-button" id="font-size-increase" type="button" aria-label="放大字體" title="放大字體">＋</button>
+            </div>
           </div>
         </div>
       </div>
+      <button class="compact-menu-button" id="compact-menu-button" type="button" aria-expanded="false" aria-controls="compact-menu-panel" aria-label="開啟網站選單" title="網站選單">
+        <span class="compact-menu-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+      </button>
     </div>
   </header>
+  <div class="compact-menu-backdrop" id="compact-menu-backdrop" aria-hidden="true"></div>
+  <aside class="compact-menu-panel" id="compact-menu-panel" role="dialog" aria-label="網站章節選單" aria-hidden="true">
+    <nav class="compact-menu-links" aria-label="網站章節">
+      <a class="compact-menu-link" href="#cover" data-nav-target="cover">主頁</a>
+      <a class="compact-menu-link" href="#intro" data-nav-target="intro">平台簡介</a>
+      <a class="compact-menu-link" href="#part-1" data-nav-target="part-1">平台介面</a>
+      <a class="compact-menu-link" href="#part-2" data-nav-target="part-2">平台運作流程</a>
+      <a class="compact-menu-link" href="#part-3" data-nav-target="part-3">運用平台研究其他問題</a>
+    </nav>
+  </aside>
 
   <main>
     <section class="tab-panel" id="cover-panel" data-tab-panel="cover" aria-labelledby="cover-title">
@@ -1071,6 +1085,15 @@
                     <div class="part3-tool-info-copy"><p class="part3-tool-info-subtitle">備份、管理與協作</p><h3>自己的 GitHub Repository</h3><div class="body"><p>最後，建議研究者建立自己的 GitHub Repository，在雲端備份和管理程式碼、AI Skills、結構化資料及分析結果，方便後續維護、更新和協作。</p></div></div>
                   </article>
                 </div>
+                <!-- 手機版／窄螢幕：工具清單隱藏，只留下這一列左右箭頭、頁碼與勾選章，
+                     用來切換上面同一批 .part3-tool-info-view。桌面版不受影響（見
+                     storymap.css 內對應的手機版媒體查詢）。 -->
+                <div class="part3-tools-mnav" data-part3-tools-mnav aria-hidden="true">
+                  <span class="part3-tools-mtick" data-part3-tools-tick aria-hidden="true"><span class="mark">✓</span></span>
+                  <span class="part3-tools-mcount" data-part3-tools-count>1 / 4</span>
+                  <button type="button" class="part3-tools-marrow prev" data-part3-tools-nav="prev" aria-label="上一個工具">‹</button>
+                  <button type="button" class="part3-tools-marrow next" data-part3-tools-nav="next" aria-label="下一個工具">›</button>
+                </div>
               </section>
             </div>
           </div>
@@ -1078,7 +1101,7 @@
 
         <section class="story surface-c" id="part-3-basic-flow" data-tab="part-3" data-nav="#part-3-basic-flow">
           <div class="story-inner">
-            <div class="lay-stack">
+            <div class="lay-stack" id="part-3-basic-flow-stack">
               <article class="blk" id="part-3-basic-flow-card">
                 <div class="title-row"><span class="option-number">3</span><h2>重用平台的基本流程</h2></div>
                 <div class="body"><p>有準備好以上的工具後，研究者可以按照以下流程，把平台應用於新的研究主題：</p></div>
@@ -1865,10 +1888,10 @@
                     <tr><th scope="col">AI 模型</th><th scope="col">優點</th><th scope="col">適合的工作</th><th scope="col">缺點</th><th scope="col">建議使用方法</th><th scope="col">是否推薦使用</th></tr>
                   </thead>
                   <tbody>
-                    <tr><td>Claude Opus</td><td>推理能力最強</td><td>複雜程式、系統設計、檢查和修正關鍵錯誤</td><td>使用成本最高；可讓其他 AI 按照 Opus 的方案負責實作</td><td>App、CLI</td><td>視乎經濟能力</td></tr>
-                    <tr><td>GPT（5.6）</td><td>推理能力僅次於 Opus，但成本遠遠低於 Opus</td><td>大部分 Agentic AI 工作：程式設計和撰寫、一般文字工作和各種疑難雜症</td><td>推理能力不及 Opus，處理速度亦可能較慢</td><td>App、CLI</td><td>推薦使用</td></tr>
-                    <tr><td>DeepSeek Flash／Pro</td><td>成本較低，推理能力足以理解大部分奏摺文本</td><td>按照 AI Skills 分析大量文本，抽取特定資訊</td><td>未必適用於複雜推理</td><td>API</td><td>必須使用</td></tr>
-                    <tr><td>Gemini Flash</td><td>成本較低、處理速度較快，推理能力足以理解大部分奏摺文本</td><td>按照 AI Skills 分析大量文本，抽取特定資訊</td><td>未必適用於複雜推理</td><td>API</td><td>必須使用</td></tr>
+                    <tr data-mobile-model-page="primary"><td data-label="AI 模型"><div class="part3-model-mobile-name"><span>Claude Opus</span><button type="button" class="part3-model-mobile-next" data-model-mobile-next aria-label="查看 DeepSeek Flash／Pro 和 Gemini Flash">→</button></div></td><td data-label="優點">推理能力最強</td><td data-label="適合的工作">複雜程式、系統設計、檢查和修正關鍵錯誤</td><td data-label="缺點">使用成本最高；可讓其他 AI 按照 Opus 的方案負責實作</td><td data-label="建議使用方法">App、CLI</td><td data-label="是否推薦使用">視乎經濟能力</td></tr>
+                    <tr data-mobile-model-page="primary"><td data-label="AI 模型"><div class="part3-model-mobile-name"><span>GPT（5.6）</span></div></td><td data-label="優點">推理能力僅次於 Opus，但成本遠遠低於 Opus</td><td data-label="適合的工作">大部分 Agentic AI 工作：程式設計和撰寫、一般文字工作和各種疑難雜症</td><td data-label="缺點">推理能力不及 Opus，處理速度亦可能較慢</td><td data-label="建議使用方法">App、CLI</td><td data-label="是否推薦使用">推薦使用</td></tr>
+                    <tr data-mobile-model-page="secondary"><td data-label="AI 模型"><div class="part3-model-mobile-name"><span>DeepSeek Flash／Pro</span><button type="button" class="part3-model-mobile-next" data-model-mobile-next aria-label="返回 Claude Opus 和 GPT（5.6）">←</button></div></td><td data-label="優點">成本較低，推理能力足以理解大部分奏摺文本</td><td data-label="適合的工作">按照 AI Skills 分析大量文本，抽取特定資訊</td><td data-label="缺點">未必適用於複雜推理</td><td data-label="建議使用方法">API</td><td data-label="是否推薦使用">必須使用</td></tr>
+                    <tr data-mobile-model-page="secondary"><td data-label="AI 模型"><div class="part3-model-mobile-name"><span>Gemini Flash</span></div></td><td data-label="優點">成本較低、處理速度較快，推理能力足以理解大部分奏摺文本</td><td data-label="適合的工作">按照 AI Skills 分析大量文本，抽取特定資訊</td><td data-label="缺點">未必適用於複雜推理</td><td data-label="建議使用方法">API</td><td data-label="是否推薦使用">必須使用</td></tr>
                   </tbody>
                 </table>
               </div>
