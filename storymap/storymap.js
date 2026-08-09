@@ -109,7 +109,10 @@ compactMenuButton.addEventListener('mouseenter', keepCompactMenuOpen);
 compactMenuButton.addEventListener('mouseleave', scheduleCompactMenuClose);
 compactMenuPanel.addEventListener('mouseenter', keepCompactMenuOpen);
 compactMenuPanel.addEventListener('mouseleave', scheduleCompactMenuClose);
-compactMenuButton.addEventListener('click', () => setCompactMenuOpen(true));
+compactMenuButton.addEventListener('click', () => {
+  const isOpen = compactMenuPanel.classList.contains('is-open');
+  setCompactMenuOpen(!isOpen);
+});
 compactMenuBackdrop.addEventListener('click', () => setCompactMenuOpen(false));
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && compactMenuButton.getAttribute('aria-expanded') === 'true') {
@@ -2455,15 +2458,8 @@ const initPart3TryIt = () => {
         <div class="part3-try-winbar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="ttl">第一步 · 下載史料</span></div>
         <div class="part3-try-dl" data-try-pdf-source="${pdfSource}">
           <div class="meta"><div class="name">${set.pdf}</div><div class="sub">${set.pdfSub}</div></div>
-          <div class="part3-try-dl-actions">
-            <button type="button" class="part3-try-dlbtn" data-try-dl data-try-pdf-source="${pdfSource}">下載</button>
-            <button type="button" class="part3-try-already" data-try-already>已下載</button>
-          </div>
         </div>
       </div>`;
-    showGuide('第一步', isTryMobile()
-      ? '先把這份史料下載到你的手機。'
-      : '先把這份史料下載到你的電腦。');
     const advanceToPrompt = (openPdf) => {
       const pdfHref = set.href || set.pdfPath;
       if (openPdf && pdfHref) window.open(pdfHref, '_blank', 'noopener');
@@ -2473,8 +2469,23 @@ const initPart3TryIt = () => {
       renderProgress();
       renderPhase2();
     };
-    stageHost.querySelector('[data-try-dl]').addEventListener('click', () => advanceToPrompt(true));
-    stageHost.querySelector('[data-try-already]').addEventListener('click', () => advanceToPrompt(false));
+    showGuide('第一步', isTryMobile()
+      ? '先把這份史料下載到你的手機。'
+      : '先把這份史料下載到你的電腦。', (opts) => {
+      const downloadButton = document.createElement('button');
+      downloadButton.type = 'button';
+      downloadButton.className = 'part3-try-chip';
+      downloadButton.textContent = '下載';
+      downloadButton.addEventListener('click', () => advanceToPrompt(true));
+      opts.appendChild(downloadButton);
+
+      const downloadedButton = document.createElement('button');
+      downloadedButton.type = 'button';
+      downloadedButton.className = 'part3-try-chip part3-try-chip--skip';
+      downloadedButton.textContent = '已下載';
+      downloadedButton.addEventListener('click', () => advanceToPrompt(false));
+      opts.appendChild(downloadedButton);
+    });
     syncDoc();
   };
 
@@ -3083,9 +3094,9 @@ activateFromLocation();
      平台介面、平台運作流程）維持看得見但不能點。
    - 一進入頁面就直接跳到第三部分「步驟二 · OCR 並結構化原始史料」。
    - 只留步驟二・OCR並結構化原始史料完全開放；步驟二之前（適合的研究問題／
-     所需的工具與資源／重用平台的基本流程）、步驟三至五・運用AI抽取資訊、
-     以及步驟八之後（後續功能：LLM Wiki）的內容維持在畫面上，但變淡、
-     不能點擊，並標示「尚在開發中」。
+     所需的工具與資源／重用平台的基本流程）從預覽中移除，步驟三至五・運用AI
+     抽取資訊，以及步驟八之後（後續功能：LLM Wiki）的內容變淡、不能點擊，
+     並標示「尚在開發中」。
    分享給老師的連結範例：storymap-example.html?preview=ocr */
 (() => {
   const params = new URLSearchParams(window.location.search);
@@ -3124,12 +3135,16 @@ activateFromLocation();
     }
   });
 
-  /* 只留步驟二完全開放；步驟二之前的三個小節、步驟三至五（#part-3-ai）、
-     以及步驟八之後（#part-3-wiki）都變淡鎖住。 */
-  const LOCKED_SECTION_IDS = [
-    'part-3-research-questions', 'part-3-tools', 'part-3-basic-flow',
-    'part-3-ai', 'part-3-wiki'
+  /* 步驟二之前的三個小節不再在 OCR 預覽中佔據空間；
+     步驟三至五（#part-3-ai）與步驟八之後（#part-3-wiki）維持淡化鎖定。 */
+  const PREVIEW_HIDDEN_SECTION_IDS = [
+    'part-3-research-questions', 'part-3-tools', 'part-3-basic-flow'
   ];
+  PREVIEW_HIDDEN_SECTION_IDS.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.hidden = true;
+  });
+  const LOCKED_SECTION_IDS = ['part-3-ai', 'part-3-wiki'];
   LOCKED_SECTION_IDS.forEach((id) => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -3447,7 +3462,7 @@ const initMobileTryLayout = () => {
     if (mobile !== true) return;
     const has = (s) => !!stage.querySelector(s);
     let state, title;
-    if (has('[data-try-dl]')) { state = 'is-mtry-p1'; title = '第一步 · 下載史料'; }
+    if (has('[data-try-pdf-source]')) { state = 'is-mtry-p1'; title = '第一步 · 下載史料'; }
     else if (has('[data-try-cmp]')) { state = 'is-mtry-p3'; title = '第三步 · 比較 OCR 結果'; }
     else if (has('.part3-try-chat.is-final')) { state = 'is-mtry-overview'; title = '第二步 · 完成的 Prompt'; }
     else if (has('[data-try-chat]')) { state = 'is-mtry-steps'; title = '第二步 · 撰寫給 Agentic AI 的 Prompt'; }
