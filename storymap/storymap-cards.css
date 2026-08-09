@@ -1672,10 +1672,10 @@
 /* Part 3.4.4 — 運用 Agentic AI 使用 PaddleOCR：Codex 對話視窗
    #part-3-agentic-ocr-chart */
 #part-3-agentic-ocr-chart {
-  --agentic-frame-height: clamp(560px, 52vw, 680px);
+  --agentic-frame-height: clamp(460px, 39vw, 520px);
   --visual-h: var(--agentic-frame-height);
   --agentic-codex-width: 92%;
-  --agentic-codex-height: 90%;
+  --agentic-codex-height: 86%;
   --agentic-codex-left: 4%;
   --agentic-codex-top: 4%;
   --agentic-codex-font-size: 14px;
@@ -1688,12 +1688,12 @@
    media query 的大視窗設定。 */
 @media (min-width: 1041px) {
   #part-3-agentic-ocr-chart {
-    --agentic-frame-height: clamp(500px, 45vw, 580px);
+    --agentic-frame-height: clamp(460px, 39vw, 520px);
     --visual-h: var(--agentic-frame-height);
     --agentic-codex-left: 4%;
     --agentic-codex-top: 4%;
     --agentic-codex-width: 92%;
-    --agentic-codex-height: 90%;
+    --agentic-codex-height: 86%;
   }
 }
 
@@ -1701,12 +1701,12 @@
    visual 欄位，避免出現「卡片很大、Codex 很小」的比例。 */
 @media (max-width: 1040px) {
   #part-3-agentic-ocr-chart {
-    --agentic-frame-height: clamp(560px, 130vw, 680px);
+    --agentic-frame-height: clamp(460px, 110vw, 580px);
     --visual-h: var(--agentic-frame-height);
     --agentic-codex-left: 4%;
     --agentic-codex-top: 4%;
     --agentic-codex-width: 92%;
-    --agentic-codex-height: 90%;
+    --agentic-codex-height: 86%;
   }
 }
 
