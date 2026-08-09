@@ -7,11 +7,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Serif+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="storymap.css?v=20260808-sequential-scroll-04">
-  <link rel="stylesheet" href="storymap-cards.css?v=20260808-sequential-scroll-04">
+  <link rel="stylesheet" href="storymap.css?v=20260810-codex-header-02">
+  <link rel="stylesheet" href="storymap-cards.css?v=20260810-codex-header-02">
   <link rel="stylesheet" href="part-1-interface.css">
   <link rel="stylesheet" href="part-3-question-gallery.css">
-  <script src="storymap.js?v=20260809-try-download-buttons-01" defer></script>
+  <script src="storymap.js?v=20260810-codex-header-02" defer></script>
   <!-- 第一部分的介面複本：資料模組先載入，行為模組再依它組裝畫面。 -->
   <script src="part-1-interface-data.js" defer></script>
   <script src="part-1-interface.js" defer></script>
@@ -1223,40 +1223,14 @@
                 </div>
                 <div class="lay-visual">
                   <!-- Agentic AI × PaddleOCR 示範動畫：淺色 Codex 對話視窗（使用者指令＋AI
-                       思考過程＋安裝完成摘要）與深色 PaddleOCR Python 視窗重疊排列，點擊
-                       任一視窗標題列可切換上下層。逐字播放沿用 storymap.js 既有的
+                       思考過程＋安裝完成摘要）。逐字播放沿用 storymap.js 既有的
                        typeAgenticSequence／initAgenticScene() 與 Codex 兩階段播放，內容陣列見下方 JSON 區塊。
                        視窗尺寸與位置在 storymap-cards.css 的 #part-3-agentic-ocr-chart 區塊調整。 -->
                   <div class="part3-agentic-ocr-frame visual-frame" id="part-3-agentic-ocr-chart" role="group" aria-label="運用 Agentic AI 使用 PaddleOCR 示範動畫">
                     <div class="agentic-scene agentic-scene-paddleocr" data-agentic-scene aria-hidden="true">
-                      <div class="agentic-mac-window agentic-window-pyocr" data-agentic-window="pyocr">
-                        <div class="agentic-mac-titlebar" data-agentic-bring-front="pyocr"><span class="agentic-mac-dot red"></span><span class="agentic-mac-dot yellow"></span><span class="agentic-mac-dot green"></span><span class="agentic-window-title">PaddleOCR Python</span></div>
-                        <div class="agentic-window-body agentic-code" data-agentic-sequence>
-                          <script type="application/json" data-agentic-lines>
-                            [
-                              "<span class=\"kw\">from</span> paddleocr <span class=\"kw\">import</span> PaddleOCR",
-                              "ocr = <span class=\"fn\">PaddleOCR</span>(",
-                              "    lang=<span class=\"str\">\"chinese_cht\"</span>,",
-                              "    device=<span class=\"str\">\"cpu\"</span>,",
-                              "    use_doc_orientation_classify=<span class=\"kw\">False</span>,",
-                              "    use_doc_unwarping=<span class=\"kw\">False</span>,",
-                              "    use_textline_orientation=<span class=\"kw\">False</span>,",
-                              ")",
-                              "<span class=\"kw\">for</span> result <span class=\"kw\">in</span> ocr.<span class=\"fn\">predict</span>(<span class=\"str\">\"/path/to/image.png\"</span>):",
-                              "    result.<span class=\"fn\">print</span>()",
-                              "    result.<span class=\"fn\">save_to_json</span>(<span class=\"str\">\"/Users/creamybanana/Downloads/PaddleOCR-output\"</span>)",
-                              "    result.<span class=\"fn\">save_to_img</span>(<span class=\"str\">\"/Users/creamybanana/Downloads/PaddleOCR-output\"</span>)",
-                              "    data = result.json",
-                              "    <span class=\"kw\">for</span> text, score <span class=\"kw\">in</span> <span class=\"fn\">zip</span>(data[<span class=\"str\">\"rec_texts\"</span>], data[<span class=\"str\">\"rec_scores\"</span>]):",
-                              "        <span class=\"fn\">print</span>(f<span class=\"str\">\"{score:.3f}\\t{text}\"</span>)",
-                              "<span class=\"ok\">✓ OCR complete — JSON and annotated image saved</span>"
-                            ]
-                          </script>
-                        </div>
-                      </div>
                       <div class="agentic-mac-window agentic-window-codex is-agentic-front" data-agentic-window="codex">
                         <div class="agentic-mac-titlebar" data-agentic-bring-front="codex"><span class="agentic-mac-dot red"></span><span class="agentic-mac-dot yellow"></span><span class="agentic-mac-dot green"></span><span class="agentic-window-title">Codex</span></div>
-                        <div class="agentic-codex-user-row"><div class="agentic-codex-user-bubble">set up PaddleOCR on my mac, and use it to OCR '/Users/mymac/Downloads/Text/奏摺1.pdf'</div></div>
+                        <div class="agentic-codex-user-row"><div class="agentic-codex-user-bubble">set up PaddleOCR on my computer</div></div>
                         <div class="agentic-window-body agentic-prose agentic-codex-body" data-agentic-codex-phases>
                           <div class="agentic-codex-phase agentic-codex-thinking" data-agentic-codex-thinking>
                             <div class="agentic-codex-status">Working…</div>
@@ -1476,7 +1450,7 @@
                     "foldAspect": "344 / 747",
                     "features": [
                       {
-                        "key": "vertical", "panel": 0, "image": "辨識手寫字Label/直排單欄.png", "colour": "#7fb5b1",
+                        "key": "vertical", "panel": 4, "image": "辨識手寫字Label/直排單欄.png", "colour": "#7fb5b1",
                         "tag": {"right":"-142px","top":"6%"},
                         "title": "直排單欄",
                         "desc": "奏摺採用直排書寫，閱讀方向由右至左、由上至下。OCR 必須按此順序輸出文字，而非由左至右的閱讀方式。",
@@ -1485,7 +1459,7 @@
                         "json": "{\n  <span class=\"jkey\">\"text_direction\"</span>: <span class=\"jstr\">\"vertical_rtl\"</span>,\n  <span class=\"jkey\">\"column_count\"</span>: <span class=\"jnum\">9</span>,\n  <span class=\"jkey\">\"text\"</span>: <span class=\"jstr\">\"竊照臺灣近來屢有匪徒滋事奴才時刻留心察查不敢稍有懈忽茲本年十二月初五日戌刻訪聞得臺灣彰化縣屬又有匪徒聚集會黨於十一月二十九日辰刻攻打彰化縣城至午刻縣城被陷文武官員不知生死之事查臺灣不法民番甫經兩次大加懲治乃該匪等竟膽敢聚眾攻陷城池\"</span>\n}"
                       },
                       {
-                        "key": "regular-script", "panel": 0, "image": "辨識手寫字Label/正文字體.png", "colour": "#a28ca8",
+                        "key": "regular-script", "panel": 4, "image": "辨識手寫字Label/正文字體.png", "colour": "#a28ca8",
                         "tag": {"right":"-142px","top":"20%"},
                         "title": "正文字體",
                         "desc": "這份奏摺採用楷書書寫，字跡清晰，字與字、行與行之間間距明確，且字體大小一致，容易進行 OCR 辨識。。",
@@ -1494,7 +1468,7 @@
                         "json": "{\n  <span class=\"jkey\">\"body_script\"</span>: <span class=\"jstr\">\"regular_kai_shu\"</span>,\n  <span class=\"jkey\">\"legibility\"</span>: <span class=\"jstr\">\"clear\"</span>,\n  <span class=\"jkey\">\"word_spacing\"</span>: <span class=\"jstr\">\"clear\"</span>,\n  <span class=\"jkey\">\"line_spacing\"</span>: <span class=\"jstr\">\"clear\"</span>,\n  <span class=\"jkey\">\"ocr_possible\"</span>: <span class=\"jstr\">\"true\"</span>,\n  <span class=\"jkey\">\"text\"</span>: <span class=\"jstr\">\"竊照臺灣近來屢有匪徒滋事奴才時刻留心察查不敢稍有懈忽茲本年十二月初五日戌刻訪聞得臺灣彰化縣屬又有匪徒聚集會黨於十一月二十九日辰刻攻打彰化縣城至午刻縣城被陷文武官員不知生死之事查臺灣不法民番甫經兩次大加懲治乃該匪等竟膽敢聚眾攻陷城池\"</span>\n}"
                       },
                       {
-                        "key": "author", "panel": 0, "image": "辨識手寫字Label/上奏官員.png", "colour": "#c88f8a",
+                        "key": "author", "panel": 4, "image": "辨識手寫字Label/上奏官員.png", "colour": "#c88f8a",
                         "tag": {"right":"-142px","top":"72%"},
                         "title": "上奏官員",
                         "desc": "奏摺第二頁首行註明上奏官員的官職與姓名「福建水師提督黃仕簡」。OCR 時應辨識並獨立標記這項作者資料，不要與正文混合。",
@@ -1503,7 +1477,7 @@
                         "json": "{\n  <span class=\"jkey\">\"author\"</span>: {\n    <span class=\"jkey\">\"office\"</span>: <span class=\"jstr\">\"福建水師提督\"</span>,\n    <span class=\"jkey\">\"name\"</span>: <span class=\"jstr\">\"黃仕簡\"</span>\n  },\n  <span class=\"jkey\">\"saved_individually\"</span>: <span class=\"jstr\">\"true\"</span>\n}"
                       },
                       {
-                        "key": "minister", "panel": 0, "image": "辨識手寫字Label/臣字款.png", "colour": "#6e98d0",
+                        "key": "minister", "panel": 4, "image": "辨識手寫字Label/臣字款.png", "colour": "#6e98d0",
                         "tag": {"left":"-134px","top":"34%"},
                         "title": "臣字款（小字自稱）",
                         "desc": "官員在文中自稱「奴才」或「臣」時以小字偏右書寫，字體小於正文。這些字也要作正文一部份進行 OCR。",
@@ -1512,7 +1486,7 @@
                         "json": "{\n  <span class=\"jkey\">\"self_reference\"</span>: [<span class=\"jstr\">\"奴才\"</span>, <span class=\"jstr\">\"臣\"</span>],\n  <span class=\"jkey\">\"style\"</span>: <span class=\"jstr\">\"small_inline\"</span>,\n  <span class=\"jkey\">\"in_body\"</span>: <span class=\"jstr\">\"true\"</span>\n}"
                       },
                       {
-                        "key": "respect", "panel": 4, "image": "辨識手寫字Label/抬頭.png", "colour": "#d97967",
+                        "key": "respect", "panel": 7, "image": "辨識手寫字Label/抬頭.png", "colour": "#d97967",
                         "tag": {"right":"-142px","top":"38%"},
                         "title": "抬頭",
                         "desc": "當提及皇帝時，官員會另起一行並提高書寫位置，這種格式稱為「抬頭」。「抬頭」會把同一句話拆成兩行，OCR 需要把分隔的文字重新合併。",
@@ -1521,7 +1495,7 @@
                         "json": "{\n  <span class=\"jkey\">\"honorific_breaks\"</span>: [<span class=\"jnum\">3</span>, <span class=\"jnum\">11</span>],\n  <span class=\"jkey\">\"merged_sentences\"</span>: <span class=\"jnum\">2</span>\n}"
                       },
                       {
-                        "key": "rescript", "panel": 4, "image": "辨識手寫字Label/硃批.png", "colour": "#c86f62",
+                        "key": "rescript", "panel": 5, "image": "辨識手寫字Label/硃批.png", "colour": "#c86f62",
                         "tag": {"left":"-142px","top":"58%"},
                         "title": "硃批（草書）",
                         "desc": "硃批以草書書寫，連筆多、字形變化大，辨識準確率低。OCR 時應先辨識紅色筆跡範圍，並把它與正文分開，留待人工判讀。",
@@ -1539,7 +1513,7 @@
                         "json": "{\n  <span class=\"jkey\">\"watermark\"</span>: [<span class=\"jstr\">\"國立故宮博物院\"</span>, <span class=\"jstr\">\"NATIONAL PALACE MUSEUM\"</span>],\n  <span class=\"jkey\">\"excluded_from_text\"</span>: <span class=\"jstr\">\"true\"</span>\n}"
                       },
                       {
-                        "key": "stamp", "panel": 10, "image": "辨識手寫字Label/印章.png", "colour": "#d89a7e",
+                        "key": "stamp", "panel": 5, "image": "辨識手寫字Label/印章.png", "colour": "#d89a7e",
                         "tag": {"left":"-142px","top":"10%"},
                         "title": "印章",
                         "desc": "奏摺正文後蓋有印章，不應對它們進行OCR。",

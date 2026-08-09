@@ -1490,7 +1490,10 @@ const initPart3FeatureExplorers = () => {
       // 不可在 render() 內重設 pair，否則按鈕會被立刻覆蓋回原位。
       syncToCurrent = () => {
         const f = features[cur];
-        if (f) pair = pairOf(f.panel || 0);
+        if (!f) return;
+        pair = pairOf(f.panel || 0);
+        // 手機版抽屜：選了特徵就把「目前這一摺」也跳到該特徵所在的摺
+        if (root.__mFold) root.__mFold.syncTo(f.panel || 0);
       };
       render = () => {
         const f = features[cur];
@@ -1523,6 +1526,51 @@ const initPart3FeatureExplorers = () => {
       sizeStrip();
       window.addEventListener('resize', sizeStrip);
       if (typeof ResizeObserver === 'function') new ResizeObserver(sizeStrip).observe(strip.parentElement);
+
+      /* 手機版／窄螢幕的史料抽屜（收合狀態）：抽屜太窄，風琴摺（同時露出
+         所有摺痕）既看不清也放不下，因此改成「一次只顯示一摺」——每摺就是
+         掃描頁面的三分之一，寬度填滿抽屜。展開（is-full）後空間夠了，就直接
+         沿用桌面／窄視窗版原本的風琴摺，不套用這裡的單摺樣式。
+         這裡只維護一個 mfold 索引並在對應的摺子上掛 .is-mopen，桌面版用的
+         .is-open 完全不動，兩套狀態互不干擾。選特徵時會跳到該特徵所在的摺
+         （見 syncToCurrent），收合時的方向鍵則是換特徵。 */
+      let mfold = 0;
+      /* 收合時：只切換 .is-mopen（見 CSS 的 :not(.is-full) 版面）。
+         展開時：直接沿用桌面版風琴摺，靠 .is-open 決定哪兩摺展開，
+         .is-open 只有桌面版的 pair 邏輯（render()）會設定——單摺瀏覽時
+         按 <> 只會移動 mfold，完全不會動到 pair／render／is-open。
+         這代表：如果使用者先用 <> 把單摺切到某個特徵所在的摺，
+         再按「整頁」展開，pair 有可能還停在上一次選特徵時的舊值，
+         is-open 蓋到的兩摺就會跟目前 mfold 對不上，展開後看起來像
+         什麼都沒展開（只有摺痕）。因此展開當下要強制把 pair 對齊
+         pairOf(mfold) 再呼叫 render()，兩套狀態才會一致。 */
+      const applyMobileFold = () => {
+        // 抽屜是 initMobileDocDrawers() 之後才包起來的，這裡用查詢拿，
+        // 不能假設有現成的 drawer 變數（那是另一個函式的作用域）。
+        const drawerEl = root.querySelector('.mdrawer');
+        const full = drawerEl && drawerEl.classList.contains('is-full');
+        if (full) {
+          pair = pairOf(mfold);
+          render();
+          return;
+        }
+        [...strip.children].forEach((el, i) => {
+          el.classList.toggle('is-mopen', i === mfold);
+        });
+      };
+      root.__mFold = {
+        count: panels.length,
+        step: (dir) => {
+          mfold = Math.max(0, Math.min(panels.length - 1, mfold + dir));
+          applyMobileFold();
+        },
+        syncTo: (i) => {
+          mfold = Math.max(0, Math.min(panels.length - 1, i || 0));
+          applyMobileFold();
+        },
+        refresh: applyMobileFold
+      };
+      applyMobileFold();
     }
 
     showFeature(0);
@@ -1746,8 +1794,8 @@ const initAgenticCodexPhases = () => {
 };
 initAgenticCodexPhases();
 
-// 運用 Agentic AI 使用 PaddleOCR：Codex 對話視窗與 PaddleOCR Python 視窗重疊排列，
-// 點擊任一視窗即可把該視窗切換到最上層。
+// 運用 Agentic AI 使用 PaddleOCR：Codex 對話視窗。
+// 保留標題列點擊行為，方便日後加入其他示範視窗時重用。
 const initPart3AgenticOcrWindows = () => {
   document.querySelectorAll('[data-agentic-window]').forEach((windowEl) => {
     windowEl.addEventListener('click', () => {
@@ -1821,8 +1869,8 @@ const initOcrScanScene = () => {
       if (stopPages.length || stopOutput) return;
       // 兩份文書的翻頁間隔稍微錯開，避免同時翻頁顯得太整齊、不自然。
       stopPages = pageImgs.map((img, i) => cycleOcrPage(img, pageSets[i], { interval: 3200 + i * 700 }));
-      // body 欄位是全文，字數較多，打字間隔調快一點，避免跑完一輪要等太久。
-      stopOutput = typeAgenticSequence(outputHost, outputLines, { charDelay: 9, lineDelay: 220, holdTime: 3600, clearDelay: 500 });
+      // body 欄位是全文；放慢逐字速度，讓研究者可以看清楚 JSON 的輸出過程。
+      stopOutput = typeAgenticSequence(outputHost, outputLines, { charDelay: 18, lineDelay: 220, holdTime: 3600, clearDelay: 500 });
     };
     const stop = () => {
       stopPages.forEach((fn) => fn());
@@ -2443,9 +2491,10 @@ const initPart3TryIt = () => {
       const state = n < phase ? 'done' : n === phase ? 'current' : 'pending';
       return `<span class="part3-try-dot is-${state}" aria-hidden="true">${n}</span>`;
     }).join('');
-    todoHost.innerHTML = `<div class="part3-try-progress"><span class="cap">進度</span>${dots}</div>`;
-    const progressRow = todoHost.firstElementChild;
-    if (switchHost && progressRow) progressRow.appendChild(switchHost);
+    /* 進度列已移除；模式切換固定在「11 試一試」標題旁，讓每一步的
+       史料／對話視窗取得完整高度。保留這個重繪函式，讓階段切換時不必
+       改動其他流程。 */
+    todoHost.innerHTML = '';
   };
 
   /* ---------- 第一步：下載史料 ---------- */
@@ -3207,8 +3256,19 @@ const initMobileDocDrawers = () => {
           <button type="button" data-m-next aria-label="下一個特徵">${IC.next}</button>
           <button type="button" data-m-full aria-label="整頁／縮小">${IC.ex}</button>
           <button type="button" data-m-close aria-label="收起">${IC.cl}</button>
-        </div>
-        <button type="button" class="mdrawer-grip" data-m-grip aria-label="調整寬度">${IC.grip}</button>`);
+        </div>`);
+
+      /* 寬度調整鈕要「騎」在抽屜的右邊界上（邊界線正好穿過按鈕中間），
+         所以不能放在抽屜裡面：.mdrawer 有 overflow:hidden（避免史料圖
+         溢出蓋掉頁首頁尾），又因為滑入動畫用了 transform 而成為固定定位的
+         包含塊，放在裡面一定會被裁掉一半。因此改成 root 的子元素，用
+         position:fixed 對齊 --mdrawer-w，並把該變數改設在 root 上讓兩者共用。 */
+      const grip = document.createElement('button');
+      grip.type = 'button';
+      grip.className = 'mdrawer-grip';
+      grip.setAttribute('aria-label', '調整寬度');
+      grip.innerHTML = IC.grip;
+      root.appendChild(grip);
 
       /* 2. 拉手與遮罩（固定在視窗上，只有捲到這一節時才出現） */
       const puller = document.createElement('button');
@@ -3226,7 +3286,6 @@ const initMobileDocDrawers = () => {
       const edgeL = drawer.querySelector('.mdrawer-edge.l');
       const edgeR = drawer.querySelector('.mdrawer-edge.r');
       const fullBtn = drawer.querySelector('[data-m-full]');
-      const grip = drawer.querySelector('[data-m-grip]');
       let zoom = 1;
       const setZoom = (z) => { zoom = Math.max(1, Math.min(4, z)); drawer.style.setProperty('--z', zoom); };
 
@@ -3291,6 +3350,8 @@ const initMobileDocDrawers = () => {
         if (on) closers.forEach((fn) => fn !== setOpen && fn(false));
         drawer.classList.toggle('is-open', on);
         scrim.classList.toggle('is-on', on);
+        // 寬度調整鈕現在是 root 的子元素，得自己跟著抽屜開合顯示／隱藏
+        grip.classList.toggle('is-on', on && !drawer.classList.contains('is-full'));
         puller.setAttribute('aria-expanded', String(on));
       };
       closers.push(setOpen);
@@ -3301,9 +3362,20 @@ const initMobileDocDrawers = () => {
         const full = drawer.classList.toggle('is-full');
         fullBtn.innerHTML = full ? IC.sh : IC.ex;
         setZoom(1);
+        // 展開時佔滿整個畫面寬度，沒有可調的右邊界，寬度鈕就收起來
+        grip.classList.toggle('is-on', !full);
+        if (root.__mFold) root.__mFold.refresh();
       });
 
       const stepFeature = (dir) => {
+        /* 8 辨識手寫字（收合的抽屜）：方向鍵換「特徵」，換到的特徵會自動
+           跳到它所在的那一摺；只有展開（is-full）後才改為換頁／換摺，
+           因為展開後才看得到完整的風琴摺。 */
+        if (root.__mFold && drawer.classList.contains('is-full')) {
+          const btn = root.querySelector(dir > 0 ? '[data-part3-fx-next]' : '[data-part3-fx-prev]');
+          if (btn && !btn.disabled) btn.click();
+          return;
+        }
         if (!tags.length) {
           /* 11 試一試沒有特徵，方向鍵改為翻頁 */
           const btn = root.querySelector(dir > 0 ? '[data-try-next]' : '[data-try-prev]');
@@ -3329,7 +3401,8 @@ const initMobileDocDrawers = () => {
       grip.addEventListener('pointermove', (e) => {
         if (!rs) return;
         const w = Math.max(150, Math.min(window.innerWidth, rs.w + (e.clientX - rs.x)));
-        drawer.style.setProperty('--mdrawer-w', w + 'px');
+        // 設在 root 上：抽屜與（現在是 root 子元素的）寬度調整鈕共用同一個值
+        root.style.setProperty('--mdrawer-w', w + 'px');
       });
       const endRs = () => { if (rs) { drawer.classList.remove('is-resizing'); rs = null; } };
       grip.addEventListener('pointerup', endRs);
@@ -3372,7 +3445,12 @@ const initMobileDocDrawers = () => {
         pts.delete(e.pointerId);
         if (pts.size < 2) pinch = null;
         if (!drag) return;
-        if (over > 52 && pageBtns.next) pageBtns.next.click();
+        /* 8 辨識手寫字且抽屜收合時：拖到邊界再拖 = 換上一／下一摺
+           （展開後與其他區塊一樣是翻頁）。 */
+        if (root.__mFold && !drawer.classList.contains('is-full')) {
+          if (over > 52) root.__mFold.step(1);
+          else if (over < -52) root.__mFold.step(-1);
+        } else if (over > 52 && pageBtns.next) pageBtns.next.click();
         else if (over < -52 && pageBtns.prev) pageBtns.prev.click();
         edgeL.classList.remove('is-on'); edgeR.classList.remove('is-on');
         drag = null; over = 0;

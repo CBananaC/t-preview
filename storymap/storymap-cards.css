@@ -1669,24 +1669,45 @@
   --card-border: rgba(140, 170, 255, .35); /* 飄浮卡片邊框顏色 */
 }
 
-/* Part 3.4.4 — 運用 Agentic AI 使用 PaddleOCR：Codex 對話視窗＋PaddleOCR Python 視窗
+/* Part 3.4.4 — 運用 Agentic AI 使用 PaddleOCR：Codex 對話視窗
    #part-3-agentic-ocr-chart */
 #part-3-agentic-ocr-chart {
   --agentic-frame-height: clamp(560px, 52vw, 680px);
   --visual-h: var(--agentic-frame-height);
-  --agentic-pyocr-width: 72%;
-  --agentic-pyocr-height: 54%;
-  --agentic-pyocr-left: 28%;
-  --agentic-pyocr-top: 2%;
-  --agentic-pyocr-font-size: 11px;
-  --agentic-pyocr-angle: 0deg;
-  --agentic-codex-width: 82%;
-  --agentic-codex-height: 84%;
-  --agentic-codex-left: 0%;
-  --agentic-codex-top: 14%;
-  --agentic-codex-font-size: 12px;
-  --agentic-codex-text-size: 15px;
+  --agentic-codex-width: 92%;
+  --agentic-codex-height: 90%;
+  --agentic-codex-left: 4%;
+  --agentic-codex-top: 4%;
+  --agentic-codex-font-size: 14px;
+  --agentic-codex-text-size: 18px;
   --agentic-codex-angle: 0deg;
+}
+
+/* 一般桌面版：Codex 使用原本右側 Python 視窗的區域，
+   上緣與左側文字卡對齊，並縮短高度讓動畫更集中。窄螢幕沿用下方
+   media query 的大視窗設定。 */
+@media (min-width: 1041px) {
+  #part-3-agentic-ocr-chart {
+    --agentic-frame-height: clamp(500px, 45vw, 580px);
+    --visual-h: var(--agentic-frame-height);
+    --agentic-codex-left: 4%;
+    --agentic-codex-top: 4%;
+    --agentic-codex-width: 92%;
+    --agentic-codex-height: 90%;
+  }
+}
+
+/* Narrow／mobile：仍在文字卡下方，但把視窗往上貼齊並放大到整個
+   visual 欄位，避免出現「卡片很大、Codex 很小」的比例。 */
+@media (max-width: 1040px) {
+  #part-3-agentic-ocr-chart {
+    --agentic-frame-height: clamp(560px, 130vw, 680px);
+    --visual-h: var(--agentic-frame-height);
+    --agentic-codex-left: 4%;
+    --agentic-codex-top: 4%;
+    --agentic-codex-width: 92%;
+    --agentic-codex-height: 90%;
+  }
 }
 
 /* Part 3.3.2 — Text block: #part-3-basic-flow-card */
@@ -1870,7 +1891,7 @@
          --try-diff-h          第三步比對結果那一欄的高度
 
    二、字級（全部會再乘上網站的字級設定 --font-scale）
-         --try-switch-font-size   進度列最右側「印刷字／手寫字」切換鈕
+         --try-switch-font-size   「11 試一試」標題旁的「印刷字／手寫字」切換鈕
          --try-dot-size           進度圓點的直徑
          --try-dot-font-size      進度圓點裡數字的字級
          --try-rpg-font-size      底部引導對話框的內文
@@ -1958,8 +1979,8 @@
   --try-pdf-backdrop-h: calc(var(--try-pdf-max-h) + (2 * var(--try-doc-pad)) + 18px);
 }
 
-/* 試一試：綠色原件區填滿左欄，不在上方／下方留下透明白邊。
-   進度列的模式切換固定在 1／2／3 數字列最右側。 */
+/* 試一試：淺灰色原件區填滿左欄，不在上方／下方留下透明白邊。
+   印刷字／手寫字模式切換固定在「11 試一試」標題旁。 */
 #part-3-try-explorer .part3-try-doc {
   background-size: 100% 100%, 100% 100%;
 }
@@ -2222,3 +2243,9 @@
 #part-3-try-explorer[data-try-mode="handwritten"] [data-try-visual="硃批.png"]   { --tryimg-fit: contain; --tryimg-scale: 1; }
 #part-3-try-explorer[data-try-mode="handwritten"] [data-try-visual="奏報日期.png"] { --tryimg-fit: contain; --tryimg-scale: 1; }
 #part-3-try-explorer[data-try-mode="handwritten"] [data-try-visual="水印.png"]   { --tryimg-fit: contain; --tryimg-scale: 1; }
+
+/* Normal desktop: keep the Codex title bar inside the scene. The desktop
+   layout above places it at a negative top, but .agentic-scene clips overflow. */
+@media (min-width: 1041px) {
+  #part-3-agentic-ocr-chart { --agentic-codex-top: 4px; }
+}
