@@ -98,16 +98,6 @@ img { max-width: 100%; }
 .is-preview-locked-tab { opacity: .38; cursor: not-allowed; pointer-events: auto; }
 .is-preview-locked-tab:hover { color: rgba(247, 243, 234, .72) !important; }
 
-/* 教師預覽模式：步驟二之前／步驟八之後的內容維持在畫面上，但變淡、
-   不能互動，並在區塊最上面加一個小標籤，說明這部分尚在開發中。 */
-.is-preview-faded { position: relative; opacity: .38; filter: grayscale(.4); pointer-events: none; user-select: none; }
-.preview-faded-badge {
-  position: sticky; top: 12px; left: 12px; z-index: 5;
-  display: inline-block; width: fit-content;
-  margin: 0 0 14px; padding: 6px 14px; border-radius: 999px;
-  background: var(--ink); color: #fff; font-family: var(--sans);
-  font-weight: 700; font-size: calc(11.5px * var(--font-scale)); letter-spacing: .06em;
-}
 .nav-dropdown { position: static; display: flex; align-items: center; height: 100%; }
 .nav-dropdown-chevron { font-size: 10px; opacity: .7; transition: transform .22s; }
 .nav-dropdown:hover .nav-dropdown-chevron,
@@ -2315,6 +2305,50 @@ img { max-width: 100%; }
 .agentic-window-html .agentic-window-title,
 .agentic-window-ocr .agentic-window-title,
 .agentic-window-skills .agentic-window-title { font-size: var(--agentic-window-title-size, 10px); }
+.agentic-window-vscode {
+  left: var(--agentic-vscode-left, 3%); top: var(--agentic-vscode-top, 5%);
+  width: var(--agentic-vscode-width, 92%); height: var(--agentic-vscode-height, 89%);
+  z-index: 1; background: #1e1e1e; cursor: pointer;
+  opacity: .92; transition: transform .32s ease, opacity .24s ease, box-shadow .32s ease;
+  --agentic-window-title-size: var(--agentic-vscode-title-size, 10px);
+}
+.agentic-window-vscode.is-agentic-front {
+  opacity: 1; transform: translateY(-4px) scale(1);
+  box-shadow: 0 22px 38px rgba(0, 0, 0, .28);
+}
+.agentic-window-vscode .agentic-mac-titlebar {
+  background: #252526; border-bottom-color: #3b3b3b;
+}
+.agentic-window-vscode .agentic-window-title { color: #bdbdbd; }
+.agentic-vscode-shell {
+  display: grid; grid-template-columns: 29px minmax(0, 1fr);
+  flex: 1; min-height: 0; background: #1e1e1e;
+}
+.agentic-vscode-activitybar {
+  display: flex; flex-direction: column; align-items: center; gap: 13px;
+  padding: 13px 0; color: #858585; background: #333333;
+  font: 12px/1 var(--sans); border-right: 1px solid #424242;
+}
+.agentic-vscode-activitybar span:last-child { margin-top: auto; }
+.agentic-vscode-editor {
+  display: flex; flex-direction: column; min-width: 0; min-height: 0;
+}
+.agentic-vscode-tabs {
+  display: flex; flex: none; min-height: 28px; align-items: stretch;
+  background: #252526; border-bottom: 1px solid #333333;
+}
+.agentic-vscode-tab {
+  display: flex; align-items: center; max-width: 100%; padding: 0 10px;
+  color: #d4d4d4; background: #1e1e1e; border-top: 1px solid #e6b86a;
+  font: 10px/1.2 "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.agentic-window-vscode .agentic-window-body {
+  padding: 12px 14px; color: #d4d4d4; background: #1e1e1e;
+  overflow-x: hidden; overflow-y: auto; scrollbar-width: none; overflow-wrap: anywhere;
+  font: var(--agentic-vscode-font-size, 10px)/1.55 "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+.agentic-window-vscode .agentic-window-body::-webkit-scrollbar { display: none; }
 .agentic-code .cmt { color: #6a9955; }
 .agentic-code .str { color: #ce9178; }
 .agentic-code .kw { color: #c586c0; }

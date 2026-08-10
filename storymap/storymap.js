@@ -1245,6 +1245,158 @@ const initPart3OriginalCharts = () => {
 };
 initPart3OriginalCharts();
 
+/* 使用AI Api／AI Chain 執行Skills — 環狀 AI Chain 動畫。
+   七個步驟依序填滿一圈的外圈進度環（--p 0→100），代表「一步做完才開始下一步」；
+   第 7 步（輸出JSON）與第 1 步（文書總結）之間刻意不畫連接線，圓圈下方留一個缺口。
+   背景是 Matrix 式文字雨，字元逐字取自硃25（黃仕簡〈為奏彰化失陷已調兵赴臺事〉，
+   與林爽文事件相關）原文的 body 欄位全文，不是隨機亂碼；原文段落換行在拼接成
+   單一字元流時合併為全形空格，僅為動畫需要，不影響逐字內容本身。
+   大小、顏色、版面比例在 storymap-cards.css 的 #part-3-ai-chain 區塊。 */
+const initPart3ChainRing = () => {
+  document.querySelectorAll('[data-part3-chain-ring]').forEach((square) => {
+    const nodes = [...square.querySelectorAll('.part3-chain-ring-node')];
+    const links = [...square.querySelectorAll('.part3-chain-ring-link')];
+    const status = square.querySelector('[data-part3-chain-ring-status]');
+    const canvas = square.querySelector('[data-part3-chain-ring-matrix]');
+    if (!nodes.length || !canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const STEP_MS = 1100;   // 一個步驟：外圈從 0 填到 100
+    const HOLD_MS = 900;    // 七步都完成後，停留一下再重播
+    const TOTAL_MS = STEP_MS * nodes.length + HOLD_MS;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // 純時間軸函式：輸入「這一圈跑了多久」，直接算出畫面該長怎樣，
+    // 不用逐格累加狀態，分頁切走幾秒再切回來也不會亂跳。
+    const render = (elapsed) => {
+      const t = ((elapsed % TOTAL_MS) + TOTAL_MS) % TOTAL_MS;
+      let currentStep = -1;
+      nodes.forEach((node, i) => {
+        const stepStart = i * STEP_MS;
+        const stepEnd = stepStart + STEP_MS;
+        let p;
+        if (t < stepStart) {
+          p = 0;
+        } else if (t < stepEnd) {
+          p = ((t - stepStart) / STEP_MS) * 100;
+          currentStep = i;
+        } else {
+          p = 100;
+        }
+        node.style.setProperty('--p', p.toFixed(1));
+        node.classList.toggle('is-filled', p >= 100);
+      });
+      links.forEach((link, i) => {
+        // 連結 i 接的是 node i → node i+1；node i 填滿後才亮起。
+        link.classList.toggle('is-active', t >= (i + 1) * STEP_MS);
+      });
+      if (status) status.classList.toggle('is-shown', currentStep === -1 && t < TOTAL_MS);
+    };
+
+    // 背景文字雨的字元來源：review-tools/shared data/stage1_original_text.json
+    // 中 doc_id: 硃25 的 body 欄位全文，逐字未改動。
+    const RAIN_SOURCE = '福建水師提督一等海澄公奴才黃仕簡謹奏，為奏聞事。竊照臺灣近來屢有匪徒滋事，奴才時刻留心察查，不敢稍有懈忽。茲本年十二月初五日戌刻，訪聞得臺灣彰化縣屬又有匪徒聚集會黨，於十一月二十九日辰刻，攻打彰化縣城。至午刻，縣城被陷，文武官員不知生死之事。查臺灣不法民番，甫經兩次大加懲治，乃該匪等竟膽敢聚眾攻陷城池。其謀為不軌，四行無忌，烏合之眾，自必甚多，罪惡至此已極，殊堪痛恨。雖未准臺灣鎮、道等報到，未知虛實，急當預為查辦征剿。奴才一面委令提標右營遊擊邱維揚，先帶兵二百名渡臺，確查賊匪共有若干，為首者何人，作何起釁，四近村莊有無擾害，臺地文武曾否業已收復城池，首夥均行捕獲，如尚有散逃，協同追拿盡淨。一面飭令挑選提標五營員弁及備戰兵丁一千名，配足軍火、器械，封備商哨船只齊足。奴才冬間舊染風症，雖復時愈時發，現在心神氣力不能如常，但仰蒙聖主深恩，值海疆緊要事務，當即力疾星速親赴該地剿捕。所有廈門地方，札達督臣檄委金門鎮總兵羅英笈，就近前來彈壓照應。又慮賊匪聞拿竄逃內地，飛札撫臣、陸路提臣、藩臬兩司、興泉道及水師各鎮協營，並臺灣鎮、道，一體嚴飭營、縣在於各口岸要隘，堵緝盤拿。仍擬續調水陸官兵酌由鹿耳門、淡水南北兩路夾攻在案。現在派撥本標五營官兵，軍械船隻均點驗齊備，未據臺地報到事宜緊急救援。奴才於初十日帶領官兵登舟候風放洋飛渡之際（硃批：仍以調養為要，勿過勞），接據署北路淡水同知程峻、守備董得魁會稟稱，彰化縣匪犯林爽文等，結黨肆虐，擒捕未獲。十一月二十九日，彰邑大肚社番字寄淡屬大甲社通事據稱，本月二十七日夜，本縣俞在大墩地方拿匪被害。二十九早，彰城失陷，卑職等督同兵役，整齊槍炮，募集鄉勇社番，在於扼要〔處〕所，分頭堵禦，一面救援。第兵力單薄，道路隔絕，伏祈迅發大兵拯救。再，彰城失陷，被害文武官員若干，此時探聽維艱，未知的實，俟查確另稟。等情前來。查，奴才原擬淡水一路，已屬必須由此救援夾攻。省城直對淡水，際此北風當令，渡往甚易。除星飛咨行陸路提臣、水師、海壇、閩安、烽火各鎮、協、營，立就近省營分，續調官兵北路援剿。奴才直由鹿耳門、郡城南路進兵，會督夾攻。容俟在接實在情形具奏外，合將聞報彰化賊匪殺官陷城，及奴才辦理赴剿緣由，謹先恭摺由驛六百里奏聞，伏乞皇上睿鑒。謹奏。　乾隆五十一年十二月初十日　乾隆五十一年十二月二十七日奉硃批：已有旨了。欽此。【本文原收錄於軍錄】';
+    const rainChars = Array.from(RAIN_SOURCE);
+
+    let fontSize = 14;
+    let cols = 0;
+    let drops = [];
+    let offsets = [];
+    let cw = 0;
+    let ch = 0;
+
+    const sizeMatrix = () => {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const dpr = window.devicePixelRatio || 1;
+      cw = rect.width;
+      ch = rect.height;
+      canvas.width = Math.max(1, Math.round(cw * dpr));
+      canvas.height = Math.max(1, Math.round(ch * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      fontSize = Math.max(11, Math.round(cw / 24));
+      cols = Math.max(1, Math.floor(cw / fontSize));
+      drops = new Array(cols).fill(0).map(() => Math.random() * -30);
+      offsets = new Array(cols).fill(0).map(() => Math.floor(Math.random() * rainChars.length));
+      // 完全透明起手：不再鋪一層深色底，畫布本身沒有任何背景色，
+      // 直接看到頁面本身的底色（不是一片綠色／深色的「背景板」）。
+      ctx.clearRect(0, 0, cw, ch);
+    };
+
+    const drawMatrixFrame = () => {
+      if (!cw || !ch) return;
+      // 用 destination-out 把畫面整體「擦淡」一點，而不是疊一層深色——
+      // 疊色會讓透明度越疊越高，跑久了畫布會整片變深（等於又長出一塊背景）。
+      // 用擦除的方式，舊字會淡出，但畫布不會累積出實色背景。
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.fillStyle = 'rgba(0, 0, 0, .14)';
+      ctx.fillRect(0, 0, cw, ch);
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.font = fontSize + 'px "SF Mono", ui-monospace, Menlo, Consolas, monospace';
+      ctx.textBaseline = 'top';
+      for (let i = 0; i < cols; i++) {
+        const glyph = rainChars[offsets[i] % rainChars.length];
+        offsets[i] += 1;
+        const y = drops[i] * fontSize;
+        // 深色卡片背景，字元用較亮的綠色才看得清楚。
+        ctx.fillStyle = Math.random() < 0.045 ? 'rgba(214, 255, 230, .42)' : 'rgba(58, 209, 138, .3)';
+        ctx.fillText(glyph, i * fontSize, y);
+        if (y > ch && Math.random() > 0.975) drops[i] = 0;
+        drops[i] += 1;
+      }
+    };
+
+    if (reduceMotion) {
+      // 靜止畫面：文字雨畫一次靜態紋理、外圈示意跑到一半，不持續播放。
+      sizeMatrix();
+      for (let n = 0; n < 40; n += 1) drawMatrixFrame();
+      render(3 * STEP_MS + STEP_MS * 0.5);
+      return;
+    }
+
+    sizeMatrix();
+
+    let raf = null;
+    let visible = false;
+    let lastMatrixDraw = 0;
+    const start = performance.now();
+
+    const loop = (now) => {
+      render(now - start);
+      if (now - lastMatrixDraw > 55) {
+        drawMatrixFrame();
+        lastMatrixDraw = now;
+      }
+      if (visible) raf = requestAnimationFrame(loop);
+    };
+
+    if (typeof IntersectionObserver === 'function') {
+      new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          visible = entry.isIntersecting;
+          if (visible && raf === null) {
+            raf = requestAnimationFrame(loop);
+          } else if (!visible && raf !== null) {
+            cancelAnimationFrame(raf);
+            raf = null;
+          }
+        });
+      }, { threshold: .15 }).observe(square);
+    } else {
+      visible = true;
+      raf = requestAnimationFrame(loop);
+    }
+
+    if (typeof ResizeObserver === 'function') {
+      new ResizeObserver(() => sizeMatrix()).observe(canvas);
+    } else {
+      window.addEventListener('resize', sizeMatrix);
+    }
+  });
+};
+initPart3ChainRing();
+
 const initPart3ToolsChecklist = () => {
   document.querySelectorAll('[data-part3-tools-checklist]').forEach((workbench) => {
     const rows = [...workbench.querySelectorAll('[data-part3-tool-id]')];
@@ -1887,6 +2039,7 @@ const parseJsonScript = (host) => {
 
 const initAgenticScene = () => {
   document.querySelectorAll('[data-agentic-scene]').forEach((scene) => {
+    if (scene.matches('[data-agentic-skills-sequence]')) return;
     const sequences = [...scene.querySelectorAll('[data-agentic-sequence]')]
       .map((host) => ({ host, lines: parseJsonScript(host) }))
       .filter((item) => item.lines.length);
@@ -1968,6 +2121,7 @@ const typeAgenticCodexPhases = (thinkingPhase, thinkingHost, resultPhase, result
 const initAgenticCodexPhases = () => {
   document.querySelectorAll('[data-agentic-codex-phases]').forEach((body) => {
     const scene = body.closest('[data-agentic-scene]');
+    if (scene?.matches('[data-agentic-skills-sequence]')) return;
     const thinkingPhase = body.querySelector('[data-agentic-codex-thinking]');
     const thinkingHost = body.querySelector('[data-agentic-codex-thinking-sequence]');
     const resultPhase = body.querySelector('[data-agentic-codex-result]');
@@ -2009,12 +2163,109 @@ const initAgenticCodexPhases = () => {
 };
 initAgenticCodexPhases();
 
-// 運用 Agentic AI 使用 PaddleOCR：Codex 對話視窗。
+// 修改、建立 AI Skills：按「提示 → 思考 → VS Code Skill → Codex 輸出」順序播放。
+// 這個示範需要跨兩個視窗協調，因此不使用一般的並行逐字播放初始化器。
+const playAgenticLinesOnce = async (host, lines, {
+  charDelay = 18,
+  lineDelay = 300,
+  isCurrent = () => true
+} = {}) => {
+  host.innerHTML = '';
+  for (let i = 0; i < lines.length; i += 1) {
+    if (!isCurrent()) return false;
+    await revealAgenticLine(host, lines[i], charDelay);
+    if (!isCurrent()) return false;
+    if (i < lines.length - 1) await wait(lineDelay);
+  }
+  return true;
+};
+
+const initPart3AiSkillsSequence = () => {
+  document.querySelectorAll('[data-agentic-skills-sequence]').forEach((scene) => {
+    const promptBubble = scene.querySelector('[data-agentic-codex-prompt]');
+    const thinkingPhase = scene.querySelector('[data-agentic-codex-thinking]');
+    const thinkingHost = scene.querySelector('[data-agentic-codex-thinking-sequence]');
+    const resultPhase = scene.querySelector('[data-agentic-codex-result]');
+    const resultHost = scene.querySelector('[data-agentic-codex-result-lines]');
+    const vscodeHost = scene.querySelector('[data-agentic-vscode-code]');
+    const vscodeWindow = scene.querySelector('.agentic-window-vscode');
+    const codexWindow = scene.querySelector('.agentic-window-codex');
+    if (!promptBubble || !thinkingPhase || !thinkingHost || !resultPhase || !resultHost || !vscodeHost) return;
+
+    const promptText = promptBubble.textContent.trim();
+    const thinkingLines = parseJsonScript(thinkingHost);
+    const resultLines = parseJsonScript(resultHost);
+    const vscodeLines = parseJsonScript(vscodeHost);
+    if (!promptText || !thinkingLines.length || !resultLines.length || !vscodeLines.length) return;
+
+    const reset = () => {
+      promptBubble.textContent = '';
+      thinkingHost.innerHTML = '';
+      resultHost.innerHTML = '';
+      vscodeHost.innerHTML = '';
+      thinkingPhase.hidden = false;
+      resultPhase.hidden = true;
+      if (vscodeWindow) {
+        vscodeWindow.style.zIndex = '1';
+        vscodeWindow.classList.remove('is-agentic-front');
+      }
+      if (codexWindow) {
+        codexWindow.style.zIndex = '2';
+        codexWindow.classList.add('is-agentic-front');
+      }
+    };
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      promptBubble.textContent = promptText;
+      thinkingPhase.hidden = true;
+      resultPhase.hidden = false;
+      thinkingHost.innerHTML = thinkingLines.map((line) => `<span class="line">${line}</span>`).join('');
+      resultHost.innerHTML = resultLines.map((line) => `<span class="line">${line}</span>`).join('');
+      vscodeHost.innerHTML = vscodeLines.map((line) => `<span class="line">${line}</span>`).join('');
+      return;
+    }
+
+    let runToken = 0;
+    let running = false;
+    let hasPlayed = false;
+    const start = () => {
+      if (running || hasPlayed) return;
+      running = true;
+      hasPlayed = true;
+      scene.dataset.agenticSkillsPlayed = 'true';
+      const token = ++runToken;
+      const isCurrent = () => token === runToken;
+      reset();
+      (async () => {
+        await revealAgenticLine(promptBubble, promptText, 14);
+        if (!isCurrent()) return;
+        await playAgenticLinesOnce(thinkingHost, thinkingLines, { charDelay: 9, lineDelay: 300, isCurrent });
+        if (!isCurrent()) return;
+        thinkingPhase.hidden = true;
+        await playAgenticLinesOnce(vscodeHost, vscodeLines, { charDelay: 8, lineDelay: 110, isCurrent });
+        if (!isCurrent()) return;
+        resultPhase.hidden = false;
+        await playAgenticLinesOnce(resultHost, resultLines, { charDelay: 12, lineDelay: 260, isCurrent });
+        if (isCurrent()) running = false;
+      })();
+    };
+    if (typeof IntersectionObserver === 'function') {
+      new IntersectionObserver((entries) => {
+        entries.forEach((entry) => { if (entry.isIntersecting) start(); });
+      }, { threshold: .1 }).observe(scene);
+    } else {
+      start();
+    }
+  });
+};
+initPart3AiSkillsSequence();
+
+// 運用 Agentic AI 使用 PaddleOCR／修改 AI Skills：Codex 與工作視窗的前後層切換。
 // 保留標題列點擊行為，方便日後加入其他示範視窗時重用。
 const initPart3AgenticOcrWindows = () => {
   document.querySelectorAll('[data-agentic-window]').forEach((windowEl) => {
     windowEl.addEventListener('click', () => {
-      const scene = windowEl.closest('.agentic-scene-paddleocr');
+      const scene = windowEl.closest('.agentic-scene-paddleocr, .part3-ai-skills-scene');
       if (!scene) return;
       const target = windowEl.dataset.agenticWindow;
       scene.querySelectorAll('[data-agentic-window]').forEach((win) => {
@@ -3438,35 +3689,6 @@ applyMobileTryText();
 
 initPart3TryIt();
 
-/* ---------------------------------------------------------------------------
-   選用的 AI Model：手機版兩頁垂直模型卡
-   桌面版維持六欄比較表；手機版先顯示 Claude／GPT，再用第一張卡的箭頭
-   切換至 DeepSeek／Gemini。
-   --------------------------------------------------------------------------- */
-const initPart3ModelMobile = () => {
-  const table = document.querySelector('#part-3-model .part3-model-table');
-  if (!table) return;
-  const buttons = [...table.querySelectorAll('[data-model-mobile-next]')];
-  if (!buttons.length) return;
-  let page = 'primary';
-  const setPage = (next) => {
-    page = next;
-    table.dataset.mobilePage = page;
-    buttons.forEach((button) => {
-      const secondary = page === 'secondary';
-      button.textContent = secondary ? '←' : '→';
-      button.setAttribute('aria-label', secondary
-        ? '返回 Claude Opus 和 GPT（5.6）'
-        : '查看 DeepSeek Flash／Pro 和 Gemini Flash');
-    });
-  };
-  buttons.forEach((button) => button.addEventListener('click', () => {
-    setPage(page === 'primary' ? 'secondary' : 'primary');
-  }));
-  setPage(page);
-};
-initPart3ModelMobile();
-
 const activateFromLocation = () => {
   const hash = window.location.hash || '#cover';
   const tabName = panelForHash(hash);
@@ -3485,10 +3707,9 @@ activateFromLocation();
    - 分頁只保留「平台簡介」與「運用平台研究其他問題」可以點擊，其餘（主頁、
      平台介面、平台運作流程）維持看得見但不能點。
    - 一進入頁面就直接跳到第三部分「步驟二 · OCR 並結構化原始史料」。
-   - 只留步驟二・OCR並結構化原始史料完全開放；步驟二之前（適合的研究問題／
-     所需的工具與資源）從預覽中移除，「重用平台的基本流程」在所有版本保留，步驟三至五・運用AI
-     抽取資訊，以及步驟八之後（後續功能：LLM Wiki）的內容變淡、不能點擊，
-     並標示「尚在開發中」。
+   - 只留步驟二・OCR並結構化原始史料作為預覽的起始位置；步驟二之前（適合的
+     研究問題／所需的工具與資源）從預覽中移除，「重用平台的基本流程」在所有版本保留。
+     其餘第三部分內容維持原本的完整顯示，不再加上「尚在開發中」的淡化區塊。
    分享給老師的連結範例：storymap-example.html?preview=ocr */
 (() => {
   const params = new URLSearchParams(window.location.search);
@@ -3528,7 +3749,7 @@ activateFromLocation();
   });
 
   /* 步驟二之前的兩個小節不再在 OCR 預覽中佔據空間；
-     步驟三至五（#part-3-ai）與步驟八之後（#part-3-wiki）維持淡化鎖定。 */
+     Part 3 後續內容不加尚在開發中的淡化遮罩，保持正常顯示。 */
   const PREVIEW_HIDDEN_SECTION_IDS = [
     'part-3-research-questions', 'part-3-tools'
   ];
@@ -3536,19 +3757,6 @@ activateFromLocation();
     const el = document.getElementById(id);
     if (el) el.hidden = true;
   });
-  const LOCKED_SECTION_IDS = ['part-3-ai', 'part-3-wiki'];
-  LOCKED_SECTION_IDS.forEach((id) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.classList.add('is-preview-faded');
-    el.setAttribute('aria-hidden', 'true');
-    el.setAttribute('inert', ''); /* 連鍵盤 Tab 也跳過這個區塊；不支援的舊瀏覽器會忽略此屬性，不影響上面的視覺與滑鼠鎖定 */
-    const badge = document.createElement('div');
-    badge.className = 'preview-faded-badge';
-    badge.textContent = '此部分尚在開發中，暫未開放於此預覽';
-    el.prepend(badge);
-  });
-
   /* 不論網址原本帶什麼 hash，教師預覽一律直接跳到步驟二。 */
   setActiveTab('part-3', { updateHash: false, scrollTarget: '#part-3-ocr' });
 })();

@@ -381,12 +381,18 @@
      圖片下面多墊了一塊灰白色底板。要維持「圖片剛好貼合圖片區」就不能設上限。 */
 
   /* 05 研究成果：手機版把示範 GIF 縮小，讓它不要獨占一整段版面。
-     桌面版的 --visual-scale 不動，這裡只在窄螢幕覆寫成較小的比例；
-     要再調整就改 --intro-5-visual-scale（0.78 ≈ 佔內容寬度的 78%）。 */
+     桌面版的 --visual-scale 不動，這裡只在窄螢幕覆寫。
+     寬度改用「掙脫 .story-inner 內距、以視窗寬度定位」的作法（與
+     .part3-feature-explorer 相同技巧），因為要求的是「螢幕寬度的 97%」，
+     不是文字欄寬度的 97%；.story-inner 本身有左右內距，用容器的 100%
+     去乘只會量到內距以內那一小段，達不到「幾乎滿版」的效果。
+     要再調整就改 --intro-5-visual-scale（0.97 ＝ 佔螢幕寬度 97%）。 */
   #intro-1-5 .review-capture-frame {
-    width: calc(100% * var(--intro-5-visual-scale, .78));
+    width: calc(100vw * var(--intro-5-visual-scale, .97));
+    max-width: calc(100vw * var(--intro-5-visual-scale, .97));
     min-height: 0;
-    margin-inline: auto;
+    margin-left: calc(50% - (50vw * var(--intro-5-visual-scale, .97)));
+    margin-right: calc(50% - (50vw * var(--intro-5-visual-scale, .97)));
   }
   /* 圖縮小後，說明卡與圖之間原本為桌面留的空白也一併收窄 */
   #intro-1-5 .annotation-band {
@@ -421,6 +427,10 @@
   --source-panel-offset-y: 0px;
   --source-panel-source-space: clamp(122px, 19%, 184px);
   --source-panel-mobile-top-gap: 86px;
+
+  /* 消息來源標籤（左／右兩組）共用的欄寬，桌面與手機都讀這個變數，
+     手機版把兩組疊到右側時也用它算右側欄寬與位移，確保寬度一致。 */
+  --intro3-callout-w: clamp(76px, calc(18% - 6px), 148px);
 }
 
 /* 引言 03 的消息來源標籤：正常桌面版也沿用窄版的定位方式。
@@ -436,7 +446,7 @@
   bottom: 0;
   left: 0;
   display: block;
-  width: clamp(76px, calc(18% - 6px), 148px);
+  width: var(--intro3-callout-w);
   padding: 0;
 }
 #intro-1-3-a .source-callouts-right {
@@ -750,6 +760,17 @@
     min-height: 0;
     max-height: none;
   }
+  /* 畫廊型面板：拿掉外層 .acc-panel 自己的底色／邊框／陰影。
+     .photo-gallery 本身已經有一層底色與邊框，兩層疊在一起，加上外層的
+     陰影，會在圖片＋說明區與頁面背景之間多墊出一塊「背板」，看起來像
+     圖片外面又包了一層框。只在畫廊型的面板（有 .photo-gallery 子層）拿掉
+     外層樣式，通信關係／資訊流向那兩張文件面板不受影響。 */
+  #intro-1-3-a .acc-panel:has(> .photo-gallery),
+  #intro-1-6-a-source .acc-panel:has(> .photo-gallery) {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+  }
   /* 同上：不設高度上限，否則圖片會縮小、兩側露出底色，像多了一塊底板。 */
   #intro-1-3-a .source-flow-panel,
   #intro-1-3-a .source-flow-visual {
@@ -759,11 +780,15 @@
     margin-right: 0 !important;
   }
   #intro-1-3-a .source-flow-document {
-    width: min(78%, 760px) !important;
+    width: min(85%, 760px) !important;
     max-width: none !important;
     margin-right: auto !important;
     margin-left: auto !important;
+    margin-bottom: 20px !important;
   }
+  /* 硃113／硃119：恢復成原本的排法——文件面板置中，兩組來源標籤
+     各自站在左右兩側（沿用最上面 #intro-1-3-a .source-callouts /
+     .source-callouts-right 的定位，這裡不再覆寫）。 */
   /* 硃113／硃119：面板高度維持不變，只把它與前後卡片之間多餘的空隙收掉。
      這兩個面板本來就是「一直展開」的（不套用捲動展開動畫），因此原本
      為了動畫預留的上下間距在這裡只是白白拉長版面。負的上邊距讓面板貼近
@@ -888,7 +913,7 @@
        Part 3.5.3.1  Card 1: #part-3-ai-chain-card-1
        Part 3.5.3.2  Card 2: #part-3-ai-chain-card-2
        Part 3.5.3.3  Workflow: #part-3-ai-chain-chart
-     Part 3.5.4–3.5.5  AI Model and Google Cloud
+     Part 3.5.4  Google Cloud
    Part 3.6  後續功能：LLM Wiki
      Part 3.6.1  Stage bar: #part-3-wiki
      Part 3.6.2–3.6.4  Wiki intro, data, and analysis cards
@@ -1585,9 +1610,131 @@
   --part3-title-size: clamp(27px, 3.4vw, 46px);
   --part3-body-size: calc(16px * var(--font-scale));
   --part3-body-line-height: 1.9;
+  --part3-ai-skills-visual-width: 54%;
+  --part3-ai-skills-frame-height: clamp(680px, 48vw, 800px);
 }
 
-/* Part 3.5.3 — Section defaults: 執行 AI Skills 的方法 (#part-3-ai-chain) */
+/* Part 3.5.2.3 — 修改、建立 AI Skills：使用 Codex 對話建立每日事件分類 Skill
+   手動調整視窗：以下 base／窄版／手機三組變數分別控制 VS Code 與 Codex
+   的 left、top、width、height、標題字級及內容字級。 */
+#part-3-ai-skills .part3-ai-skills-layout {
+  display: grid;
+  grid-template-columns: minmax(0, calc(100% - var(--part3-ai-skills-visual-width) - var(--col-gap))) minmax(360px, var(--part3-ai-skills-visual-width));
+  align-items: start;
+  gap: var(--col-gap);
+}
+#part-3-ai-skills .part3-ai-skills-copy,
+#part-3-ai-skills .part3-ai-skills-visual {
+  min-width: 0;
+}
+#part-3-ai-skills .part3-ai-skills-copy .part3-two-card-grid {
+  grid-template-columns: 1fr;
+}
+#part-3-ai-skills .part3-ai-skills-frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: var(--part3-ai-skills-frame-height);
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  --visual-h: var(--part3-ai-skills-frame-height);
+  --agentic-vscode-left: 3%;
+  --agentic-vscode-top: 5%;
+  --agentic-vscode-width: 92%;
+  --agentic-vscode-height: 89%;
+  --agentic-vscode-font-size: 20px;
+  --agentic-vscode-title-size: 15px;
+  --agentic-codex-left: 20%;
+  --agentic-codex-top: 30%;
+  --agentic-codex-width: 92%%;
+  --agentic-codex-height: 76%;
+  --agentic-codex-font-size: 15px;
+  --agentic-codex-text-size: 20px;
+}
+#part-3-ai-skills .part3-ai-skills-frame > .agentic-scene {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+#part-3-ai-skills .part3-ai-skills-scene {
+  background: transparent;
+}
+#part-3-ai-skills .agentic-window-vscode .agentic-window-body {
+  line-height: 1.42;
+}
+#part-3-ai-skills .agentic-window-codex .agentic-window-body {
+  padding: 11px 14px;
+}
+#part-3-ai-skills .agentic-codex-user-row {
+  padding: 11px 14px 0;
+}
+#part-3-ai-skills .agentic-codex-user-bubble {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+#part-3-ai-skills .agentic-codex-thinking,
+#part-3-ai-skills .agentic-codex-result {
+  font-size: var(--agentic-codex-text-size);
+  line-height: 1.62;
+}
+#part-3-ai-skills .agentic-prose .line,
+#part-3-ai-skills .agentic-prose .meta-line {
+  margin-bottom: 8px;
+}
+#part-3-ai-skills .agentic-prose .final-item {
+  margin-bottom: 7px;
+}
+
+@media (max-width: 1040px) {
+  #part-3-ai-skills .part3-ai-skills-layout {
+    grid-template-columns: 1fr;
+  }
+  #part-3-ai-skills .part3-ai-skills-frame {
+    --part3-ai-skills-frame-height: clamp(620px, 96vw, 740px);
+    --agentic-vscode-left: 2%;
+    --agentic-vscode-top: 4%;
+    --agentic-vscode-width: 85%;
+    --agentic-vscode-height: 80%;
+    --agentic-vscode-font-size: 20px;
+    --agentic-vscode-title-size: 9px;
+    --agentic-codex-left: 20%;
+    --agentic-codex-top: 30%;
+    --agentic-codex-width: 80%;
+    --agentic-codex-height: 78%;
+    --agentic-codex-font-size: 20px;
+    --agentic-codex-text-size: 20px;
+  }
+}
+
+@media (max-width: 620px) {
+  #part-3-ai-skills .part3-ai-skills-frame {
+    --part3-ai-skills-frame-height: clamp(600px, 160vw, 720px);
+    --agentic-vscode-left: 2%;
+    --agentic-vscode-top: 4%;
+    --agentic-vscode-width: 85%;
+    --agentic-vscode-height: 80%;
+    --agentic-vscode-font-size: 20px;
+    --agentic-vscode-title-size: 9px;
+    --agentic-codex-left: 20%;
+    --agentic-codex-top: 30%;
+    --agentic-codex-width: 80%;
+    --agentic-codex-height: 78%;
+    --agentic-codex-font-size: 20px;
+    --agentic-codex-text-size: 20px;
+  }
+  #part-3-ai-skills .agentic-window-codex .agentic-window-body {
+    padding: 10px 12px;
+  }
+  #part-3-ai-skills .agentic-codex-user-row {
+    padding: 10px 12px 0;
+  }
+}
+
+/* Part 3.5.3 — Section defaults: 使用 AI Api／AI Chain 執行 Skills (#part-3-ai-chain) */
 #part-3-ai-chain {
   --part3-card-width: 100%;
   --part3-card-max-width: 74ch;
@@ -1597,71 +1744,160 @@
   --part3-title-size: clamp(27px, 3.4vw, 46px);
   --part3-body-size: calc(16px * var(--font-scale));
   --part3-body-line-height: 1.9;
-  --part3-flow-width: 100%;
-  --part3-flow-min-height: 0;
-  --part3-flow-padding: clamp(18px, 2.4vw, 32px);
-  --part3-flow-node-size: calc(15px * var(--font-scale));
+  --part3-chain-ring-visual-width: 40%;
 }
 
-#part-3-ai-chain .part3-flow-frame {
-  width: var(--part3-flow-width, 100%);
-  min-height: var(--part3-flow-min-height, 0);
-  padding: var(--part3-flow-padding, clamp(18px, 2.4vw, 32px));
+/* 左：兩張文字卡直向堆疊；右：環狀 AI Chain 視覺元素。版面比照
+   #part-3-ai-skills .part3-ai-skills-layout 的左文右圖寫法。 */
+#part-3-ai-chain .part3-chain-ring-layout {
+  display: grid;
+  grid-template-columns: minmax(0, calc(100% - var(--part3-chain-ring-visual-width) - var(--col-gap))) minmax(280px, var(--part3-chain-ring-visual-width));
+  align-items: start;
+  gap: var(--col-gap);
 }
-#part-3-ai-chain .part3-flow-frame .workflow-node {
-  font-size: var(--part3-flow-node-size, calc(15px * var(--font-scale)));
+#part-3-ai-chain .part3-chain-ring-copy,
+#part-3-ai-chain .part3-chain-ring-visual {
+  min-width: 0;
 }
-
-/* Part 3.5.4 — Single-card section: 選用的 AI Model (#part-3-model) */
-#part-3-model {
-  --part3-card-width: 100%;
-  --part3-card-max-width: 74ch;
-  --part3-card-height: auto;
-  --part3-card-min-height: 0;
-  --part3-card-padding: clamp(18px, 1.8vw, 26px);
-  --part3-title-size: clamp(27px, 3.4vw, 46px);
-  --part3-body-size: calc(16px * var(--font-scale));
-  --part3-body-line-height: 1.9;
+#part-3-ai-chain .part3-chain-ring-copy .part3-two-card-grid {
+  grid-template-columns: 1fr;
 }
 
-/* Part 3.5.4.1 — Model comparison table beneath the text card */
-#part-3-model .story-inner {
+/* ---- 環狀 AI Chain 視覺元素：七個步驟排成一圈的小圓形卡片，逐一填滿外圈
+   進度環，代表「一步做完才開始下一步」；第 7 步（輸出JSON）與第 1 步
+   （文書總結）之間刻意不畫連接線，圓圈下方留一個缺口（不再額外標註文字）。
+   背景是深色卡片＋Matrix 式文字雨，字元逐字取自硃25（林爽文事件相關奏摺）
+   原文，動畫邏輯在 storymap.js 的 initPart3ChainRing()。
+
+   手動調整位置／大小：--part3-chain-ring-max-width／-margin 這兩個變數
+   分別在桌面（本區塊）、窄版（≤1040px）、手機（≤620px）三處各自可覆寫；
+   桌面的整體寬度比例則由上面 #part-3-ai-chain 區塊的
+   --part3-chain-ring-visual-width 控制（右欄佔版面的百分比）。 ---- */
+#part-3-ai-chain .part3-chain-ring-visual {
+  --part3-chain-ring-max-width: none;
+  --part3-chain-ring-margin: 0;
+  position: relative;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: clamp(20px, 2.4vw, 34px);
-}
-#part-3-model-card {
-  align-self: center;
-}
-#part-3-model .part3-model-table-wrap {
+  gap: 10px;
   width: 100%;
-  margin-top: 0;
+  max-width: var(--part3-chain-ring-max-width);
+  margin: var(--part3-chain-ring-margin);
+  padding: clamp(16px, 1.8vw, 22px);
+  background: var(--ink);
+  border: 1px solid rgba(22, 61, 63, .22);
+  box-shadow: 0 10px 26px rgba(22, 61, 63, .14);
 }
-#part-3-model .part3-model-table {
-  min-width: 1180px;
-  font-size: calc(14px * var(--font-scale));
+#part-3-ai-chain .part3-chain-ring-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+  overflow: hidden;
 }
-#part-3-model .part3-model-table th,
-#part-3-model .part3-model-table td {
-  min-width: 150px;
+#part-3-ai-chain .part3-chain-ring-matrix {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
 }
-#part-3-model .part3-model-table th:first-child,
-#part-3-model .part3-model-table td:first-child {
-  min-width: 132px;
-  white-space: nowrap;
+#part-3-ai-chain .part3-chain-ring-svg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
-#part-3-model .part3-model-table th:nth-child(5),
-#part-3-model .part3-model-table td:nth-child(5),
-#part-3-model .part3-model-table th:nth-child(6),
-#part-3-model .part3-model-table td:nth-child(6) {
-  min-width: 136px;
+#part-3-ai-chain .part3-chain-ring-link {
+  fill: none;
+  stroke: rgba(247, 243, 234, .22);
+  stroke-width: 2.5;
+  stroke-linecap: round;
 }
-#part-3-model .part3-model-mobile-next {
-  display: none;
+#part-3-ai-chain .part3-chain-ring-link.is-active {
+  stroke: var(--yellow);
+  filter: drop-shadow(0 0 4px rgba(243, 201, 103, .55));
+}
+#part-3-ai-chain .part3-chain-ring-node {
+  --p: 0; /* 0–100，由 JS 每一格動畫更新，代表這一步「填滿」的進度 */
+  position: absolute;
+  z-index: 3;
+  transform: translate(-50%, -50%);
+  width: 22%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background: conic-gradient(var(--yellow) calc(var(--p) * 1%), rgba(255, 255, 255, .14) 0);
+  box-shadow: 0 0 0 3px rgba(22, 61, 63, .9);
+  transition: box-shadow .25s;
+}
+#part-3-ai-chain .part3-chain-ring-node-inner {
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  padding: 4%;
+  background: rgba(22, 61, 63, .92);
+  border: 1px solid rgba(247, 243, 234, .22);
+  transition: border-color .25s, background .25s;
+}
+#part-3-ai-chain .part3-chain-ring-node-inner span {
+  color: rgba(247, 243, 234, .88);
+  font: 700 calc(11px * var(--font-scale))/1.2 var(--sans);
+  text-align: center;
+  letter-spacing: .01em;
+}
+#part-3-ai-chain .part3-chain-ring-node.is-filled {
+  box-shadow: 0 0 0 3px rgba(22, 61, 63, .9), 0 0 12px rgba(243, 201, 103, .55);
+}
+#part-3-ai-chain .part3-chain-ring-node.is-filled .part3-chain-ring-node-inner {
+  border-color: var(--yellow);
+  background: rgba(27, 75, 77, .92);
+}
+#part-3-ai-chain .part3-chain-ring-node.is-filled .part3-chain-ring-node-inner span {
+  color: #fdf6e6;
+}
+#part-3-ai-chain .part3-chain-ring-status {
+  position: absolute;
+  z-index: 4;
+  right: 3%;
+  top: 3%;
+  padding: 2px 7px;
+  color: #12363a;
+  background: var(--yellow);
+  font: 800 calc(8px * var(--font-scale))/1.4 var(--sans);
+  letter-spacing: .04em;
+  border-radius: 2px;
+  opacity: 0;
+  transform: translateY(-2px);
+  transition: opacity .3s, transform .3s;
+  pointer-events: none;
+}
+#part-3-ai-chain .part3-chain-ring-status.is-shown {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-/* Part 3.5.5 — Single-card section: Google Cloud (#part-3-cloud) */
+@media (max-width: 1040px) {
+  #part-3-ai-chain .part3-chain-ring-layout {
+    grid-template-columns: 1fr;
+  }
+  #part-3-ai-chain .part3-chain-ring-visual {
+    --part3-chain-ring-max-width: 480px;
+    --part3-chain-ring-margin: 0 auto;
+  }
+}
+
+@media (max-width: 620px) {
+  #part-3-ai-chain .part3-chain-ring-visual {
+    --part3-chain-ring-max-width: 340px;
+  }
+}
+
+/* Part 3.5.4 — Single-card section: Google Cloud (#part-3-cloud) */
 #part-3-cloud {
   --part3-card-width: 100%;
   --part3-card-max-width: 74ch;
@@ -1993,7 +2229,6 @@
 /* Part 3.7.2 — Accent colours: AI sections */
 #part-3-ai-skills { --card-accent: #ad7a35; }
 #part-3-ai-chain { --card-accent: #c7543f; }
-#part-3-model,
 #part-3-cloud { --card-accent: #7e6a39; }
 
 /* Part 3.7.3 — Accent colours: LLM Wiki */
@@ -2327,110 +2562,6 @@
 }
 
 @media (max-width: 1040px) {
-  /* Part 3.5.4.2 — Mobile model cards: two vertical pages */
-  #part-3-model .part3-model-table-wrap {
-    overflow: visible;
-  }
-  #part-3-model .part3-model-table {
-    display: block;
-    width: 100%;
-    min-width: 0;
-    border: 0;
-    box-shadow: none;
-    background: transparent;
-  }
-  #part-3-model .part3-model-table thead {
-    display: none;
-  }
-  #part-3-model .part3-model-table tbody {
-    display: block;
-  }
-  #part-3-model .part3-model-table tr {
-    display: block;
-    margin: 0 0 16px;
-    padding: 0;
-    border: 1px solid rgba(22, 61, 63, .18);
-    border-radius: 14px;
-    background: #fff;
-    box-shadow: 0 8px 20px rgba(22, 61, 63, .08);
-    overflow: hidden;
-  }
-  #part-3-model .part3-model-table tr[data-mobile-model-page="secondary"] {
-    display: none;
-  }
-  #part-3-model .part3-model-table[data-mobile-page="secondary"] tr[data-mobile-model-page="primary"] {
-    display: none;
-  }
-  #part-3-model .part3-model-table[data-mobile-page="secondary"] tr[data-mobile-model-page="secondary"] {
-    display: block;
-  }
-  #part-3-model .part3-model-table td,
-  #part-3-model .part3-model-table td:first-child {
-    display: grid;
-    grid-template-columns: minmax(86px, 25%) minmax(0, 1fr);
-    gap: 12px;
-    align-items: start;
-    width: auto;
-    min-width: 0;
-    padding: 11px 14px;
-    border: 0;
-    border-bottom: 1px solid rgba(22, 61, 63, .1);
-    background: transparent;
-    color: var(--ink);
-    white-space: normal;
-  }
-  #part-3-model .part3-model-table td:last-child {
-    border-bottom: 0;
-  }
-  #part-3-model .part3-model-table td::before {
-    content: attr(data-label);
-    color: var(--muted);
-    font: 700 calc(12px * var(--font-scale)) / 1.45 var(--sans);
-    letter-spacing: .04em;
-  }
-  #part-3-model .part3-model-table td:first-child {
-    display: block;
-    padding: 14px;
-    color: var(--accent);
-    background: linear-gradient(135deg, rgba(196, 93, 56, .1), rgba(22, 61, 63, .035));
-    font: 700 calc(19px * var(--font-scale)) / 1.35 var(--sans);
-  }
-  #part-3-model .part3-model-table td:first-child::before {
-    display: block;
-    margin-bottom: 5px;
-  }
-  #part-3-model .part3-model-mobile-name {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-  }
-  #part-3-model .part3-model-mobile-next {
-    display: inline-flex;
-    flex: 0 0 auto;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 32px;
-    border: 1px solid rgba(196, 93, 56, .35);
-    border-radius: 999px;
-    color: var(--accent);
-    background: rgba(255, 255, 255, .72);
-    cursor: pointer;
-    font: 700 22px/1 var(--sans);
-    transition: background-color .18s, color .18s, transform .18s;
-  }
-  #part-3-model .part3-model-mobile-next:hover,
-  #part-3-model .part3-model-mobile-next:focus-visible {
-    color: #fff;
-    background: var(--accent);
-    outline: none;
-    transform: translateX(2px);
-  }
-  #part-3-model .part3-model-table td:not(:first-child) {
-    font-size: calc(14px * var(--font-scale));
-    line-height: 1.65;
-  }
 }
 
 /* =========================================================================

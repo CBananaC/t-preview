@@ -8,10 +8,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Serif+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="storymap.css?v=20260810-codex-try-folded-01">
-  <link rel="stylesheet" href="storymap-cards.css?v=20260810-codex-try-folded-01">
+  <link rel="stylesheet" href="storymap-cards.css?v=20260810-claude-chain-ring-03">
   <link rel="stylesheet" href="part-1-interface.css">
   <link rel="stylesheet" href="part-3-question-gallery.css">
-  <script src="storymap.js?v=20260810-codex-try-folded-01" defer></script>
+  <script src="storymap.js?v=20260810-claude-chain-ring-03" defer></script>
   <!-- 第一部分的介面複本：資料模組先載入，行為模組再依它組裝畫面。 -->
   <script src="part-1-interface-data.js" defer></script>
   <script src="part-1-interface.js" defer></script>
@@ -1842,42 +1842,120 @@
           </section>
 
           <section class="story surface-a" id="part-3-ai-skills" data-tab="part-3" data-nav="#part-3-ai-skills">
-            <div class="story-inner"><div class="part3-two-card-grid">
-              <article class="copybox blk" id="part-3-ai-skills-card-1"><div class="title-row"><span class="option-number">1</span><h2>修改、建立AI Skills</h2></div><div class="body"><p>完成資料整理後，研究者需要按照新的研究問題，修改或建立新的 Skills。例如，現時系統用於提取林爽文軍事行動的 Skills，可以根據新的研究主題，改為其他的事件類型，例如水災的情況、司法案件的調查進展等。</p></div></article>
-              <article class="copybox blk" id="part-3-ai-skills-card-2"><div class="title-row"><h2>建立新的 Skill 時，研究者應說明：</h2></div><div class="body"><p>- 這項 Skill 要回答哪一個研究問題；</p><p>- AI 需要從文本中提取哪些資訊；</p><p>- 每項結果需要保存哪些原文引文等。</p><p>研究者可以請 Agentic AI修改和建立指令，完成 Skill 後，應先用少量文書測試，檢查 AI 是否能按照要求提取合適的結果，再進行批次處理。</p></div></article>
+            <div class="story-inner"><div class="part3-ai-skills-layout">
+              <div class="part3-ai-skills-copy"><div class="part3-two-card-grid">
+                <article class="copybox blk" id="part-3-ai-skills-card-1"><div class="title-row"><span class="option-number">1</span><h2>修改、建立AI Skills</h2></div><div class="body"><p>完成資料整理後，研究者需要按照新的研究問題，修改或建立新的 Skills。例如，現時系統用於提取林爽文軍事行動的 Skills，可以根據新的研究主題，改為其他的事件類型，例如水災的情況、司法案件的調查進展等。</p></div></article>
+                <article class="copybox blk" id="part-3-ai-skills-card-2"><div class="title-row"><span class="option-number">2</span><h2>建立新的 Skill 時，研究者應說明：</h2></div><div class="body"><p>研究者可以按照以下問題，請 Agentic AI修改和建立指令：</p><p>- 這項 Skill 要回答哪一個研究問題；</p><p>- AI 需要從文本中提取哪些資訊；</p><p>- 每項結果需要保存哪些原文引文等。</p><p>完成 Skill 後，應先用少量文書測試，檢查 AI 是否能按照要求提取合適的結果，再進行批次處理。</p></div></article>
+              </div></div>
+              <div class="part3-ai-skills-visual">
+                <div class="part3-ai-skills-frame visual-frame" id="part-3-ai-skills-chart" role="group" aria-label="以 Codex 對話視窗建立乾隆帝起居注每日事件分類 Skill">
+                  <div class="agentic-scene part3-ai-skills-scene" data-agentic-scene data-agentic-skills-sequence>
+                    <div class="agentic-mac-window agentic-window-vscode" data-agentic-window="skills-editor" aria-label="Visual Studio Code 中的 Skill 草稿">
+                      <div class="agentic-mac-titlebar" data-agentic-bring-front="skills-editor"><span class="agentic-mac-dot red"></span><span class="agentic-mac-dot yellow"></span><span class="agentic-mac-dot green"></span><span class="agentic-window-title">Visual Studio Code — classify-qianlong-diary-events.md</span></div>
+                      <div class="agentic-vscode-shell">
+                        <div class="agentic-vscode-activitybar" aria-hidden="true"><span>▤</span><span>⌕</span><span>⑂</span><span>⊞</span><span>⚙</span></div>
+                        <div class="agentic-vscode-editor">
+                          <div class="agentic-vscode-tabs"><span class="agentic-vscode-tab">classify-qianlong-diary-events.md</span></div>
+                          <div class="agentic-window-body agentic-code agentic-vscode-code" data-agentic-vscode-code data-agentic-sequence data-agentic-char-delay="8" data-agentic-line-delay="180" data-agentic-hold-time="3200">
+                            <script type="application/json" data-agentic-lines>[
+                              "<span class='cmt'># classify-qianlong-diary-events.md</span>",
+                              "<span class='cmt'>## 任務</span>",
+                              "讀取起居注 OCR JSON，逐日處理原始文本。",
+                              "把每一天的文本分成互不重疊、按原文順序排列的事件。",
+                              "為每個事件加上固定的中文類型標籤。",
+                              "保留日期、頁碼、逐字引文與 OCR 不確定性。",
+                              "<span class='cmt'>## 輸入</span>",
+                              "輸入是起居注 OCR JSON；日期是主要的處理單位。",
+                              "不得刪除、改寫或重新排列原始文本。",
+                              "<span class='cmt'>## 分段規則</span>",
+                              "依事件內容與時間順序分段，不以固定字數切割。",
+                              "每段原文只能屬於一個事件，事件之間不得重疊。",
+                              "完整涵蓋當日文本，不遺漏任何逐字內容。",
+                              "不補造 OCR 沒有記錄的日期、頁碼、人名或事件。",
+                              "<span class='cmt'>## 固定分類</span>",
+                              "禮儀巡幸祭祀｜召見朝會筵宴｜上諭奏摺政務",
+                              "人事任免賞罰｜刑名司法懲處｜軍務邊疆臺灣",
+                              "賑恤財賦糧餉｜河工交通營建｜文教典籍科舉",
+                              "外藩朝貢外交｜賜食筵宴賞賚",
+                              "<span class='cmt'>## 輸出規則</span>",
+                              "輸出 JSON；每個事件都要保留日期、頁碼、逐字引文與類型。",
+                              "逐字引文必須直接取自輸入原文，不得摘要或潤飾。",
+                              "類型只能使用上述 11 個固定分類，不自行新增分類。",
+                              "<span class='cmt'>## 不確定性與覆核</span>",
+                              "保留 OCR 錯字與無法判讀處，標記待研究者確認。",
+                              "先以少量日期測試分段與分類，再進行批次處理。",
+                              "<span class='ok'>研究者確認事件邊界與引文後，才納入研究結果。</span>"
+                            ]</script>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="agentic-mac-window agentic-window-codex is-agentic-front" data-agentic-window="skills-codex">
+                      <div class="agentic-mac-titlebar"><span class="agentic-mac-dot red"></span><span class="agentic-mac-dot yellow"></span><span class="agentic-mac-dot green"></span><span class="agentic-window-title">Codex — Create Skill</span></div>
+                      <div class="agentic-codex-user-row"><div class="agentic-codex-user-bubble" data-agentic-codex-prompt>請為我撰寫一個 AI Skill。讓skill 輸入起居注 OCR JSON，並把每一天的文本劃分為互不重疊的事件，並為每個事件分類。輸出 JSON，當中把原文分割成多個事件，在每個事件前標示其類型。保留日期、頁碼及逐字引文。</div></div>
+                      <div class="agentic-window-body agentic-prose agentic-codex-body" data-agentic-codex-phases>
+                        <div class="agentic-codex-phase agentic-codex-thinking" data-agentic-codex-thinking>
+                          <div class="agentic-codex-status">Working…</div>
+                          <div class="agentic-codex-thinking-sequence" data-agentic-codex-thinking-sequence data-agentic-codex-char-delay="9" data-agentic-codex-line-delay="300">
+                            <script type="application/json" data-agentic-lines>[
+                              "<span class='meta-line'><span class='ic'>↳</span>整理每日文本的事件分段與分類規則</span>",
+                              "<span class='meta-line'><span class='ic'>↳</span>確認輸出保留日期、頁碼與逐字引文</span>",
+                              "<span class='line'>我會把每一天的原文分成互不重疊的事件，並為每個事件加上類型標籤。</span>",
+                              "<span class='line'>我會把這些規則整理成可重複使用的 Markdown Skill。</span>"
+                            ]</script>
+                          </div>
+                        </div>
+                        <div class="agentic-codex-phase agentic-codex-result" data-agentic-codex-result hidden>
+                          <div class="agentic-codex-result-lines" data-agentic-codex-result-lines>
+                            <script type="application/json" data-agentic-lines>[
+                              "<span class='final-lead'>已整理為 Skill 草稿：</span>",
+                              "<span class='final-item'><code>classify-qianlong-diary-events.md</code></span>",
+                              "<span class='final-label'>11 個固定分類</span>",
+                              "<span class='final-item'>禮儀巡幸祭祀 · 召見朝會筵宴 · 上諭奏摺政務</span>",
+                              "<span class='final-item'>人事任免賞罰 · 刑名司法懲處 · 軍務邊疆臺灣</span>",
+                              "<span class='final-item'>賑恤財賦糧餉 · 河工交通營建 · 文教典籍科舉</span>",
+                              "<span class='final-item'>外藩朝貢外交 · 賜食筵宴賞賚</span>"
+                            ]</script>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div></div>
           </section>
 
           <section class="story surface-b" id="part-3-ai-chain" data-tab="part-3" data-nav="#part-3-ai-chain">
             <div class="story-inner">
-              <div class="part3-two-card-grid">
-                <article class="copybox blk" id="part-3-ai-chain-card-1"><div class="title-row"><span class="option-number">2</span><h2>執行 AI Skills的方法</h2></div><div class="body"><p>完成修改或建立 AI Skills 後，研究者便可透過 AI API，在本機呼叫 AI Model，根據 AI Skills 的設定，批次分析大量結構化史料。</p></div></article>
-                <article class="copybox blk" id="part-3-ai-chain-card-2"><div class="body"><p>為減少重複操作，研究者可要求 Agentic AI 撰寫 Python代碼，將多個 AI Skills 串聯成自動化的分析流程 （Chain）。程式會逐份讀取結構化文書，依序執行各項 AI Skills，並自動將結果儲存至 JSON 檔案，直至完成所有史料的分析，</p></div></article>
-              </div>
-              <div class="part3-flow-frame part3-chain-frame" id="part-3-ai-chain-chart" role="group" aria-label="文書總結、分段 → 抽取事件及官員行動 → 追溯資訊來源 → 抽取上諭中皇帝對奏摺的回應 → 抽取後續官員的回應 → 輸出結構化 JSON">
-                <div class="body"><p>例如，研究者可以建立一條處理奏摺的 AI Chain：</p></div>
-                <div class="workflow-chain">
-                  <button type="button" class="workflow-node part3-chain-node" data-part3-chart-toggle="chain-1" aria-pressed="true">文書總結、分段</button><span class="workflow-link" aria-hidden="true"></span><button type="button" class="workflow-node part3-chain-node" data-part3-chart-toggle="chain-2" aria-pressed="false">抽取事件及官員行動</button><span class="workflow-link" aria-hidden="true"></span><button type="button" class="workflow-node part3-chain-node" data-part3-chart-toggle="chain-3" aria-pressed="false">追溯資訊來源</button><span class="workflow-link" aria-hidden="true"></span><button type="button" class="workflow-node part3-chain-node" data-part3-chart-toggle="chain-4" aria-pressed="false">抽取上諭中皇帝對奏摺的回應</button><span class="workflow-link" aria-hidden="true"></span><button type="button" class="workflow-node part3-chain-node" data-part3-chart-toggle="chain-5" aria-pressed="false">抽取後續官員的回應</button><span class="workflow-link" aria-hidden="true"></span><button type="button" class="workflow-node part3-chain-node" data-part3-chart-toggle="chain-6" aria-pressed="false">輸出結構化 JSON</button>
+              <div class="part3-chain-ring-layout">
+                <div class="part3-chain-ring-copy">
+                  <div class="part3-two-card-grid">
+                    <article class="copybox blk" id="part-3-ai-chain-card-1"><div class="title-row"><span class="option-number">3</span><h2>使用AI Api 執行Skills</h2></div><div class="body"><p>完成修改或建立 AI Skills 後，研究者便可透過 AI API，在本機呼叫 AI Model，根據 AI Skills 的設定，批次分析大量結構化史料。</p></div></article>
+                    <article class="copybox blk" id="part-3-ai-chain-card-2"><div class="title-row"><span class="option-number">4</span><h2>使用AI Chain 執行Skills</h2></div><div class="body"><p>為減少重複操作，研究者可要求 Agentic AI 撰寫 Python代碼，將多個 AI Skills 串聯成自動化的分析流程 （Chain）。程式會逐份讀取結構化文書，依序執行各項 AI Skills，並自動將結果儲存至 JSON 檔案，直至完成所有史料的分析，</p></div></article>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </section>
-
-          <section class="story surface-c" id="part-3-model" data-tab="part-3" data-nav="#part-3-model">
-            <div class="story-inner">
-              <article class="copybox blk" id="part-3-model-card"><div class="title-row"><span class="option-number">3</span><h2>選用的AI Model</h2></div><div class="body"><p>然而，由於 AI Skills 鏈（Chain）需要對每份史料逐步執行多項的分析，因此需要消耗大量 Token，提高了使用 API 的成本。因此，建議研究者選擇成本較低，但仍具備足夠分析能力的 AI Model，以兼顧研究成本和分析品質。</p><p>目前推薦 Gemini Flash 系列及 DeepSeek 的模型。兩者的 API 成本較低，亦能大致正確理解奏摺、上諭中的文言文，因此適合用來批次執行 AI Skills，分析大量文書。</p></div></article>
-              <div class="table-wrap part3-model-table-wrap">
-                <table class="method-table part3-model-table">
-                  <thead>
-                    <tr><th scope="col">AI 模型</th><th scope="col">優點</th><th scope="col">適合的工作</th><th scope="col">缺點</th><th scope="col">建議使用方法</th><th scope="col">是否推薦使用</th></tr>
-                  </thead>
-                  <tbody>
-                    <tr data-mobile-model-page="primary"><td data-label="AI 模型"><div class="part3-model-mobile-name"><span>Claude Opus</span><button type="button" class="part3-model-mobile-next" data-model-mobile-next aria-label="查看 DeepSeek Flash／Pro 和 Gemini Flash">→</button></div></td><td data-label="優點">推理能力最強</td><td data-label="適合的工作">複雜程式、系統設計、檢查和修正關鍵錯誤</td><td data-label="缺點">使用成本最高；可讓其他 AI 按照 Opus 的方案負責實作</td><td data-label="建議使用方法">App、CLI</td><td data-label="是否推薦使用">視乎經濟能力</td></tr>
-                    <tr data-mobile-model-page="primary"><td data-label="AI 模型"><div class="part3-model-mobile-name"><span>GPT（5.6）</span></div></td><td data-label="優點">推理能力僅次於 Opus，但成本遠遠低於 Opus</td><td data-label="適合的工作">大部分 Agentic AI 工作：程式設計和撰寫、一般文字工作和各種疑難雜症</td><td data-label="缺點">推理能力不及 Opus，處理速度亦可能較慢</td><td data-label="建議使用方法">App、CLI</td><td data-label="是否推薦使用">推薦使用</td></tr>
-                    <tr data-mobile-model-page="secondary"><td data-label="AI 模型"><div class="part3-model-mobile-name"><span>DeepSeek Flash／Pro</span><button type="button" class="part3-model-mobile-next" data-model-mobile-next aria-label="返回 Claude Opus 和 GPT（5.6）">←</button></div></td><td data-label="優點">成本較低，推理能力足以理解大部分奏摺文本</td><td data-label="適合的工作">按照 AI Skills 分析大量文本，抽取特定資訊</td><td data-label="缺點">未必適用於複雜推理</td><td data-label="建議使用方法">API</td><td data-label="是否推薦使用">必須使用</td></tr>
-                    <tr data-mobile-model-page="secondary"><td data-label="AI 模型"><div class="part3-model-mobile-name"><span>Gemini Flash</span></div></td><td data-label="優點">成本較低、處理速度較快，推理能力足以理解大部分奏摺文本</td><td data-label="適合的工作">按照 AI Skills 分析大量文本，抽取特定資訊</td><td data-label="缺點">未必適用於複雜推理</td><td data-label="建議使用方法">API</td><td data-label="是否推薦使用">必須使用</td></tr>
-                  </tbody>
-                </table>
+                <div class="part3-chain-ring-visual" data-part3-chain-ring role="group" aria-label="1 文書總結 → 2 抽取事件 → 3 抽取官員行動 → 4 追溯資訊來源 → 5 抽取皇帝回應 → 6 抽取官員後續回應 → 7 輸出JSON">
+                  <div class="part3-chain-ring-wrap">
+                    <canvas class="part3-chain-ring-matrix" data-part3-chain-ring-matrix aria-hidden="true"></canvas>
+                    <svg class="part3-chain-ring-svg" viewBox="0 0 400 400" aria-hidden="true">
+                      <path class="part3-chain-ring-link" d="M139.26,326.14 A140,140 0 0,1 63.51,231.15" />
+                      <path class="part3-chain-ring-link" d="M63.51,231.15 A140,140 0 0,1 90.54,112.71" />
+                      <path class="part3-chain-ring-link" d="M90.54,112.71 A140,140 0 0,1 200,60" />
+                      <path class="part3-chain-ring-link" d="M200,60 A140,140 0 0,1 309.46,112.71" />
+                      <path class="part3-chain-ring-link" d="M309.46,112.71 A140,140 0 0,1 336.49,231.15" />
+                      <path class="part3-chain-ring-link" d="M336.49,231.15 A140,140 0 0,1 260.74,326.14" />
+                    </svg>
+                    <div class="part3-chain-ring-node" style="left:34.815%; top:81.535%;" aria-hidden="true"><div class="part3-chain-ring-node-inner"><span>文書總結</span></div></div>
+                    <div class="part3-chain-ring-node" style="left:15.877%; top:57.788%;" aria-hidden="true"><div class="part3-chain-ring-node-inner"><span>抽取事件</span></div></div>
+                    <div class="part3-chain-ring-node" style="left:22.635%; top:28.177%;" aria-hidden="true"><div class="part3-chain-ring-node-inner"><span>抽取官員行動</span></div></div>
+                    <div class="part3-chain-ring-node" style="left:50%; top:15%;" aria-hidden="true"><div class="part3-chain-ring-node-inner"><span>追溯資訊來源</span></div></div>
+                    <div class="part3-chain-ring-node" style="left:77.365%; top:28.177%;" aria-hidden="true"><div class="part3-chain-ring-node-inner"><span>抽取皇帝回應</span></div></div>
+                    <div class="part3-chain-ring-node" style="left:84.123%; top:57.788%;" aria-hidden="true"><div class="part3-chain-ring-node-inner"><span>抽取官員後續回應</span></div></div>
+                    <div class="part3-chain-ring-node" style="left:65.185%; top:81.535%;" aria-hidden="true"><div class="part3-chain-ring-node-inner"><span>輸出JSON</span></div></div>
+                    <span class="part3-chain-ring-status" data-part3-chain-ring-status>7 步完成</span>
+                  </div>
+                </div>
               </div>
             </div>
           </section>
@@ -1885,7 +1963,7 @@
           <section class="story surface-a" id="part-3-cloud" data-tab="part-3" data-nav="#part-3-cloud">
             <div class="story-inner">
               <div class="part3-cloud-layout">
-                <article class="copybox blk" id="part-3-cloud-card"><div class="title-row"><span class="option-number">4</span><h2>Google Cloud</h2></div><div class="body"><p>研究者可透過 Google Cloud 使用 Gemini Flash 及 DeepSeek 的 API，因為Google Cloud 為新用戶提供一定金額的免費額度（約港幣 2,000 元），足以應付大量的 AI Skills 批次分析工作。</p></div></article>
+                <article class="copybox blk" id="part-3-cloud-card"><div class="title-row"><span class="option-number">6</span><h2>Google Cloud</h2></div><div class="body"><p>研究者可透過 Google Cloud 使用 Gemini Flash 及 DeepSeek 的 API，因為Google Cloud 為新用戶提供一定金額的免費額度（約港幣 2,000 元），足以應付大量的 AI Skills 批次分析工作。</p></div></article>
                 <div class="part3-cloud-visual">
                   <div class="photo-gallery visual-frame part3-cloud-photo-gallery" data-photo-gallery data-photo-gallery-id="google-cloud">
                     <div class="photo-gallery-stage"></div>
