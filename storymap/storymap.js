@@ -416,8 +416,22 @@ const initResponsiveSequentialRows = () => {
         if (isFixedSourceRow(panel) || panel.classList.contains('is-scroll-open')) return;
         const rect = card.getBoundingClientRect();
         if (rect.top <= triggerLine) {
+          /* 展開高度改成量出來的實際高度，而不是沿用固定的面板高度變數。
+             面板在手機版已改為內容決定高度（圖片區依原圖比例收合留白），
+             若還用固定值當 max-height，內容較高時會被裁掉、較矮時則會有
+             一大段「空跑」的緩動，看起來像卡住。先暫時解除限制量測，
+             量完立刻還原，量測發生在同一個 frame 內，不會閃動。 */
+          const prevMax = panel.style.maxHeight;
+          panel.style.maxHeight = 'none';
+          const natural = panel.scrollHeight;
+          panel.style.maxHeight = prevMax;
+          if (natural) panel.style.setProperty('--panel-open-h', `${Math.ceil(natural)}px`);
           card.classList.add('is-scroll-open');
           panel.classList.add('is-scroll-open');
+          /* 動畫結束後解除 max-height 上限（改用 .is-scroll-done）。
+             否則之後圖片載入完成、字體換行改變等讓內容長高時，
+             會被當初量到的高度硬生生裁掉。 */
+          window.setTimeout(() => panel.classList.add('is-scroll-done'), 820);
         }
       });
     };
@@ -429,6 +443,8 @@ const initResponsiveSequentialRows = () => {
       rows.forEach(({ card, panel }) => {
         card.classList.remove('is-scroll-open');
         panel.classList.remove('is-scroll-open');
+        panel.classList.remove('is-scroll-done');
+        panel.style.removeProperty('--panel-open-h');
       });
       if (responsiveQuery.matches) requestRowUpdate();
     };
@@ -448,6 +464,118 @@ const initResponsiveSequentialRows = () => {
   });
 };
 initResponsiveSequentialRows();
+
+/* 手機／窄螢幕：引言各節的卡片與視覺元素捲進畫面時「浮現」一次
+   （淡入＋微微上移＋輕微放大），讓一張接一張的版面不會顯得呆板。
+   只在引言分頁、只在窄版套用；桌面版完全不加這個 class，版面不受影響。
+   使用者若在系統開啟「減少動態效果」，CSS 會直接讓元素維持最終狀態
+   （見 storymap.css 對應的 prefers-reduced-motion 規則）。 */
+const initIntroMobileReveal = () => {
+  const responsiveQuery = window.matchMedia('(pointer: coarse) and (hover: none), (max-width: 1040px)');
+  const introRoot = document.getElementById('intro-content');
+  if (!introRoot || typeof IntersectionObserver !== 'function') return;
+
+  /* 依「元素種類」給不同的出場方式，而不是全部用同一種淡入：
+       heading  節標題／編號列   —— 由左側滑入
+       text     卡片外的說明文字 —— 由下方升起
+       card     文字卡           —— 升起＋放大，幅度最大
+       inner    卡片內的段落     —— 由下方依序升起（延遲交給 --reveal-i）
+       visual   圖片＋說明面板   —— 放大浮現
+       table    表格             —— 由上往下展開
+       source   硃113／硃119面板 —— 像被點開一樣，由上往下裁切展開
+     每一類的實際動畫寫在 storymap.css 的「13 ·」區塊。 */
+  const GROUPS = [
+    ['card',    '.copybox, .acc-card, .story-card'],
+    /* .acc-panels 也帶著 .visual-frame，但它在手機版是 display:contents——
+       根本不產生方框，套 opacity／transform 完全無效，卻會因為「祖先已在名單」
+       而把裡面真正該動的畫廊與硃113／硃119面板全部擋掉。同理排除
+       .acc-visual／.acc-track 這兩個純版面外框。 */
+    ['visual',  '.photo-gallery, .gif-annotated, .visual-frame:not(.acc-panels):not(.acc-visual):not(.acc-track), .visual-frame-tall:not(.acc-panels), .visual-frame-wide:not(.acc-panels)'],
+    /* 只取外層的 .source-flow-panel：裡面的 .source-flow-visual 是它的子元素，
+       兩層都套動畫會互相疊加。 */
+    ['source',  '.source-flow-panel'],
+    ['heading', '.title-row, .eyebrow'],
+    ['text',    '.story-inner > .blk, .lay-stack > .blk, .annotation-label'],
+  ];
+
+  /* 絕對不要讓一個元素在「也會動的祖先」裡面再套一層自己的位移／縮放：
+     兩層 transform 會疊加，子元素看起來會脫離它的卡片。
+
+     注意：不能邊掃邊用 closest('.intro-reveal') 判斷——那只擋得住「祖先比
+     子孫早被標記」的情況。實際上 .title-row 屬於 heading、它的外層 .blk 屬於
+     text，而 text 排在後面才處理，於是兩個都被標記，標題往下移、外層又往下移，
+     標題就掉進下一張卡片裡（節標題被卡片蓋住就是這樣來的）。
+     因此改成兩段式：先收集所有候選，再把「祖先也在候選名單裡」的剔除，
+     這樣不論群組先後順序都不會出現巢狀動畫。 */
+  const candidates = new Map();
+  GROUPS.forEach(([kind, selector]) => {
+    introRoot.querySelectorAll(selector).forEach((el) => {
+      if (!candidates.has(el)) candidates.set(el, kind);   // 先列到的類別優先
+    });
+  });
+
+  const seen = new Set();
+  const targets = [];
+  candidates.forEach((kind, el) => {
+    for (let p = el.parentElement; p && p !== introRoot; p = p.parentElement) {
+      if (candidates.has(p)) return;        // 祖先也會動 → 交給 inner 交錯動畫
+    }
+    seen.add(el);
+    el.classList.add('intro-reveal');
+    el.dataset.revealKind = kind;
+    targets.push(el);
+  });
+  if (!targets.length) return;
+
+  /* 卡片內部的標題與段落：在卡片出現後依序跟上，形成「卡片打開 →
+     裡面的字一行行浮現」的節奏。
+     刻意不包含硃113／硃119面板與表格內部：那個面板的標籤氣泡和連接線
+     是 storymap.js 量出來的座標（refreshSourceFlowConnectors），
+     在裡面加位移會讓量到的位置全部跑掉，面板就整片顯示不出來。 */
+  introRoot.querySelectorAll('.copybox, .acc-card, .story-card, .story-inner > .blk, .lay-stack > .blk').forEach((holder) => {
+    if (holder.closest('.source-flow-panel')) return;
+    const inner = [...holder.querySelectorAll(':scope > .title-row, :scope > .body > p, :scope > .body > h3, :scope > .acc-body > p')];
+    inner.slice(0, 8).forEach((el, i) => {
+      if (seen.has(el)) return;
+      seen.add(el);
+      el.classList.add('intro-reveal-inner');
+      el.style.setProperty('--reveal-i', String(i));
+    });
+  });
+  const innerTargets = [...introRoot.querySelectorAll('.intro-reveal-inner')];
+
+  /* 進入畫面就播、離開就重設，因此上下捲動都會再看到一次效果。
+     rootMargin 底部收 -6%：元素要真的進到閱讀區才觸發，
+     而不是剛冒出螢幕邊緣就播完。 */
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!responsiveQuery.matches) return;
+      entry.target.classList.toggle('is-revealed', entry.isIntersecting);
+      /* 硃113／硃119面板的標籤氣泡與連接線是量出來的座標。文件本體是從
+         標題列往下「拉開」的（scaleY），拉開途中量到的位置全是中間值，
+         因此要等動作結束再算。分兩次算：文件拉開完成後一次，側邊標籤
+         全部出現後再一次，確保最後停在正確位置。 */
+      if (entry.isIntersecting && entry.target.dataset.revealKind === 'source') {
+        window.setTimeout(scheduleSourceFlowConnectorRefresh, 820);
+        window.setTimeout(scheduleSourceFlowConnectorRefresh, 1180);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -6% 0px' });
+
+  targets.forEach((el) => io.observe(el));
+  innerTargets.forEach((el) => io.observe(el));
+
+  /* 切換到桌面版時，把所有元素直接設為已顯示，避免留下半透明的殘影 */
+  const releaseAll = () => {
+    if (responsiveQuery.matches) return;
+    targets.forEach((el) => el.classList.add('is-revealed'));
+    innerTargets.forEach((el) => el.classList.add('is-revealed'));
+  };
+  if (responsiveQuery.addEventListener) responsiveQuery.addEventListener('change', releaseAll);
+  else responsiveQuery.addListener(releaseAll);
+  releaseAll();
+};
+initIntroMobileReveal();
 
 document.addEventListener('click', (event) => {
   if (!introDropdown.contains(event.target)) setIntroDropdownOpen(false);
@@ -614,14 +742,13 @@ document.querySelectorAll('[data-photo-gallery]').forEach((gallery) => {
   const updateMobileScrollExpansion = () => {
     scrollFrame = 0;
     if (!PHOTO_GALLERY_MOBILE_MQ.matches || !body.getClientRects().length) return;
-    const currentScrollY = window.scrollY;
-    const scrollingDown = currentScrollY >= previousScrollY;
-    const photoTop = stage.getBoundingClientRect().top;
-    const expandLine = window.innerHeight * PHOTO_GALLERY_EXPAND_RATIO;
-    const collapseLine = window.innerHeight * PHOTO_GALLERY_COLLAPSE_RATIO;
-    if (scrollingDown && photoTop <= expandLine) body.classList.add('is-expanded');
-    else if (!scrollingDown && photoTop >= collapseLine) body.classList.remove('is-expanded');
-    previousScrollY = currentScrollY;
+    /* 說明區在手機／窄螢幕一律跟著圖片顯示，不再依捲動方向收合。
+       原本「往下捲展開、往回捲收合」會讓說明區在捲動中忽隱忽現，
+       而且說明區收合時圖片區會跟著改變高度，整段版面上下跳動。
+       現在畫廊高度＝圖片（依原圖比例）＋說明區，說明區固定展開，
+       高度就不會隨捲動變化。 */
+    body.classList.add('is-expanded');
+    previousScrollY = window.scrollY;
   };
   const requestMobileScrollExpansion = () => {
     if (!PHOTO_GALLERY_MOBILE_MQ.matches) return;
@@ -633,7 +760,8 @@ document.querySelectorAll('[data-photo-gallery]').forEach((gallery) => {
     if (PHOTO_GALLERY_MOBILE_MQ.matches) updateMobileScrollExpansion();
   }, { passive: true });
   const resetMobileScrollExpansion = () => {
-    body.classList.remove('is-expanded');
+    // 切回桌面版才收合（桌面版靠滑鼠移入展開）；切到手機版則保持自動展開
+    if (!PHOTO_GALLERY_MOBILE_MQ.matches) body.classList.remove('is-expanded');
     previousScrollY = window.scrollY;
     if (PHOTO_GALLERY_MOBILE_MQ.matches) requestMobileScrollExpansion();
   };
@@ -651,6 +779,7 @@ document.querySelectorAll('[data-photo-gallery]').forEach((gallery) => {
   }
 
   stage.innerHTML = '';
+  const naturalDesktopGallery = Boolean(gallery.closest('#intro-1-1'));
   pages.forEach((page, i) => {
     const frame = document.createElement('div');
     frame.className = 'photo-gallery-frame' + (i === 0 ? ' is-active' : '');
@@ -675,6 +804,59 @@ document.querySelectorAll('[data-photo-gallery]').forEach((gallery) => {
     stage.appendChild(frame);
   });
   const frames = [...stage.querySelectorAll('.photo-gallery-frame')];
+  let index = 0;
+
+  /* 引言 01 的桌面畫廊不使用一個共用固定高度。每次切頁時，圖片區按
+     當前圖片的原始寬高比重算；因此直式圖、橫式圖和下一張圖片各自回到
+     自己的高度，不會沿用上一張圖片的框高。窄螢幕仍交由 responsive CSS
+     控制，保留原有的可讀版面。 */
+  /* 手機／窄螢幕也要「圖片區貼合圖片」：圖片用 object-fit: contain 時，
+     圖片會依比例縮到框內，框比圖片高就會在上下留出底色空白（letterbox）。
+     把圖片區的高度改成「目前這張圖依框寬換算出來的高度」，空白就消失了，
+     而圖片本身的顯示大小完全不變——因為 contain 的情況下限制它的是寬度，
+     高度只是多出來的空間。用 cover 的圖片本來就填滿、沒有空白，因此跳過，
+     否則反而會把刻意裁切的構圖改掉。 */
+  const galleryInAccPanel = Boolean(gallery.closest('.acc-panel'));
+  const usesContainFit = (image) => {
+    if (!image) return false;
+    return window.getComputedStyle(image).objectFit === 'contain';
+  };
+  const syncNaturalDesktopGallerySize = () => {
+    const mobile = PHOTO_GALLERY_MOBILE_MQ.matches;
+    /* 手機版：面板裡的畫廊，以及引言 01 的畫廊，都讓圖片區依「當前這張圖」
+       的原始比例決定高度——每張圖各自貼合自己的高度，換頁時框也跟著換，
+       不會沿用上一張的框高，圖片上下也不會留下底色空白。 */
+    const active = mobile ? (galleryInAccPanel || naturalDesktopGallery) : naturalDesktopGallery;
+    if (!active) {
+      stage.style.removeProperty('height');
+      stage.style.removeProperty('flex');
+      gallery.style.removeProperty('height');
+      return;
+    }
+    const image = frames[index]?.querySelector('img');
+    const stageWidth = stage.clientWidth;
+    if (!image || !image.naturalWidth || !image.naturalHeight || !stageWidth) return;
+    if (mobile && !usesContainFit(image)) {
+      stage.style.removeProperty('height');
+      stage.style.removeProperty('flex');
+      gallery.style.removeProperty('height');
+      return;
+    }
+    stage.style.flex = '0 0 auto';
+    stage.style.height = `${Math.round(stageWidth * image.naturalHeight / image.naturalWidth)}px`;
+    gallery.style.height = 'auto';
+  };
+  frames.forEach((frame) => frame.querySelector('img')?.addEventListener('load', syncNaturalDesktopGallerySize));
+  if ((naturalDesktopGallery || galleryInAccPanel) && 'ResizeObserver' in window) {
+    new ResizeObserver(syncNaturalDesktopGallerySize).observe(gallery);
+  }
+  if (naturalDesktopGallery || galleryInAccPanel) {
+    if (PHOTO_GALLERY_MOBILE_MQ.addEventListener) {
+      PHOTO_GALLERY_MOBILE_MQ.addEventListener('change', syncNaturalDesktopGallerySize);
+    } else {
+      PHOTO_GALLERY_MOBILE_MQ.addListener(syncNaturalDesktopGallerySize);
+    }
+  }
 
   if (pages.length > 1) {
     const prevBtn = document.createElement('button');
@@ -687,7 +869,6 @@ document.querySelectorAll('[data-photo-gallery]').forEach((gallery) => {
     counter.className = 'photo-gallery-counter';
     stage.append(prevBtn, nextBtn, counter);
 
-    let index = 0;
     const show = (next) => {
       index = (next + frames.length) % frames.length;
       frames.forEach((frame, i) => {
@@ -695,14 +876,19 @@ document.querySelectorAll('[data-photo-gallery]').forEach((gallery) => {
         frame.hidden = i !== index;
       });
       counter.textContent = `圖 ${index + 1} / ${frames.length}`;
-      /* A touch-expanded page must not leave its larger information area on
-         the next page.  Reset the transient state before rendering the new
-         page; a desktop hover can still expand it again naturally. */
-      body.classList.remove('is-expanded');
+      /* 桌面版：換頁時把展開狀態收回，避免上一頁被滑鼠展開的說明區
+         直接套用到下一頁；滑鼠再移入時自然會重新展開。
+         手機／窄螢幕：說明區改為「跟著圖片一起自動顯示」。原本這裡一律
+         收回展開狀態，而手機上的展開只由捲動位置觸發，所以只要用箭頭切到
+         第 2、3 張圖，說明區就再也不會出現（捲動位置根本沒變）——這正是
+         第 2、3 張圖看不到說明的原因。 */
+      if (PHOTO_GALLERY_MOBILE_MQ.matches) body.classList.add('is-expanded');
+      else body.classList.remove('is-expanded');
       body.scrollTop = 0;
       if (pages[index].bodyMaxHeight) body.style.setProperty('--gallery-body-max-h', pages[index].bodyMaxHeight);
       else body.style.removeProperty('--gallery-body-max-h');
       renderBody(pages[index]);
+      syncNaturalDesktopGallerySize();
     };
     prevBtn.addEventListener('click', () => show(index - 1));
     nextBtn.addEventListener('click', () => show(index + 1));
@@ -714,13 +900,24 @@ document.querySelectorAll('[data-photo-gallery]').forEach((gallery) => {
     show(0);
   } else {
     renderBody(pages[0]);
+    /* 只有一張圖的畫廊（例如《欽定剿平三省邪匪方略》封面）不會經過
+       show()，因此在這裡補上同樣的手機版自動展開。 */
+    if (PHOTO_GALLERY_MOBILE_MQ.matches) body.classList.add('is-expanded');
+    syncNaturalDesktopGallerySize();
   }
 
   function renderBody(page) {
     /* Keep each page's optional layout override independent.  This also
        makes a page with a short description return to its own area after a
-       previous page with a longer description was expanded. */
-    body.classList.remove('is-expanded');
+       previous page with a longer description was expanded.
+
+       手機／窄螢幕例外：說明區要跟著圖片自動顯示。
+       這一行原本無條件收合，而且 renderBody() 是在 show() 之後才執行的，
+       所以先前在 show() 裡加上的 is-expanded 每次都被這裡清掉——這正是
+       第 2、3 張圖始終看不到說明區的真正原因。判斷寫在這裡，
+       所有呼叫端（換頁、單張圖）就一次到位。 */
+    if (PHOTO_GALLERY_MOBILE_MQ.matches) body.classList.add('is-expanded');
+    else body.classList.remove('is-expanded');
     body.scrollTop = 0;
     const paragraphs = (page.paragraphs || []).filter(Boolean);
     const hasDescription = paragraphs.length > 0;
@@ -2295,6 +2492,8 @@ const initPart3TryIt = () => {
 
   const imgEl = root.querySelector('[data-try-img]');
   const hlHost = root.querySelector('[data-try-hls]');
+  const tryFoldedHost = root.querySelector('[data-try-folded]');
+  const tryFoldStrip = root.querySelector('[data-try-fold-strip]');
   const indEl = root.querySelector('[data-try-ind]');
   const prevBtn = root.querySelector('[data-try-prev]');
   const nextBtn = root.querySelector('[data-try-next]');
@@ -2302,7 +2501,8 @@ const initPart3TryIt = () => {
   const stageHost = root.querySelector('[data-try-stage]');
   const scrollHost = root.querySelector('.part3-try-scroll');
   const guideHost = root.querySelector('[data-try-guide]');
-  const switchHost = document.querySelector('[data-part3-try-switch]');
+  const progressHost = root.querySelector('[data-try-progress]');
+  const switchHosts = [...document.querySelectorAll('[data-part3-try-switch]')];
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   let mode = 'printed';
@@ -2312,6 +2512,8 @@ const initPart3TryIt = () => {
   let pageIdx = 0;
   let compareRaw = '';
   let compareHasRun = false;
+  let tryFoldPair = 0;
+  let tryFoldFeatureKey = null;
   let typingTimer = null;
   const modeStates = Object.fromEntries(Object.keys(data).map((key) => [key, {
     phase: 1,
@@ -2364,24 +2566,116 @@ const initPart3TryIt = () => {
   };
   injectDefaults();
 
+  const useTryFoldedDesktop = () => mode === 'handwritten'
+    && tryFoldedHost && tryFoldStrip
+    && window.matchMedia('(min-width: 1041px)').matches;
+  const desktopPagesFor = (set) => set.desktopPages || set.pages || [];
+  const desktopPageFor = (feature) => Number.isFinite(feature && feature.desktopPage)
+    ? feature.desktopPage : (feature && feature.page) || 0;
+  const foldCountFor = (set, page, featureImage) => {
+    if (featureImage) return 3;
+    const counts = set.desktopFoldCounts || [];
+    return Number(counts[page]) === 3 ? 3 : 2;
+  };
+  const pairCountFor = (count) => count === 3 ? 2 : 1;
+  const isBlankFinalTryPage = (set, page, featureImage) => !featureImage
+    && desktopPagesFor(set).length > 1
+    && page === desktopPagesFor(set).length - 1;
+  const tryPairCountFor = (set, page, featureImage) => isBlankFinalTryPage(set, page, featureImage)
+    ? 1 : pairCountFor(foldCountFor(set, page, featureImage));
+
+  /* 試一試的手寫字圖片與 8 辨識手寫字共用同一種「風琴摺」視覺。
+     每一張 desktopPages 都保留自己的摺子；目前頁面的兩摺展開，其餘頁面
+     收成紙邊。這樣按左右箭頭時，舊頁會收起、新頁會展開，而不是整個
+     viewer 突然換圖。兩摺合成圖用 2 摺，三摺合成圖用右＋中／中＋左。 */
+  const renderTryFolded = (set, currentPage, featureSource, count, pair) => {
+    if (!tryFoldStrip) return;
+    const pages = desktopPagesFor(set);
+    const safeCount = count === 3 ? 3 : 2;
+    const blankFinal = isBlankFinalTryPage(set, currentPage, Boolean(featureSource));
+    const safePair = Math.max(0, Math.min(blankFinal ? 0 : pairCountFor(safeCount) - 1, pair));
+    const requiredPanels = pages.length * 3;
+    if (tryFoldStrip.children.length !== requiredPanels) {
+      tryFoldStrip.innerHTML = '';
+      pages.forEach((_, page) => {
+        [2, 1, 0].forEach((part) => {
+          const panel = document.createElement('div');
+          panel.className = 'part3-fx-panel';
+          panel.dataset.tryFoldPage = String(page);
+          panel.dataset.tryFoldPart = String(part);
+          panel.style.setProperty('--fold-aspect', '454 / 1000');
+          panel.title = '點擊放大檢視整張奏摺頁面';
+          panel.addEventListener('click', () => openTryGallery(panel));
+          tryFoldStrip.appendChild(panel);
+        });
+      });
+    }
+    const openParts = safeCount === 3
+      ? (safePair === 0 ? [2, 1] : [1, 0])
+      : [1, 0];
+    [...tryFoldStrip.children].forEach((panel) => {
+      const page = Number(panel.dataset.tryFoldPage);
+      const part = Number(panel.dataset.tryFoldPart);
+      const isCurrent = page === currentPage;
+      const pageCount = isCurrent && featureSource
+        ? 3 : foldCountFor(set, page, false);
+      const source = isCurrent && featureSource ? featureSource : `${set.assetDir || ''}${pages[page]}`;
+      const blankPanel = isCurrent && blankFinal && part === 1;
+      const unused = part >= pageCount || (blankFinal && part === 0);
+      const open = isCurrent && !unused && openParts.includes(part);
+      panel.classList.toggle('is-unused', unused);
+      panel.classList.toggle('is-open', open);
+      panel.classList.toggle('is-blank', blankPanel);
+      panel.style.setProperty('--src', unused || blankPanel ? 'none' : `url("${source}")`);
+      panel.style.setProperty('--try-fold-size', `${pageCount * 100}%`);
+      panel.style.setProperty('--posx', `${(part / (pageCount - 1)) * 100}%`);
+    });
+    tryFoldedHost.dataset.foldCount = String(safeCount);
+    tryFoldedHost.dataset.foldPair = String(safePair);
+  };
+
   /* ---------- 左半：史料與標示區 ----------
-     恢復成單純一頁一頁顯示：選到某個特徵時，直接把該頁圖片換成該特徵
-     的專屬標示圖（不摺、不裁切），沒有特徵時照 pageIdx 顯示原頁面。 */
+     桌面版手寫字使用與「辨識手寫字」相同的兩摺展開介面；手機版仍保留
+     原本的整張圖片抽屜，避免窄螢幕把三摺壓到無法閱讀。 */
   const renderDoc = (activeKey) => {
     const set = d();
     const feature = phase === 2 && activeKey ? set.features[activeKey] : null;
     const featureImage = feature && feature.image;
-    const visualFile = featureImage || set.pages[pageIdx];
+    const foldedDesktop = useTryFoldedDesktop();
+    const pages = foldedDesktop ? desktopPagesFor(set) : (set.pages || []);
+    const visualPage = feature
+      ? (foldedDesktop ? desktopPageFor(feature) : feature.page || 0)
+      : pageIdx;
+    const visualFile = featureImage || pages[visualPage];
     const assetDir = set.assetDir || '';
     imgEl.src = `${assetDir}${visualFile}`;
     imgEl.alt = featureImage ? `${feature.title || visualFile}示意圖` : '試一試史料頁面';
     imgEl.dataset.tryVisual = featureImage || `page${pageIdx + 1}`;
+    if (foldedDesktop) {
+      if (featureImage && tryFoldFeatureKey !== activeKey) {
+        tryFoldPair = Number.isFinite(feature.foldPair) ? feature.foldPair : 0;
+        tryFoldFeatureKey = activeKey;
+      } else if (!featureImage) {
+        tryFoldFeatureKey = null;
+        tryFoldPair = Math.min(tryFoldPair, tryPairCountFor(set, pageIdx, false) - 1);
+      }
+      renderTryFolded(set, visualPage, featureImage ? `${assetDir}${visualFile}` : null,
+        foldCountFor(set, visualPage, featureImage), tryFoldPair);
+      tryFoldedHost.hidden = false;
+    } else if (tryFoldedHost) {
+      tryFoldedHost.hidden = true;
+    }
     /* 只要正在顯示某個特徵的專屬圖片，一律用標題取代「頁X／Y」。 */
-    indEl.textContent = featureImage
-      ? (feature.title || visualFile.replace(/\.png$/i, ''))
-      : `頁 ${pageIdx + 1} / ${set.pages.length}`;
-    prevBtn.disabled = Boolean(featureImage) || pageIdx === 0;
-    nextBtn.disabled = Boolean(featureImage) || pageIdx === set.pages.length - 1;
+    const pairCount = foldedDesktop ? tryPairCountFor(set, visualPage, Boolean(featureImage)) : 1;
+    indEl.textContent = foldedDesktop
+      ? `頁 ${visualPage + 1} / ${pages.length}`
+      : (featureImage ? (feature.title || visualFile.replace(/\.png$/i, '')) : `頁 ${pageIdx + 1} / ${set.pages.length}`);
+    prevBtn.disabled = foldedDesktop
+      ? (featureImage ? tryFoldPair === 0 : tryFoldPair === 0 && pageIdx === 0)
+      : (Boolean(featureImage) || pageIdx === 0);
+    nextBtn.disabled = foldedDesktop
+      ? (featureImage ? tryFoldPair >= pairCount - 1 : tryFoldPair >= pairCount - 1 && pageIdx === pages.length - 1)
+      : (Boolean(featureImage) || pageIdx === set.pages.length - 1);
     hlHost.innerHTML = '';
     if (featureImage) return;
     Object.keys(set.features).forEach((key) => {
@@ -2433,7 +2727,8 @@ const initPart3TryIt = () => {
     const step = phase === 2 ? d().steps[cur] : null;
     if (step && step.feature) {
       const f = d().features[step.feature];
-      if (f && f.page !== pageIdx) pageIdx = f.page;
+      const targetPage = useTryFoldedDesktop() ? desktopPageFor(f) : f.page;
+      if (f && targetPage !== pageIdx) pageIdx = targetPage;
       renderDoc(step.feature);
     } else {
       renderDoc(null);
@@ -2491,9 +2786,7 @@ const initPart3TryIt = () => {
       const state = n < phase ? 'done' : n === phase ? 'current' : 'pending';
       return `<span class="part3-try-dot is-${state}" aria-hidden="true">${n}</span>`;
     }).join('');
-    /* 進度列已移除；模式切換固定在「11 試一試」標題旁，讓每一步的
-       史料／對話視窗取得完整高度。保留這個重繪函式，讓階段切換時不必
-       改動其他流程。 */
+    if (progressHost) progressHost.innerHTML = `<span class="cap">進度</span>${dots}`;
     todoHost.innerHTML = '';
   };
 
@@ -2982,11 +3275,41 @@ const initPart3TryIt = () => {
   /* ---------- 翻頁與模式切換 ---------- */
   prevBtn.addEventListener('click', () => {
     animateHandwrittenTurn(-1);
+    if (useTryFoldedDesktop()) {
+      const set = d();
+      const step = phase === 2 ? set.steps[cur] : null;
+      const feature = step && step.feature ? set.features[step.feature] : null;
+      const count = tryPairCountFor(set, feature ? desktopPageFor(feature) : pageIdx, Boolean(feature && feature.image));
+      if (feature && tryFoldPair > 0) tryFoldPair -= 1;
+      else if (!feature && tryFoldPair > 0) tryFoldPair -= 1;
+      else {
+        const pages = desktopPagesFor(set);
+        pageIdx = (pageIdx - 1 + pages.length) % pages.length;
+        tryFoldPair = tryPairCountFor(set, pageIdx, false) - 1;
+      }
+      syncDoc();
+      return;
+    }
     pageIdx = (pageIdx - 1 + d().pages.length) % d().pages.length;
     syncDoc();
   });
   nextBtn.addEventListener('click', () => {
     animateHandwrittenTurn(1);
+    if (useTryFoldedDesktop()) {
+      const set = d();
+      const step = phase === 2 ? set.steps[cur] : null;
+      const feature = step && step.feature ? set.features[step.feature] : null;
+      const count = tryPairCountFor(set, feature ? desktopPageFor(feature) : pageIdx, Boolean(feature && feature.image));
+      const pairCount = count;
+      if (tryFoldPair < pairCount - 1) tryFoldPair += 1;
+      else {
+        const pages = desktopPagesFor(set);
+        pageIdx = (pageIdx + 1) % pages.length;
+        tryFoldPair = 0;
+      }
+      syncDoc();
+      return;
+    }
     pageIdx = (pageIdx + 1) % d().pages.length;
     syncDoc();
   });
@@ -3007,7 +3330,7 @@ const initPart3TryIt = () => {
     else renderPhase3();
   };
 
-  if (switchHost) {
+  switchHosts.forEach((switchHost) => {
     switchHost.addEventListener('click', (e) => {
       const btn = e.target.closest('button');
       if (!btn || !data[btn.dataset.tryMode]) return;
@@ -3015,10 +3338,12 @@ const initPart3TryIt = () => {
       mode = btn.dataset.tryMode;
       restoreModeState();
       root.dataset.tryMode = mode;
-      [...switchHost.children].forEach((b) => b.classList.toggle('is-on', b === btn));
+      switchHosts.forEach((host) => {
+        [...host.children].forEach((b) => b.classList.toggle('is-on', b.dataset.tryMode === mode));
+      });
       renderCurrentPhase();
     });
-  }
+  });
 
   resetAll();
 };
@@ -3143,7 +3468,7 @@ activateFromLocation();
      平台介面、平台運作流程）維持看得見但不能點。
    - 一進入頁面就直接跳到第三部分「步驟二 · OCR 並結構化原始史料」。
    - 只留步驟二・OCR並結構化原始史料完全開放；步驟二之前（適合的研究問題／
-     所需的工具與資源／重用平台的基本流程）從預覽中移除，步驟三至五・運用AI
+     所需的工具與資源）從預覽中移除，「重用平台的基本流程」在所有版本保留，步驟三至五・運用AI
      抽取資訊，以及步驟八之後（後續功能：LLM Wiki）的內容變淡、不能點擊，
      並標示「尚在開發中」。
    分享給老師的連結範例：storymap-example.html?preview=ocr */
@@ -3184,10 +3509,10 @@ activateFromLocation();
     }
   });
 
-  /* 步驟二之前的三個小節不再在 OCR 預覽中佔據空間；
+  /* 步驟二之前的兩個小節不再在 OCR 預覽中佔據空間；
      步驟三至五（#part-3-ai）與步驟八之後（#part-3-wiki）維持淡化鎖定。 */
   const PREVIEW_HIDDEN_SECTION_IDS = [
-    'part-3-research-questions', 'part-3-tools', 'part-3-basic-flow'
+    'part-3-research-questions', 'part-3-tools'
   ];
   PREVIEW_HIDDEN_SECTION_IDS.forEach((id) => {
     const el = document.getElementById(id);

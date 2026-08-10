@@ -7,11 +7,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Serif+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="storymap.css?v=20260810-codex-header-02">
-  <link rel="stylesheet" href="storymap-cards.css?v=20260810-codex-header-02">
+  <link rel="stylesheet" href="storymap.css?v=20260810-codex-try-folded-01">
+  <link rel="stylesheet" href="storymap-cards.css?v=20260810-codex-try-folded-01">
   <link rel="stylesheet" href="part-1-interface.css">
   <link rel="stylesheet" href="part-3-question-gallery.css">
-  <script src="storymap.js?v=20260810-codex-header-02" defer></script>
+  <script src="storymap.js?v=20260810-codex-try-folded-01" defer></script>
   <!-- 第一部分的介面複本：資料模組先載入，行為模組再依它組裝畫面。 -->
   <script src="part-1-interface-data.js" defer></script>
   <script src="part-1-interface.js" defer></script>
@@ -150,7 +150,7 @@
                   </script>
                 </div>
               </div>
-              <article class="copybox blk" id="intro-1-2" data-intro-card data-tab="1.2" data-nav="#intro-1-2" style="margin-top: clamp(24px, 2.2vw, 40px);">
+              <article class="copybox blk" id="intro-1-2" data-intro-card data-tab="1.2" data-nav="#intro-1-2" style="margin-top: clamp(10px, 1vw, 18px);">
                 <div class="title-row"><span class="option-number">2</span><h2>清代奏折的研究價值</h2></div>
                 <div class="body">
                   <p>在清史研究中，奏摺、硃批和上諭都是極為重要的第一手史料，是中央與地方在政治決策過程中的原始通信記錄，有助研究者重構特定議題的決策過程。</p>
@@ -1625,6 +1625,9 @@
                         <img data-try-img alt="試一試史料頁面" loading="lazy" decoding="async">
                         <div data-try-hls></div>
                       </div>
+                      <div class="part3-try-folded" data-try-folded aria-hidden="true">
+                        <div class="part3-fx-strip" data-try-fold-strip></div>
+                      </div>
                     </div>
                     <div class="part3-fx-nav">
                       <button type="button" data-try-prev aria-label="上一頁">←</button>
@@ -1633,6 +1636,13 @@
                     </div>
                   </div>
                   <div class="part3-try-panel">
+                    <div class="part3-try-panel-topbar" data-try-topbar>
+                      <div class="part3-try-progress" data-try-progress aria-label="試一試進度"></div>
+                      <div class="part3-try-switch" data-part3-try-switch role="group" aria-label="切換印刷字或手寫字">
+                        <button type="button" data-try-mode="printed" class="is-on">印刷字</button>
+                        <button type="button" data-try-mode="handwritten">手寫字</button>
+                      </div>
+                    </div>
                     <div class="part3-try-scroll">
                       <div data-try-todo></div>
                       <div data-try-stage></div>
@@ -1732,13 +1742,15 @@
                       "href": "試一試/手寫字/為請酌籌加調官兵協力進剿事_手寫字.pdf",
                       "assetDir": "試一試/手寫字/",
                       "pages": ["page1.png", "page2.png", "page3.png"],
+                      "desktopPages": ["1b1a.png", "2a1c.png", "2c2b.png", "3c3b3a.png"],
+                      "desktopFoldCounts": [2, 2, 2, 3],
                       "features": {
-                        "column":   {"page": 0, "image": "直欄.png", "colour": "#cfe3d4", "box": {"left": "14%", "top": "12%", "width": "62%", "height": "70%"}},
-                        "author":   {"page": 0, "image": "作者.png", "colour": "#cfe0ef", "box": {"left": "68%", "top": "10%", "width": "20%", "height": "20%"}},
-                        "minor":    {"page": 0, "image": "臣字.png", "colour": "#f5e6bd", "box": {"left": "30%", "top": "40%", "width": "12%", "height": "14%"}},
-                        "rescript": {"page": 2, "image": "硃批.png", "colour": "#f0d6d0", "box": {"left": "20%", "top": "16%", "width": "26%", "height": "34%"}},
-                        "sendDate": {"page": 2, "image": "奏報日期.png", "colour": "#e3d4b8", "box": {"left": "60%", "top": "10%", "width": "22%", "height": "20%"}},
-                        "stamp":    {"page": 2, "image": "水印.png", "colour": "#ddd6ea", "box": {"left": "50%", "top": "60%", "width": "22%", "height": "22%"}}
+                        "column":   {"page": 0, "desktopPage": 0, "foldPair": 0, "image": "直欄.png", "colour": "#cfe3d4", "box": {"left": "14%", "top": "12%", "width": "62%", "height": "70%"}},
+                        "author":   {"page": 0, "desktopPage": 0, "foldPair": 0, "image": "作者.png", "colour": "#cfe0ef", "box": {"left": "68%", "top": "10%", "width": "20%", "height": "20%"}},
+                        "minor":    {"page": 0, "desktopPage": 0, "foldPair": 1, "image": "臣字.png", "colour": "#f5e6bd", "box": {"left": "30%", "top": "40%", "width": "12%", "height": "14%"}},
+                        "rescript": {"page": 2, "desktopPage": 3, "foldPair": 0, "image": "硃批.png", "colour": "#f0d6d0", "box": {"left": "20%", "top": "16%", "width": "26%", "height": "34%"}},
+                        "sendDate": {"page": 2, "desktopPage": 3, "foldPair": 0, "image": "奏報日期.png", "colour": "#e3d4b8", "box": {"left": "60%", "top": "10%", "width": "22%", "height": "20%"}},
+                        "stamp":    {"page": 2, "desktopPage": 3, "foldPair": 1, "image": "水印.png", "colour": "#ddd6ea", "box": {"left": "50%", "top": "60%", "width": "22%", "height": "22%"}}
                       },
                       "steps": [
                         {"kind": "advance", "k": "撰寫 Prompt",

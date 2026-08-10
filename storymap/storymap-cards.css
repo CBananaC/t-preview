@@ -294,14 +294,13 @@
 #intro-1-1 {
   --vis-w: 50%;
   --card-accent: #b66d48;
-  --visual-h: 900px;          /*畫廊固定高度，與文字欄相近 */
   --gallery-fit: contain;     /*整組畫廊預設：完整顯示（改 cover 則裁切填滿框） */
   --gallery-left: 50%;
   --gallery-top: 50%; /*整組畫廊預設對齊位置 */
 }
 
-/* 研究價值卡片與制度卡片之間保留額外上方留白 */
-#intro-1-2 { margin-top: clamp(24px, 2.2vw, 40px) !important; }
+/* 研究價值卡片與制度卡片之間只保留小段間距。 */
+#intro-1-2 { margin-top: clamp(10px, 1vw, 18px) !important; }
 
 /* 引言 01：桌面版把兩張文字卡放在左欄，原有三頁畫廊放在右欄。
    窄螢幕改為「卡片 1 → 原有畫廊 → 卡片 2」，三者保持獨立。 */
@@ -310,7 +309,8 @@
   grid-template-columns: minmax(0, 1fr) minmax(0, var(--vis-w, 50%));
   grid-template-rows: auto auto;
   align-items: start;
-  gap: var(--col-gap, clamp(22px, 4vw, 72px));
+  row-gap: clamp(10px, 1vw, 18px);
+  column-gap: var(--col-gap, clamp(22px, 4vw, 72px));
 }
 #intro-1-1 .intro-1-1-layout > #intro-1-1-card {
   grid-column: 1;
@@ -327,6 +327,18 @@
   grid-column: 1;
   grid-row: 2;
   margin-top: 0 !important;
+}
+
+/* 正常桌面版：畫廊外框和圖片區不設共用固定高度；storymap.js 會按目前
+   圖片的原始比例設定 stage 高度。窄螢幕則沿用下方 responsive 尺寸。 */
+@media (min-width: 1041px) {
+  #intro-1-1 .lay-visual .photo-gallery {
+    height: auto;
+    min-height: 0;
+  }
+  #intro-1-1 .lay-visual .photo-gallery-stage {
+    flex: 0 0 auto;
+  }
 }
 
 @media (pointer: coarse) and (hover: none), (max-width: 1040px) {
@@ -352,10 +364,33 @@
     order: 3;
     margin-top: 0 !important;
   }
+  /* 引言 01 的畫廊：高度改由內容決定＝圖片區（依當前這張圖的原始比例）
+     ＋說明區。原本是固定高度，說明區一展開就只能從圖片那邊「借」高度，
+     圖片因此被壓小——也就是說明區往上擠。改成 auto 之後，說明區展開是
+     把畫廊整體往下延伸，圖片大小完全不受影響。
+     圖片區的實際高度由 storymap.js 寫成行內樣式，所以這裡不能再鎖高度。 */
   #intro-1-1 .intro-1-1-layout > .lay-visual .photo-gallery {
     width: 100%;
-    height: min(70vh, 720px);
-    min-height: 360px;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+  }
+  /* 直式圖的安全上限，避免長圖在小螢幕上佔掉太多版面 */
+  #intro-1-1 .intro-1-1-layout > .lay-visual .photo-gallery .photo-gallery-stage {
+    max-height: min(70vh, 720px);
+  }
+
+  /* 05 研究成果：手機版把示範 GIF 縮小，讓它不要獨占一整段版面。
+     桌面版的 --visual-scale 不動，這裡只在窄螢幕覆寫成較小的比例；
+     要再調整就改 --intro-5-visual-scale（0.78 ≈ 佔內容寬度的 78%）。 */
+  #intro-1-5 .review-capture-frame {
+    width: calc(100% * var(--intro-5-visual-scale, .78));
+    min-height: 0;
+    margin-inline: auto;
+  }
+  /* 圖縮小後，說明卡與圖之間原本為桌面留的空白也一併收窄 */
+  #intro-1-5 .annotation-band {
+    margin-bottom: var(--intro-5-band-gap, clamp(8px, 1.6vh, 14px));
   }
 }
 
@@ -386,6 +421,34 @@
   --source-panel-offset-y: 0px;
   --source-panel-source-space: clamp(122px, 19%, 184px);
   --source-panel-mobile-top-gap: 86px;
+}
+
+/* 引言 03 的消息來源標籤：正常桌面版也沿用窄版的定位方式。
+   JS 會把每個標籤的 --source-bubble-top 對準文件內相應引文；原本的
+   正常版沒有讀取這個變數，所以標籤全部堆在視覺框頂端。 */
+#intro-1-3-a .source-flow-visual {
+  --source-panel-source-space: clamp(86px, 17%, 150px);
+}
+#intro-1-3-a .source-callouts {
+  position: absolute;
+  top: 0;
+  right: auto;
+  bottom: 0;
+  left: 0;
+  display: block;
+  width: clamp(76px, calc(18% - 6px), 148px);
+  padding: 0;
+}
+#intro-1-3-a .source-callouts-right {
+  right: 0;
+  left: auto;
+  margin-top: 0;
+}
+#intro-1-3-a .source-callout {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: var(--source-bubble-top, auto) !important;
 }
 
 /* 引言 03 的三張面板，可各自指定固定高度（不寫則沿用上面的 --visual-x）。
@@ -538,6 +601,19 @@
     --responsive-tall-panel-h: max(560px, calc(130svh - var(--bar-h) - 175px));
   }
 
+  /* 節標題（含其下的引言文字）與第一張卡片之間要留出明顯的呼吸空間，
+     否則標題、內文和卡片會擠成一團，看不出「這是標題、以下是內容」。
+     .blk 的行內 margin-bottom 是 var(--head-gap)，這裡用 !important 蓋過它。 */
+  #intro-1-3-a > .story-inner > .blk,
+  #intro-1-6-a-source > .story-inner > .blk {
+    margin-bottom: var(--intro-head-gap, clamp(26px, 5vh, 46px)) !important;
+  }
+  /* 標題列與它下面的說明文字也拉開一點 */
+  #intro-1-3-a > .story-inner > .blk .title-row,
+  #intro-1-6-a-source > .story-inner > .blk .title-row {
+    margin-bottom: var(--intro-title-gap, clamp(12px, 2.2vh, 20px));
+  }
+
   #intro-1-3-a .lay-acc,
   #intro-1-6-a-source .lay-acc {
     display: grid;
@@ -591,10 +667,15 @@
 
   #intro-1-3-a .acc-card[data-acc-card="difficulty-quantity"],
   #intro-1-6-a-source .acc-card[data-acc-card="case-background"] { order: 1; }
+  /* 放圖片畫廊的面板改為「內容決定高度」：storymap.js 會把圖片區的高度
+     設成目前這張圖依框寬換算的高度，圖片上下就不會再留下底色空白。
+     這裡必須放掉原本的固定高度（含 !important），否則畫廊被撐回固定高度，
+     空白依舊存在。--responsive-short-panel-h 改當成高度上限，避免直式圖
+     在小螢幕上長到誇張。 */
   #intro-1-3-a .acc-panel[data-acc-panel="difficulty-quantity"],
   #intro-1-6-a-source .acc-panel[data-acc-panel="case-background"] {
     order: 2;
-    height: var(--responsive-short-panel-h) !important;
+    height: auto !important;
   }
   #intro-1-3-a .acc-card[data-acc-card="difficulty-relations"],
   #intro-1-6-a-source .acc-card[data-acc-card="case-route"] { order: 3; }
@@ -612,40 +693,71 @@
   #intro-1-6-a-source .acc-card[data-acc-card="case-route"] { order: 3; }
   #intro-1-6-a-source .acc-panel[data-acc-panel="case-route"] {
     order: 4;
-    height: var(--responsive-short-panel-h) !important;
+    height: auto !important;
   }
   #intro-1-6-a-source .acc-card[data-acc-card="case-sources"] { order: 5; }
   #intro-1-6-a-source .acc-panel[data-acc-panel="case-sources"] {
     order: 6;
-    height: var(--responsive-short-panel-h) !important;
+    height: auto !important;
   }
 
-  /* 普通清單列先保留標題卡，捲到列的閱讀位置後再平滑伸展視覺框。
-     Part 3 的 02／03 硃113／硃119通信面板不收合。 */
+  /* 普通清單列先保留標題卡，捲到列的閱讀位置後再「彈開」視覺框：
+     高度展開的同時淡入、輕微上移並帶一點回彈的放大，比單純拉開高度
+     更有「打開」的感覺。Part 3 的 02／03 硃113／硃119通信面板不收合。
+
+     展開高度用 --panel-open-h（storymap.js 量出面板實際內容高度後寫入），
+     量不到時才退回原本的固定值。之所以要量：手機版的圖片區已改成依原圖
+     比例決定高度，面板內容高度不再固定，沿用固定值會裁掉較高的內容，
+     或在較矮的內容上留下一段「空跑」的緩動。 */
   #intro-1-3-a .acc-panel[data-acc-panel="difficulty-quantity"],
   #intro-1-6-a-source .acc-panel {
     max-height: 0;
     opacity: 0;
     overflow: hidden;
-    transform: translateY(-16px);
+    transform: translateY(-14px) scale(.96);
+    transform-origin: top center;
     transition: max-height .72s cubic-bezier(.22, .72, .24, 1),
-                opacity .28s ease,
-                transform .72s cubic-bezier(.22, .72, .24, 1);
+                opacity .3s ease,
+                transform .62s cubic-bezier(.2, .9, .3, 1.12);
     will-change: max-height, opacity, transform;
   }
   #intro-1-3-a .acc-panel[data-acc-panel="difficulty-quantity"].is-scroll-open,
   #intro-1-6-a-source .acc-panel.is-scroll-open {
-    max-height: var(--responsive-short-panel-h) !important;
+    max-height: var(--panel-open-h, var(--responsive-short-panel-h)) !important;
     opacity: 1;
     overflow: visible;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
+  }
+  /* 動畫跑完後解除高度上限：之後圖片載入完成或文字換行改變讓內容長高時，
+     才不會被當初量到的高度硬生生裁掉。 */
+  #intro-1-3-a .acc-panel[data-acc-panel="difficulty-quantity"].is-scroll-done,
+  #intro-1-6-a-source .acc-panel.is-scroll-done {
+    max-height: none !important;
+  }
+  /* 標題卡本身也跟著輕輕彈一下，和視覺框一起形成「這一列打開了」的節奏 */
+  #intro-1-3-a .acc-card,
+  #intro-1-6-a-source .acc-card {
+    transition: transform .5s cubic-bezier(.2, .9, .3, 1.12);
+  }
+  #intro-1-3-a .acc-card.is-scroll-open,
+  #intro-1-6-a-source .acc-card.is-scroll-open {
+    transform: translateY(0) scale(1);
   }
 
+  /* 畫廊本身也不再撐到面板高度：高度由「圖片區（依原圖比例）＋說明區」
+     相加決定，圖片才能剛好貼合它的框。圖片區的高度由 storymap.js 寫成
+     行內樣式，所以這裡不能再用 !important 把高度鎖回 100%。 */
   #intro-1-3-a .acc-panel > .photo-gallery,
   #intro-1-6-a-source .acc-panel > .photo-gallery {
     width: 100%;
-    height: 100% !important;
+    height: auto;
     min-height: 0;
+    max-height: none;
+  }
+  /* 直式圖片的安全上限：圖片區再高也不超過一個可讀的高度 */
+  #intro-1-3-a .acc-panel > .photo-gallery .photo-gallery-stage,
+  #intro-1-6-a-source .acc-panel > .photo-gallery .photo-gallery-stage {
+    max-height: var(--responsive-short-panel-h);
   }
   #intro-1-3-a .source-flow-panel,
   #intro-1-3-a .source-flow-visual {
@@ -660,35 +772,77 @@
     margin-right: auto !important;
     margin-left: auto !important;
   }
-  /* 硃113／硃119：兩側標籤維持在視覺框邊緣，文件視窗縮窄並置中，
-     讓標籤可以疊在文件上；窄螢幕也保留左右兩側的定位。 */
+  /* 硃113／硃119：面板高度維持不變，只把它與前後卡片之間多餘的空隙收掉。
+     這兩個面板本來就是「一直展開」的（不套用捲動展開動畫），因此原本
+     為了動畫預留的上下間距在這裡只是白白拉長版面。負的上邊距讓面板貼近
+     它自己的標題卡，讀起來是「這張卡＋它的示意圖」一組，而不是兩塊分離
+     的區塊；下邊距則收掉與下一張卡片之間的重複空隙。
+     數值走變數，方便日後單獨微調而不動到其他面板。 */
+  /* 通信關係複雜／資訊流向複雜這兩列：標題卡與它自己的硃113／硃119面板
+     要貼在一起讀成「一組」，因此把 .lay-acc 的列間距整個抵銷掉（負的上邊距），
+     面板下方也只留很小的間隔再接下一張卡片。 */
+  #intro-1-3-a .acc-panel[data-acc-panel="difficulty-relations"],
+  #intro-1-3-a .acc-panel[data-acc-panel="difficulty-network"] {
+    margin-top: var(--source-panel-gap-top, calc(-1 * clamp(16px, 2.8vh, 28px))) !important;
+    margin-bottom: var(--source-panel-gap-bottom, calc(-1 * clamp(10px, 2vh, 22px))) !important;
+  }
+  /* 面板內部：示意圖本身已經很高，內距再大就只是把整節推得更長 */
+  #intro-1-3-a .source-flow-panel {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+  /* 文件面板上方原本留給標籤氣泡的空間，在手機版收窄（氣泡改為疊在兩側，
+     不需要那麼多上緣留白）。 */
   #intro-1-3-a .source-flow-visual {
-    --source-panel-source-space: clamp(86px, 17%, 150px);
+    --source-flow-top-gap: var(--source-panel-margin-top, clamp(10px, 1.6vh, 20px));
+    padding-bottom: 0;
   }
-  #intro-1-3-a .source-callouts {
-    position: absolute;
-    top: 0;
-    right: auto;
-    bottom: 0;
-    left: 0;
-    display: block;
-    width: clamp(76px, calc(18% - 6px), 148px);
-    padding: 0;
+  /* 面板底部的空白：整個 .acc-panel 比裡面的文件高很多時，多出來的高度
+     就變成一段空蕩蕩的底色。讓文件填滿面板高度，空白自然消失。 */
+  #intro-1-3-a .acc-panel[data-acc-panel="difficulty-relations"] .source-flow-document,
+  #intro-1-3-a .acc-panel[data-acc-panel="difficulty-network"] .source-flow-document {
+    height: 100%;
+    max-height: none;
+    margin-bottom: 0;
   }
-  #intro-1-3-a .source-callouts-right {
-    right: 0;
-    left: auto;
-    margin-top: 0;
-  }
-  #intro-1-3-a .source-callout {
-    position: absolute;
-    left: 0;
-    width: 100%;
-    top: var(--source-bubble-top, auto) !important;
-  }
+  /* 硃113／硃119：窄螢幕沿用上方的左右定位，並收起標籤詳情。 */
   #intro-1-3-a .source-callout-detail {
     display: none !important;
   }
+}
+
+/* ---------------------------------------------------------------------------
+   引言各節的底色變化（手機／窄螢幕）
+   原本引言從頭到尾都是同一組米褐色（#f6f1e8／#efe8dc／#e8dfd1），只有深淺
+   差別，一路往下捲時每一節看起來都一樣。這裡替每一節換上「亮度接近、但色相
+   略有不同」的底色：仍然是溫潤的紙感，不會太深或太亮，只是在暖黃、灰綠、
+   淺陶、砂色、灰褐之間輪替，讓使用者感覺得出「換了一個部分」。
+
+   色票刻意維持同一個亮度區間；要改色只需改下面的變數，不必動選擇器。
+   僅在手機／窄螢幕套用，桌面版維持原本的 surface-a/b/c 配色。
+   --------------------------------------------------------------------------- */
+@media (pointer: coarse) and (hover: none), (max-width: 1040px) {
+  #intro-content {
+    --intro-bg-1: #f5f0e6;   /* 01 暖奶油（偏黃） */
+    --intro-bg-2: #e9e7dc;   /* 03 灰綠鼠尾草 */
+    --intro-bg-3: #f2ebe5;   /* 04 淺陶土（偏粉） */
+    --intro-bg-4: #e8eae4;   /* 05 冷調灰綠 */
+    --intro-bg-5: #f0ece0;   /* 06 砂色 */
+    --intro-bg-6: #ebe6e3;   /* 其餘 溫潤灰褐 */
+  }
+  /* 用 ID 指定，權重高於 .surface-a/b/c（0-1-0），不必加 !important */
+  #intro-content #intro-1-1 { background: var(--intro-bg-1); }
+  #intro-content #intro-1-3-a { background: var(--intro-bg-2); }
+  #intro-content #intro-1-4 { background: var(--intro-bg-3); }
+  #intro-content #intro-1-5 { background: var(--intro-bg-4); }
+  #intro-content #intro-1-6-a-source { background: var(--intro-bg-5); }
+  #intro-content #intro-1-3-a-source,
+  #intro-content #intro-1-3-b,
+  #intro-content #intro-1-3-b-source,
+  #intro-content #intro-1-3-c,
+  #intro-content #intro-1-6-b,
+  #intro-content #intro-1-6-b-source,
+  #intro-content #intro-1-6-c { background: var(--intro-bg-6); }
 }
 
 /* 編號方塊沿用各節的強調色作漸層底（一般不需修改） */
@@ -1891,7 +2045,7 @@
          --try-diff-h          第三步比對結果那一欄的高度
 
    二、字級（全部會再乘上網站的字級設定 --font-scale）
-         --try-switch-font-size   「11 試一試」標題旁的「印刷字／手寫字」切換鈕
+         --try-switch-font-size   「試一試」資訊面板頂端的「印刷字／手寫字」切換鈕
          --try-dot-size           進度圓點的直徑
          --try-dot-font-size      進度圓點裡數字的字級
          --try-rpg-font-size      底部引導對話框的內文
@@ -1977,20 +2131,150 @@
   /* 印刷字 PDF 的高度上限；左側 backdrop 會隨圖片內容收合。 */
   --try-pdf-max-h: calc(var(--try-explorer-h) - (2 * var(--try-doc-pad)) - 58px);
   --try-pdf-backdrop-h: calc(var(--try-pdf-max-h) + (2 * var(--try-doc-pad)) + 18px);
+  --try-pdf-display-h: 76%;
 }
 
-/* 試一試：淺灰色原件區填滿左欄，不在上方／下方留下透明白邊。
-   印刷字／手寫字模式切換固定在「11 試一試」標題旁。 */
+/* 試一試：淺灰色原件區填滿左欄，不在上方／下方留下透明白邊。 */
 #part-3-try-explorer .part3-try-doc {
   background-size: 100% 100%, 100% 100%;
 }
-#part-3-try-explorer .part3-try-progress {
-  justify-content: flex-start;
-}
-#part-3-try-explorer .part3-try-progress .part3-try-switch {
-  margin-left: auto;
-  flex: 0 0 auto;
-  white-space: nowrap;
+
+/* The folded strip is a desktop-only enhancement. Keep it out of the
+   narrow/mobile layout even if the page is resized after initialization. */
+#part-3-try-explorer .part3-try-folded { display: none !important; }
+
+/* Normal desktop mode: use the same floating-paper composition as the 7／8
+   visual—dark-green backdrop, centered paper stack, and no feature labels.
+   The mobile/narrow rules below intentionally keep their own drawer layout. */
+@media (min-width: 1041px) {
+  #part-3-try-card .part3-try-switch { display: none; }
+  #part-3-try-explorer .part3-try-panel-topbar { display: flex; }
+  #part-3-try-explorer .part3-try-doc {
+    height: 100%;
+    max-height: none;
+    align-self: stretch;
+    padding: 0;
+    gap: 18px;
+    background-color: #12363a;
+    background-image: radial-gradient(circle at 22% 18%, rgba(196, 93, 56, .14), transparent 42%),
+                      linear-gradient(150deg, #12363a 0%, #1c464a 55%, #315d58 100%);
+    background-size: 100% 100%, 100% 100%;
+  }
+  #part-3-try-explorer .part3-try-pagestack {
+    width: fit-content;
+    max-width: 100%;
+    height: var(--try-pdf-display-h, 76%);
+    max-height: var(--try-pdf-display-h, 76%);
+    flex: 0 1 auto;
+    min-height: 0;
+  }
+  #part-3-try-explorer .part3-try-pagestack::before,
+  #part-3-try-explorer .part3-try-pagestack::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--try-pdf-fill, #fffdf8);
+    border: 1px solid rgba(22, 61, 63, .14);
+    box-shadow: 0 6px 14px rgba(22, 61, 63, .12);
+  }
+  #part-3-try-explorer .part3-try-pagestack::before { transform: translate(10px, 10px) rotate(1deg); }
+  #part-3-try-explorer .part3-try-pagestack::after { transform: translate(5px, 5px) rotate(.5deg); }
+  #part-3-try-explorer .part3-fx-page {
+    width: fit-content;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+  }
+  #part-3-try-explorer .part3-fx-page img {
+    display: block;
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+  #part-3-try-explorer .part3-fx-nav { flex: 0 0 34px; margin-top: 0; }
+
+  /* The open pair is two vertical slices of a 2-part / 3-part scan. The
+     accordion's closed fold edges add a small amount of width, so the whole
+     paper stack uses the open-pair ratio plus that fold-edge allowance. */
+  #part-3-try-explorer[data-try-mode="handwritten"] .part3-try-pagestack {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1.012 / 1;
+    max-height: 100%;
+  }
+  #part-3-try-explorer[data-try-mode="handwritten"] .part3-try-pagestack::before,
+  #part-3-try-explorer[data-try-mode="handwritten"] .part3-try-pagestack::after {
+    display: none;
+  }
+  #part-3-try-explorer[data-try-mode="handwritten"] .part3-fx-page {
+    width: 100%;
+    height: 100%;
+  }
+  #part-3-try-explorer[data-try-mode="handwritten"] .part3-fx-page img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* Normal desktop handwritten Try It: use the same persistent accordion
+     strip as 8 辨識手寫字. The original img remains available for the mobile
+     drawer, where the folded strip is intentionally hidden. */
+  #part-3-try-explorer[data-try-mode="handwritten"] .part3-fx-page { display: none; }
+  #part-3-try-explorer[data-try-mode="handwritten"] .part3-try-folded {
+    position: relative;
+    z-index: 2;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+  }
+  #part-3-try-explorer[data-try-mode="handwritten"] [data-try-fold-strip] {
+    --fold-slivers: 60px;
+    --fold-h: 100%;
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    margin: 0;
+    overflow: hidden;
+    perspective: 900px;
+    perspective-origin: 70% 50%;
+  }
+  #part-3-try-explorer[data-try-mode="handwritten"] [data-try-fold-strip] .part3-fx-panel {
+    background-size: var(--try-fold-size, 300%) 100%;
+    background-repeat: no-repeat;
+  }
+  #part-3-try-explorer[data-try-mode="handwritten"] [data-try-fold-strip] .part3-fx-panel:not(.is-open) {
+    background-color: transparent;
+    background-image: none;
+    box-shadow: none;
+    opacity: 0;
+  }
+  #part-3-try-explorer[data-try-mode="handwritten"] [data-try-fold-strip] .part3-fx-panel:not(.is-open)::after {
+    opacity: 0;
+  }
+  #part-3-try-explorer[data-try-mode="handwritten"] [data-try-fold-strip] .part3-fx-panel.is-blank {
+    background-color: #f5f1e8;
+    background-image: none;
+    box-shadow: inset 0 0 0 1px rgba(112, 85, 48, .12);
+    opacity: 1;
+  }
+  #part-3-try-explorer[data-try-mode="handwritten"] [data-try-fold-strip] .part3-fx-panel.is-unused {
+    display: none;
+  }
 }
 
 /* ── 標示區：印刷字 ─────────────────────────────────────────────── */
