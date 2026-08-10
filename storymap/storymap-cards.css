@@ -375,10 +375,10 @@
     min-height: 0;
     max-height: none;
   }
-  /* 直式圖的安全上限，避免長圖在小螢幕上佔掉太多版面 */
-  #intro-1-1 .intro-1-1-layout > .lay-visual .photo-gallery .photo-gallery-stage {
-    max-height: min(70vh, 720px);
-  }
+  /* 注意：這裡刻意「不要」對圖片區設高度上限。
+     圖片區的高度是依原圖比例算出來的，一旦被上限截短，contain 的圖片就會
+     改由高度決定大小、寬度縮水，左右兩側於是露出圖片區的底色——看起來就像
+     圖片下面多墊了一塊灰白色底板。要維持「圖片剛好貼合圖片區」就不能設上限。 */
 
   /* 05 研究成果：手機版把示範 GIF 縮小，讓它不要獨占一整段版面。
      桌面版的 --visual-scale 不動，這裡只在窄螢幕覆寫成較小的比例；
@@ -734,15 +734,11 @@
   #intro-1-6-a-source .acc-panel.is-scroll-done {
     max-height: none !important;
   }
-  /* 標題卡本身也跟著輕輕彈一下，和視覺框一起形成「這一列打開了」的節奏 */
-  #intro-1-3-a .acc-card,
-  #intro-1-6-a-source .acc-card {
-    transition: transform .5s cubic-bezier(.2, .9, .3, 1.12);
-  }
-  #intro-1-3-a .acc-card.is-scroll-open,
-  #intro-1-6-a-source .acc-card.is-scroll-open {
-    transform: translateY(0) scale(1);
-  }
+  /* 註：這裡原本有一組 .acc-card 的 transform（配合 is-scroll-open 做回彈），
+     已移除。卡片的出場動畫現在統一由 storymap.css 的 .intro-reveal
+     [data-reveal-kind="card"] 負責（由上往下展開）。舊規則帶著 ID 前綴，
+     權重高於 .intro-reveal，留著會把展開效果直接蓋掉；而且 is-scroll-open
+     一旦加上就不會移除，卡片會被永久固定在展開後的狀態，捲動時不再重播。 */
 
   /* 畫廊本身也不再撐到面板高度：高度由「圖片區（依原圖比例）＋說明區」
      相加決定，圖片才能剛好貼合它的框。圖片區的高度由 storymap.js 寫成
@@ -754,11 +750,7 @@
     min-height: 0;
     max-height: none;
   }
-  /* 直式圖片的安全上限：圖片區再高也不超過一個可讀的高度 */
-  #intro-1-3-a .acc-panel > .photo-gallery .photo-gallery-stage,
-  #intro-1-6-a-source .acc-panel > .photo-gallery .photo-gallery-stage {
-    max-height: var(--responsive-short-panel-h);
-  }
+  /* 同上：不設高度上限，否則圖片會縮小、兩側露出底色，像多了一塊底板。 */
   #intro-1-3-a .source-flow-panel,
   #intro-1-3-a .source-flow-visual {
     width: 100% !important;

@@ -465,26 +465,27 @@ const initResponsiveSequentialRows = () => {
 };
 initResponsiveSequentialRows();
 
-/* 手機／窄螢幕：引言各節的卡片與視覺元素捲進畫面時「浮現」一次
-   （淡入＋微微上移＋輕微放大），讓一張接一張的版面不會顯得呆板。
-   只在引言分頁、只在窄版套用；桌面版完全不加這個 class，版面不受影響。
+/* 手機／窄螢幕：卡片與文字捲進畫面時播放出場效果，讓一張接一張的版面
+   不會顯得呆板。套用範圍有兩個分頁，且效果種類不同：
+     #intro-content   引言 —— 文字、卡片、視覺元素、硃113／硃119面板全套
+     #part-3-content  運用平台研究其他問題 —— 只有文字與卡片（原因見 PART3_GROUPS）
+   只在窄版套用；桌面版雖然也會被掛上 class，但相關樣式全寫在手機版的
+   媒體查詢裡，桌面版看不出任何差別。
    使用者若在系統開啟「減少動態效果」，CSS 會直接讓元素維持最終狀態
    （見 storymap.css 對應的 prefers-reduced-motion 規則）。 */
 const initIntroMobileReveal = () => {
   const responsiveQuery = window.matchMedia('(pointer: coarse) and (hover: none), (max-width: 1040px)');
-  const introRoot = document.getElementById('intro-content');
-  if (!introRoot || typeof IntersectionObserver !== 'function') return;
+  if (typeof IntersectionObserver !== 'function') return;
 
   /* 依「元素種類」給不同的出場方式，而不是全部用同一種淡入：
        heading  節標題／編號列   —— 由左側滑入
        text     卡片外的說明文字 —— 由下方升起
-       card     文字卡           —— 升起＋放大，幅度最大
-       inner    卡片內的段落     —— 由下方依序升起（延遲交給 --reveal-i）
+       card     文字卡           —— 由上緣往下拉開簾子，露出裡面的字
+       inner    區塊內的段落     —— 由下方依序升起（延遲交給 --reveal-i）
        visual   圖片＋說明面板   —— 放大浮現
-       table    表格             —— 由上往下展開
-       source   硃113／硃119面板 —— 像被點開一樣，由上往下裁切展開
+       source   硃113／硃119面板 —— 文件本體由上往下拉開
      每一類的實際動畫寫在 storymap.css 的「13 ·」區塊。 */
-  const GROUPS = [
+  const INTRO_GROUPS = [
     ['card',    '.copybox, .acc-card, .story-card'],
     /* .acc-panels 也帶著 .visual-frame，但它在手機版是 display:contents——
        根本不產生方框，套 opacity／transform 完全無效，卻會因為「祖先已在名單」
@@ -498,6 +499,26 @@ const initIntroMobileReveal = () => {
     ['text',    '.story-inner > .blk, .lay-stack > .blk, .annotation-label'],
   ];
 
+  /* 第三部分（運用平台研究其他問題）只套「文字」與「卡片」兩種效果，
+     刻意不碰視覺元素。原因：這一節的視覺元素是會互動的東西——版面特徵
+     探索器（7／8）、試一試（11）、Agentic AI 動畫場景、以及手機版由
+     JavaScript 動態插入的史料抽屜。抽屜是 position:fixed，只要它的任何一個
+     祖先套上 transform 或 clip-path，該祖先就會變成固定定位的包含塊，
+     抽屜會改用祖先當座標原點而不是視窗，整個彈出位置就會錯掉。
+     只選 .copybox／.blk 這類純文字區塊就完全避開這些元素
+     （已確認第三部分沒有任何 .blk 位在那些互動元件內）。 */
+  const PART3_GROUPS = [
+    ['card',    '.copybox'],
+    ['heading', '.title-row, .eyebrow'],
+    ['text',    '.blk:not(.copybox)'],
+  ];
+
+  const ROOTS = [
+    [document.getElementById('intro-content'), INTRO_GROUPS],
+    [document.getElementById('part-3-content'), PART3_GROUPS],
+  ].filter(([root]) => root);
+  if (!ROOTS.length) return;
+
   /* 絕對不要讓一個元素在「也會動的祖先」裡面再套一層自己的位移／縮放：
      兩層 transform 會疊加，子元素看起來會脫離它的卡片。
 
@@ -507,42 +528,48 @@ const initIntroMobileReveal = () => {
      標題就掉進下一張卡片裡（節標題被卡片蓋住就是這樣來的）。
      因此改成兩段式：先收集所有候選，再把「祖先也在候選名單裡」的剔除，
      這樣不論群組先後順序都不會出現巢狀動畫。 */
-  const candidates = new Map();
-  GROUPS.forEach(([kind, selector]) => {
-    introRoot.querySelectorAll(selector).forEach((el) => {
-      if (!candidates.has(el)) candidates.set(el, kind);   // 先列到的類別優先
-    });
-  });
-
-  const seen = new Set();
   const targets = [];
-  candidates.forEach((kind, el) => {
-    for (let p = el.parentElement; p && p !== introRoot; p = p.parentElement) {
-      if (candidates.has(p)) return;        // 祖先也會動 → 交給 inner 交錯動畫
-    }
-    seen.add(el);
-    el.classList.add('intro-reveal');
-    el.dataset.revealKind = kind;
-    targets.push(el);
+  const innerTargets = [];
+
+  ROOTS.forEach(([root, groups]) => {
+    const candidates = new Map();
+    groups.forEach(([kind, selector]) => {
+      root.querySelectorAll(selector).forEach((el) => {
+        if (!candidates.has(el)) candidates.set(el, kind);   // 先列到的類別優先
+      });
+    });
+
+    const seen = new Set();
+    candidates.forEach((kind, el) => {
+      for (let p = el.parentElement; p && p !== root; p = p.parentElement) {
+        if (candidates.has(p)) return;      // 祖先也會動 → 交給 inner 交錯動畫
+      }
+      seen.add(el);
+      el.classList.add('intro-reveal');
+      el.dataset.revealKind = kind;
+      targets.push(el);
+    });
+
+    /* 區塊內部的標題與段落：依序跟上，形成一行一行浮現的節奏。
+       只處理「不是卡片」的區塊。卡片本身是用簾子由上往下展開來露出內文的，
+       若裡面的字又各自淡入，簾子拉過去時會看到一片空白，
+       等於把「展開露出文字」的效果抵銷掉。
+       也刻意不包含硃113／硃119面板內部：那裡的標籤氣泡與連接線是量出來的
+       座標，加上位移會讓量到的位置全部跑掉。 */
+    root.querySelectorAll('.blk:not(.copybox), .story-inner > .blk, .lay-stack > .blk').forEach((holder) => {
+      if (holder.closest('.source-flow-panel')) return;
+      if (holder.classList.contains('copybox')) return;
+      const inner = [...holder.querySelectorAll(':scope > .title-row, :scope > .body > p, :scope > .body > h3, :scope > .acc-body > p')];
+      inner.slice(0, 8).forEach((el, i) => {
+        if (seen.has(el)) return;
+        seen.add(el);
+        el.classList.add('intro-reveal-inner');
+        el.style.setProperty('--reveal-i', String(i));
+        innerTargets.push(el);
+      });
+    });
   });
   if (!targets.length) return;
-
-  /* 卡片內部的標題與段落：在卡片出現後依序跟上，形成「卡片打開 →
-     裡面的字一行行浮現」的節奏。
-     刻意不包含硃113／硃119面板與表格內部：那個面板的標籤氣泡和連接線
-     是 storymap.js 量出來的座標（refreshSourceFlowConnectors），
-     在裡面加位移會讓量到的位置全部跑掉，面板就整片顯示不出來。 */
-  introRoot.querySelectorAll('.copybox, .acc-card, .story-card, .story-inner > .blk, .lay-stack > .blk').forEach((holder) => {
-    if (holder.closest('.source-flow-panel')) return;
-    const inner = [...holder.querySelectorAll(':scope > .title-row, :scope > .body > p, :scope > .body > h3, :scope > .acc-body > p')];
-    inner.slice(0, 8).forEach((el, i) => {
-      if (seen.has(el)) return;
-      seen.add(el);
-      el.classList.add('intro-reveal-inner');
-      el.style.setProperty('--reveal-i', String(i));
-    });
-  });
-  const innerTargets = [...introRoot.querySelectorAll('.intro-reveal-inner')];
 
   /* 進入畫面就播、離開就重設，因此上下捲動都會再看到一次效果。
      rootMargin 底部收 -6%：元素要真的進到閱讀區才觸發，
@@ -551,13 +578,13 @@ const initIntroMobileReveal = () => {
     entries.forEach((entry) => {
       if (!responsiveQuery.matches) return;
       entry.target.classList.toggle('is-revealed', entry.isIntersecting);
-      /* 硃113／硃119面板的標籤氣泡與連接線是量出來的座標。文件本體是從
-         標題列往下「拉開」的（scaleY），拉開途中量到的位置全是中間值，
-         因此要等動作結束再算。分兩次算：文件拉開完成後一次，側邊標籤
-         全部出現後再一次，確保最後停在正確位置。 */
+      /* 硃113／硃119面板的標籤氣泡與連接線是量出來的座標。
+         文件本體現在是用 clip-path 拉開的，過程中沒有任何東西移動，
+         座標從頭到尾都正確；這兩次重算只是保險——確保在文件完全露出、
+         以及側邊標籤全部出現之後，各再對位一次。 */
       if (entry.isIntersecting && entry.target.dataset.revealKind === 'source') {
-        window.setTimeout(scheduleSourceFlowConnectorRefresh, 820);
-        window.setTimeout(scheduleSourceFlowConnectorRefresh, 1180);
+        window.setTimeout(scheduleSourceFlowConnectorRefresh, 1300);   // 文件完全露出
+        window.setTimeout(scheduleSourceFlowConnectorRefresh, 1750);   // 側邊標籤全部出現
       }
     });
   }, { threshold: 0.08, rootMargin: '0px 0px -6% 0px' });
@@ -876,14 +903,8 @@ document.querySelectorAll('[data-photo-gallery]').forEach((gallery) => {
         frame.hidden = i !== index;
       });
       counter.textContent = `圖 ${index + 1} / ${frames.length}`;
-      /* 桌面版：換頁時把展開狀態收回，避免上一頁被滑鼠展開的說明區
-         直接套用到下一頁；滑鼠再移入時自然會重新展開。
-         手機／窄螢幕：說明區改為「跟著圖片一起自動顯示」。原本這裡一律
-         收回展開狀態，而手機上的展開只由捲動位置觸發，所以只要用箭頭切到
-         第 2、3 張圖，說明區就再也不會出現（捲動位置根本沒變）——這正是
-         第 2、3 張圖看不到說明的原因。 */
-      if (PHOTO_GALLERY_MOBILE_MQ.matches) body.classList.add('is-expanded');
-      else body.classList.remove('is-expanded');
+      /* 展開狀態統一由 renderBody() 決定（桌面收合、手機自動展開），
+         這裡不要再各自處理，否則兩邊順序一亂就會互相覆蓋。 */
       body.scrollTop = 0;
       if (pages[index].bodyMaxHeight) body.style.setProperty('--gallery-body-max-h', pages[index].bodyMaxHeight);
       else body.style.removeProperty('--gallery-body-max-h');
@@ -900,9 +921,6 @@ document.querySelectorAll('[data-photo-gallery]').forEach((gallery) => {
     show(0);
   } else {
     renderBody(pages[0]);
-    /* 只有一張圖的畫廊（例如《欽定剿平三省邪匪方略》封面）不會經過
-       show()，因此在這裡補上同樣的手機版自動展開。 */
-    if (PHOTO_GALLERY_MOBILE_MQ.matches) body.classList.add('is-expanded');
     syncNaturalDesktopGallerySize();
   }
 
