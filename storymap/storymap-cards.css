@@ -1735,17 +1735,17 @@
 
 @media (max-width: 620px) {
   #part-3-ai-skills .part3-ai-skills-frame {
-    --part3-ai-skills-frame-height: clamp(600px, 160vw, 720px);
+    --part3-ai-skills-frame-height: clamp(700px, 190vw, 820px);
     --agentic-vscode-left: 2%;
-    --agentic-vscode-top: 4%;
-    --agentic-vscode-width: 90%;
-    --agentic-vscode-height: 80%;
-    --agentic-vscode-font-size: 20px;
+    --agentic-vscode-top: 3%;
+    --agentic-vscode-width: 94%;
+    --agentic-vscode-height: 84%;
+    --agentic-vscode-font-size: 15px;
     --agentic-vscode-title-size: 9px;
-    --agentic-codex-left: 20%;
-    --agentic-codex-top: 30%;
+    --agentic-codex-left: 8%;
+    --agentic-codex-top: 22%;
     --agentic-codex-width: 90%;
-    --agentic-codex-height: 78%;
+    --agentic-codex-height: 75%;
     --agentic-codex-font-size: 15px;
     --agentic-codex-text-size: 15px;
   }
