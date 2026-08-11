@@ -1915,12 +1915,15 @@
 #part-3-cloud .part3-cloud-layout {
   display: grid;
   grid-template-columns: minmax(0, calc(100% - var(--part3-cloud-gallery-width) - var(--col-gap))) minmax(280px, var(--part3-cloud-gallery-width));
-  align-items: stretch;
+  align-items: start;
   gap: var(--col-gap);
 }
 #part-3-cloud .part3-cloud-layout > .copybox {
-  width: 100%;
+  width: fit-content;
   max-width: none;
+  height: auto;
+  align-self: start;
+  justify-self: start;
 }
 #part-3-cloud .part3-cloud-visual {
   width: 100%;
