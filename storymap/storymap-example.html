@@ -1892,30 +1892,32 @@
                     </div>
                     <div class="agentic-mac-window agentic-window-codex is-agentic-front" data-agentic-window="skills-codex">
                       <div class="agentic-mac-titlebar"><span class="agentic-mac-dot red"></span><span class="agentic-mac-dot yellow"></span><span class="agentic-mac-dot green"></span><span class="agentic-window-title">Codex — Create Skill</span></div>
-                      <div class="agentic-codex-user-row"><div class="agentic-codex-user-bubble" data-agentic-codex-prompt>請為我撰寫一個 AI Skill。讓skill 輸入起居注 OCR JSON，並把每一天的文本劃分為互不重疊的事件，並為每個事件分類。輸出 JSON，當中把原文分割成多個事件，在每個事件前標示其類型。保留日期、頁碼及逐字引文。</div></div>
-                      <div class="agentic-window-body agentic-prose agentic-codex-body" data-agentic-codex-phases>
-                        <div class="agentic-codex-phase agentic-codex-thinking" data-agentic-codex-thinking>
-                          <div class="agentic-codex-status">Working…</div>
-                          <div class="agentic-codex-thinking-sequence" data-agentic-codex-thinking-sequence data-agentic-codex-char-delay="9" data-agentic-codex-line-delay="300">
-                            <script type="application/json" data-agentic-lines>[
-                              "<span class='meta-line'><span class='ic'>↳</span>整理每日文本的事件分段與分類規則</span>",
-                              "<span class='meta-line'><span class='ic'>↳</span>確認輸出保留日期、頁碼與逐字引文</span>",
-                              "<span class='line'>我會把每一天的原文分成互不重疊的事件，並為每個事件加上類型標籤。</span>",
-                              "<span class='line'>我會把這些規則整理成可重複使用的 Markdown Skill。</span>"
-                            ]</script>
+                      <div class="agentic-codex-scroll">
+                        <div class="agentic-codex-user-row"><div class="agentic-codex-user-bubble" data-agentic-codex-prompt>請為我撰寫一個 AI Skill。讓skill 輸入起居注 OCR JSON，並把每一天的文本劃分為互不重疊的事件，並為每個事件分類。輸出 JSON，當中把原文分割成多個事件，在每個事件前標示其類型。保留日期、頁碼及逐字引文。</div></div>
+                        <div class="agentic-window-body agentic-prose agentic-codex-body" data-agentic-codex-phases>
+                          <div class="agentic-codex-phase agentic-codex-thinking" data-agentic-codex-thinking>
+                            <div class="agentic-codex-status">Working…</div>
+                            <div class="agentic-codex-thinking-sequence" data-agentic-codex-thinking-sequence data-agentic-codex-char-delay="9" data-agentic-codex-line-delay="300">
+                              <script type="application/json" data-agentic-lines>[
+                                "<span class='meta-line'><span class='ic'>↳</span>整理每日文本的事件分段與分類規則</span>",
+                                "<span class='meta-line'><span class='ic'>↳</span>確認輸出保留日期、頁碼與逐字引文</span>",
+                                "<span class='line'>我會把每一天的原文分成互不重疊的事件，並為每個事件加上類型標籤。</span>",
+                                "<span class='line'>我會把這些規則整理成可重複使用的 Markdown Skill。</span>"
+                              ]</script>
+                            </div>
                           </div>
-                        </div>
-                        <div class="agentic-codex-phase agentic-codex-result" data-agentic-codex-result hidden>
-                          <div class="agentic-codex-result-lines" data-agentic-codex-result-lines>
-                            <script type="application/json" data-agentic-lines>[
-                              "<span class='final-lead'>已整理為 Skill 草稿：</span>",
-                              "<span class='final-item'><code>classify-qianlong-diary-events.md</code></span>",
-                              "<span class='final-label'>11 個固定分類</span>",
-                              "<span class='final-item'>禮儀巡幸祭祀 · 召見朝會筵宴 · 上諭奏摺政務</span>",
-                              "<span class='final-item'>人事任免賞罰 · 刑名司法懲處 · 軍務邊疆臺灣</span>",
-                              "<span class='final-item'>賑恤財賦糧餉 · 河工交通營建 · 文教典籍科舉</span>",
-                              "<span class='final-item'>外藩朝貢外交 · 賜食筵宴賞賚</span>"
-                            ]</script>
+                          <div class="agentic-codex-phase agentic-codex-result" data-agentic-codex-result hidden>
+                            <div class="agentic-codex-result-lines" data-agentic-codex-result-lines>
+                              <script type="application/json" data-agentic-lines>[
+                                "<span class='final-lead'>已整理為 Skill 草稿：</span>",
+                                "<span class='final-item'><code>classify-qianlong-diary-events.md</code></span>",
+                                "<span class='final-label'>11 個固定分類</span>",
+                                "<span class='final-item'>禮儀巡幸祭祀 · 召見朝會筵宴 · 上諭奏摺政務</span>",
+                                "<span class='final-item'>人事任免賞罰 · 刑名司法懲處 · 軍務邊疆臺灣</span>",
+                                "<span class='final-item'>賑恤財賦糧餉 · 河工交通營建 · 文教典籍科舉</span>",
+                                "<span class='final-item'>外藩朝貢外交 · 賜食筵宴賞賚</span>"
+                              ]</script>
+                            </div>
                           </div>
                         </div>
                       </div>

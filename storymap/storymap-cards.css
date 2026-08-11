@@ -1675,8 +1675,22 @@
 #part-3-ai-skills .agentic-window-vscode .agentic-window-body {
   line-height: 1.42;
 }
+#part-3-ai-skills .agentic-window-codex {
+  overflow: hidden;
+}
+#part-3-ai-skills .agentic-codex-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+#part-3-ai-skills .agentic-codex-scroll::-webkit-scrollbar { display: none; }
 #part-3-ai-skills .agentic-window-codex .agentic-window-body {
+  flex: none;
+  min-height: 0;
   padding: 11px 14px;
+  overflow: visible;
 }
 #part-3-ai-skills .agentic-codex-user-row {
   padding: 11px 14px 0;
