@@ -3866,6 +3866,28 @@ img { max-width: 100%; }
     width: calc(var(--z, 1) * 100%); height: auto;
   }
 
+  /* 7／8 展開後要顯示原件的完整可視範圍。原本的特徵圖定位變數與
+     桌面版 PDF 高度上限仍會套進抽屜，造成右側或下方被裁切；展開狀態
+     取消這些局部放大／高度限制，讓內容交給抽屜自己的捲動區。 */
+  #part-3-printed-explorer .mdrawer.is-full .part3-fx-pagestack,
+  #part-3-printed-explorer .mdrawer.is-full .part3-fx-page,
+  #part-3-printed-explorer .mdrawer.is-full .part3-fx-page img {
+    max-height: none !important;
+  }
+  #part-3-printed-explorer .mdrawer.is-full .part3-fx-page img {
+    transform: none !important;
+    width: 100%; height: auto; max-width: 100%;
+  }
+  #part-3-handwritten-explorer .mdrawer.is-full .part3-fx-striparea {
+    height: auto; min-height: 0; flex: 0 0 auto;
+  }
+  #part-3-handwritten-explorer .mdrawer.is-full .part3-fx-strip {
+    height: min(calc((var(--fold-w, 520px) - var(--fold-slivers, 60px)) / .921), 76svh);
+    max-height: none !important;
+    flex: 0 0 auto;
+    transform: none !important;
+  }
+
   /* 拖到最左／最右再繼續拖 → 換頁 */
   .mdrawer-edge {
     display: block; position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
