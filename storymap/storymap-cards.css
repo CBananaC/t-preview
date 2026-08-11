@@ -994,6 +994,15 @@
   --part3-stage-bar-padding: 28px 0;
 }
 
+/* Part 3.6.2 — 8 辨識手寫字：編號比其他步驟更克制，避免方框數字搶過標題。 */
+#part-3-handwritten-card .option-number {
+  font-size: clamp(13px, 1.35vw, 18px);
+}
+
+@media (pointer: coarse) and (hover: none), (max-width: 1040px) {
+  #part-3-handwritten-card .option-number { font-size: 13px; }
+}
+
 /* Part 3.1.1 — Section defaults: 適合的研究問題 (#part-3-research-questions) */
 #part-3-research-questions {
   --part3-card-width: 100%;
@@ -1186,8 +1195,8 @@
 
   --tile-json-font-size: 20px;        /* 批次階段 JSON 文字字級 */
   --tile-json-font-size-single: 20px; /* 單頁階段 JSON 文字字級 */
-  --count-font-size: 50px;             /* 批次階段「50頁」字級 */
-  --count-font-size-single: 50px;      /* 單頁階段「1頁」字級 */
+  --count-font-size: 22px;             /* 批次階段「50頁」字級 */
+  --count-font-size-single: 22px;      /* 單頁階段「1頁」字級 */
 
   --batch-grid-w: 74%;           /* 批次階段 2 欄格線的寬度（相對舞台內寬）。
                                      數字越小＝格子越小、下一列露出越多；

@@ -806,7 +806,7 @@ document.querySelectorAll('[data-photo-gallery]').forEach((gallery) => {
   }
 
   stage.innerHTML = '';
-  const naturalDesktopGallery = Boolean(gallery.closest('#intro-1-1'));
+  const naturalDesktopGallery = Boolean(gallery.closest('#intro-1-1, #part-3-cloud'));
   pages.forEach((page, i) => {
     const frame = document.createElement('div');
     frame.className = 'photo-gallery-frame' + (i === 0 ? ' is-active' : '');
@@ -833,10 +833,10 @@ document.querySelectorAll('[data-photo-gallery]').forEach((gallery) => {
   const frames = [...stage.querySelectorAll('.photo-gallery-frame')];
   let index = 0;
 
-  /* 引言 01 的桌面畫廊不使用一個共用固定高度。每次切頁時，圖片區按
-     當前圖片的原始寬高比重算；因此直式圖、橫式圖和下一張圖片各自回到
-     自己的高度，不會沿用上一張圖片的框高。窄螢幕仍交由 responsive CSS
-     控制，保留原有的可讀版面。 */
+  /* 引言 01 與 Google Cloud 的桌面畫廊不使用一個共用固定高度。每次切頁時，
+     圖片區按當前圖片的原始寬高比重算；因此直式圖、橫式圖和下一張圖片各自
+     回到自己的高度，不會沿用上一張圖片的框高。窄螢幕也讓圖片區貼合原圖，
+     保留原有的可讀版面。 */
   /* 手機／窄螢幕也要「圖片區貼合圖片」：圖片用 object-fit: contain 時，
      圖片會依比例縮到框內，框比圖片高就會在上下留出底色空白（letterbox）。
      把圖片區的高度改成「目前這張圖依框寬換算出來的高度」，空白就消失了，
@@ -1533,7 +1533,7 @@ const initPart3WikiVisual = () => {
     /* AI 回答：做成聊天回覆的口吻，分三個部分（各自留空隙）、帶項目符號，逐字打出。
        內容只使用資料庫中確實存在的欄位值：
        - 事件、日期、具奏人 → 取自 doc_id 硃25 的欄位
-       - 諭13 → 與硃25 同日、同收文人，依內容比對推斷（非 confirmed-pairs 已確認配對，
+       - 該上諭 → 與硃25 同日、同收文人，依內容比對推斷（非 confirmed-pairs 已確認配對，
          此不確定性完整記錄於 UI Idea/29-llm-wiki-network-animation-draft.html 的
          note-list／source-note，聊天回覆本文為求簡潔口語不逐句重複）
        - 二手研究引用 → 吳正龍 2018〈林爽文事件中的彰化戰役〉既有著錄
@@ -1550,8 +1550,8 @@ const initPart3WikiVisual = () => {
       ] },
       { gap: true, parts: [
         { t: '「' }, { t: '皇帝的回應', cite: true }, { t: '」：硃25 於十二月二十七日收悉，同日並以上諭' },
-        { t: '（諭13）', cite: true },
-        { t: ' 回應；諭13 提及黃仕簡帶兵渡臺一事，獎勉之餘並囑「仍加意調攝，勿過勞」，與硃25批語用意相呼應。' }
+        { t: '（諭閩浙總督常青等嚴行殲戮林爽文等並防餘衆四散內渡）', cite: true },
+        { t: ' 回應；上諭提及黃仕簡帶兵渡臺一事，獎勉之餘並囑「仍加意調攝，勿過勞」，與硃25批語用意相呼應。' }
       ] },
       { gap: true, parts: [
         { t: '另據已上載的' }, { t: '二手研究', cite: true }, { t: '：' },
@@ -2258,6 +2258,16 @@ initPart3FlowNavigation();
    --------------------------------------------------------------------------- */
 const wait = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
 
+// 逐字輸出有時放在可捲動視窗裡的內層 sequence；把最近的可捲動祖先
+// 一起推到底部，讓正在顯示的最新文字保持在視線內。
+const scrollAgenticHostToBottom = (host) => {
+  let current = host;
+  while (current && current !== document.body) {
+    if (current.scrollHeight > current.clientHeight) current.scrollTop = current.scrollHeight;
+    current = current.parentElement;
+  }
+};
+
 // 把一行（可能包含 <span class="..."> 這類語法標色標籤）逐字顯示出來。
 // 做法：先把整行內容放進 DOM（標籤結構都在），再把每個文字節點清空，
 // 之後照文件順序一個字一個字補回去，這樣顏色標籤不會被字元切斷。
@@ -2266,7 +2276,7 @@ const revealAgenticLine = (host, html, charDelay) => new Promise((resolve) => {
   lineEl.className = 'line';
   lineEl.innerHTML = html;
   host.appendChild(lineEl);
-  host.scrollTop = host.scrollHeight;
+  scrollAgenticHostToBottom(host);
 
   const walker = document.createTreeWalker(lineEl, NodeFilter.SHOW_TEXT);
   const textNodes = [];
@@ -2286,7 +2296,7 @@ const revealAgenticLine = (host, html, charDelay) => new Promise((resolve) => {
     entry.node.textContent += entry.full[charIndex];
     charIndex += 1;
     // 內容比顯示區長時，跟著游標往下捲動，讓正在打的那一行保持可見。
-    host.scrollTop = host.scrollHeight;
+    scrollAgenticHostToBottom(host);
     window.setTimeout(typeNextChar, charDelay);
   };
   typeNextChar();
@@ -2632,7 +2642,7 @@ const initOcrScanScene = () => {
       // 兩份文書的翻頁間隔稍微錯開，避免同時翻頁顯得太整齊、不自然。
       stopPages = pageImgs.map((img, i) => cycleOcrPage(img, pageSets[i], { interval: 3200 + i * 700 }));
       // body 欄位是全文；放慢逐字速度，讓研究者可以看清楚 JSON 的輸出過程。
-      stopOutput = typeAgenticSequence(outputHost, outputLines, { charDelay: 18, lineDelay: 220, holdTime: 3600, clearDelay: 500 });
+      stopOutput = typeAgenticSequence(outputHost, outputLines, { charDelay: 28, lineDelay: 340, holdTime: 3600, clearDelay: 500 });
     };
     const stop = () => {
       stopPages.forEach((fn) => fn());

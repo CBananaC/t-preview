@@ -4578,6 +4578,9 @@ img { max-width: 100%; }
   /* 節標題／編號列（卡片外的那些）：由左滑入。左右位移不會撞到上下的區塊，
      所以可以放大一點，最顯眼。 */
   .intro-reveal[data-reveal-kind="heading"] { transform: translateX(-30px); z-index: 3; }
+  /* 階段帶的「步驟 X」要和下方主標題共用同一條左緣；不套用一般
+     heading 的入場位移，避免標籤在窄螢幕上跑到標題左側。 */
+  .part3-stage-bar .eyebrow[data-reveal-kind="heading"] { transform: none; }
   /* 卡片外的說明文字（含節標題外框）：由下升起 */
   .intro-reveal[data-reveal-kind="text"] { transform: translateY(16px); z-index: 3; }
   /* 圖片＋說明面板：整組放大浮現 */
