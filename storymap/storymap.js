@@ -1397,6 +1397,302 @@ const initPart3ChainRing = () => {
 };
 initPart3ChainRing();
 
+// ---------------------------------------------------------------------------
+// 後續功能：LLM Wiki — 知識網絡啟動動畫（#part-3-wiki-data）
+// 研究者提問 → 送出 → 思考（紫光多向跑過網絡節點）→ AI 依檢索結果逐字作答。
+// 整段只播一次（捲入畫面才開始，播完停在最終狀態，重看需重新整理頁面）。
+// 內容、幾何、時間軸皆對應草稿 intro Website/Website/UI Idea/
+// 29-llm-wiki-network-animation-draft.html，資料來源見該檔案的 source-note。
+// ---------------------------------------------------------------------------
+const initPart3WikiVisual = () => {
+  document.querySelectorAll('[data-part3-wiki-visual]').forEach((visual) => {
+    const edgeLayer = visual.querySelector('[data-part3-wiki-edges]');
+    const pulseLayer = visual.querySelector('[data-part3-wiki-pulses]');
+    const nodeLayer = visual.querySelector('[data-part3-wiki-nodes]');
+    const askText = visual.querySelector('[data-part3-wiki-ask-text]');
+    const caret = visual.querySelector('[data-part3-wiki-caret]');
+    const answerBody = visual.querySelector('[data-part3-wiki-answer-body]');
+    const workedRow = visual.querySelector('[data-part3-wiki-worked]');
+    const workedText = visual.querySelector('[data-part3-wiki-worked-text]');
+    const toolsRow = visual.querySelector('[data-part3-wiki-tools]');
+    if (!edgeLayer || !pulseLayer || !nodeLayer || !askText || !answerBody) return;
+    const NS = 'http://www.w3.org/2000/svg';
+
+    /* ---------------- 網絡結構 ----------------
+       group: ask（研究問題、方法）／extract（已抽取的資料）
+              source（原始資料）／second（二手研究）
+       wave : 第幾波被點亮（0 = 最先亮） */
+    const NODES = [
+      { id: 'q',   label: '研究問題',   x: 62,  y: 176, r: 9, group: 'ask',     wave: 0 },
+      { id: 'm',   label: '研究方法',   x: 72,  y: 268, r: 7, group: 'ask',     wave: 0 },
+
+      { id: 'ev',  label: '已確認的事件',       x: 196, y: 96,  r: 8.5, group: 'extract', wave: 1 },
+      { id: 'src', label: '事件資訊來源',       x: 186, y: 196, r: 8.5, group: 'extract', wave: 1 },
+      { id: 'rsp', label: '皇帝及後續官員的回應', x: 196, y: 296, r: 8.5, group: 'extract', wave: 1 },
+
+      { id: 'z25', label: '硃25',   x: 330, y: 58,  r: 6.5, group: 'source', wave: 2 },
+      { id: 'z1',  label: '硃批',   x: 356, y: 138, r: 6.5, group: 'source', wave: 2 },
+      { id: 'y1',  label: '上諭',   x: 344, y: 226, r: 6.5, group: 'source', wave: 2 },
+      { id: 'a1',  label: '奏摺',   x: 328, y: 306, r: 6.5, group: 'source', wave: 2 },
+
+      { id: 's1',  label: '二手研究', x: 442, y: 132, r: 6, group: 'second', wave: 3 },
+      { id: 's3',  label: 'GIS',     x: 440, y: 244, r: 6, group: 'second', wave: 3 }
+    ];
+
+    const EDGES = [
+      ['q','m'],
+      ['q','ev'], ['q','src'], ['q','rsp'],
+      ['m','src'], ['m','rsp'],
+      // 三個「已抽取的資料」節點彼此相連（同一事件的事件本身／來源／回應是一組）
+      ['ev','src'], ['src','rsp'], ['ev','rsp'],
+      ['ev','z25'], ['ev','z1'], ['ev','a1'],
+      ['src','z25'], ['src','y1'],
+      ['rsp','z1'], ['rsp','y1'], ['rsp','a1'],
+      ['z25','s1'], ['z1','s1'], ['y1','s3'], ['a1','s3'], ['s1','s3']
+    ];
+
+    const byId = Object.fromEntries(NODES.map((n) => [n.id, n]));
+    const MAX_WAVE = Math.max(...NODES.map((n) => n.wave));
+
+    // ---- 建立 SVG 元素 ----
+    const edgeEls = EDGES.map(([a, b]) => {
+      const A = byId[a], B = byId[b];
+      const line = document.createElementNS(NS, 'line');
+      line.setAttribute('class', 'part3-wiki-edge');
+      line.setAttribute('x1', A.x); line.setAttribute('y1', A.y);
+      line.setAttribute('x2', B.x); line.setAttribute('y2', B.y);
+      edgeLayer.appendChild(line);
+
+      // 每條線各自有一段「脈衝」，用 dasharray 讓一小段亮線沿著它跑
+      const pulse = document.createElementNS(NS, 'line');
+      pulse.setAttribute('class', 'part3-wiki-pulse');
+      pulse.setAttribute('x1', A.x); pulse.setAttribute('y1', A.y);
+      pulse.setAttribute('x2', B.x); pulse.setAttribute('y2', B.y);
+      const len = Math.hypot(B.x - A.x, B.y - A.y);
+      pulse.setAttribute('stroke-dasharray', `18 ${len}`);
+      pulseLayer.appendChild(pulse);
+
+      // 這條線屬於「第幾波」：取兩端較晚亮的那一端。
+      // phase／period／forward 讓每條線的脈衝各自錯開、速度不一、方向交替，
+      // 思考期間看起來就是「訊號在網絡裡多向來回跑」，而不是整齊劃一的一次掃描。
+      return {
+        el: line, pulse, len,
+        wave: Math.max(A.wave, B.wave),
+        phase: Math.random(),
+        period: 620 + Math.random() * 520,
+        forward: Math.random() < .5
+      };
+    });
+
+    const nodeEls = NODES.map((n) => {
+      const g = document.createElementNS(NS, 'g');
+      g.setAttribute('class', 'part3-wiki-node');
+      g.setAttribute('data-group', n.group);
+
+      const dot = document.createElementNS(NS, 'circle');
+      dot.setAttribute('class', 'part3-wiki-node-dot');
+      dot.setAttribute('cx', n.x); dot.setAttribute('cy', n.y); dot.setAttribute('r', n.r);
+      g.appendChild(dot);
+
+      const label = document.createElementNS(NS, 'text');
+      label.setAttribute('class', 'part3-wiki-node-label');
+      label.setAttribute('x', n.x);
+      label.setAttribute('y', n.y - n.r - 5);
+      label.textContent = n.label;
+      g.appendChild(label);
+
+      nodeLayer.appendChild(g);
+      return { el: g, wave: n.wave };
+    });
+
+    /* ---------------- 時間軸 ----------------
+       全部由 elapsed（毫秒）算出畫面狀態，不用逐格累加，
+       分頁切走再切回來也不會亂跳。整段只播一次（見最後的 finished 旗標）。
+
+       四個階段：打字提問 → 送出後的停頓 → 思考（紫光多向來回跑、
+       輸出區顯示思考中的字）→ 思考完，思考字整段換成答案並逐字打出。 */
+    const ASK_MS    = 1600;   // 打字：研究者的問題
+    const SEND_MS   = 550;    // 送出後、開始思考前的短暫停頓
+    const THINK_MS  = 3400;   // 思考：網絡點亮＋紫光多向來回
+    const ANSWER_MS = 4200;   // AI 逐字作答
+    const T_ASK_END    = ASK_MS;
+    const T_SEND_END   = T_ASK_END + SEND_MS;
+    const T_THINK_END  = T_SEND_END + THINK_MS;
+    const T_ANSWER_END = T_THINK_END + ANSWER_MS;
+
+    // 思考中輪流顯示的狀態字（像 AI App 的 Thinking… 狀態）
+    const THINKING_STEPS = [
+      '正在檢索知識庫…',
+      '比對「已確認的事件」…',
+      '追溯事件資訊來源…',
+      '整理皇帝及後續官員的回應…'
+    ];
+
+    const QUESTION = '彰化縣城失陷後，皇帝作了什麼回應？';
+
+    /* AI 回答：做成聊天回覆的口吻，分三個部分（各自留空隙）、帶項目符號，逐字打出。
+       內容只使用資料庫中確實存在的欄位值：
+       - 事件、日期、具奏人 → 取自 doc_id 硃25 的欄位
+       - 諭13 → 與硃25 同日、同收文人，依內容比對推斷（非 confirmed-pairs 已確認配對，
+         此不確定性完整記錄於 UI Idea/29-llm-wiki-network-animation-draft.html 的
+         note-list／source-note，聊天回覆本文為求簡潔口語不逐句重複）
+       - 二手研究引用 → 吳正龍 2018〈林爽文事件中的彰化戰役〉既有著錄
+       不含任何歷史判斷或詮釋。 */
+    const ANSWER_LINES = [
+      { parts: [
+        { t: '已在「' }, { t: '已確認的事件', cite: true }, { t: '」中找到「彰化縣城失陷」：' }
+      ] },
+      { bullet: true, parts: [
+        { t: '事件時間：乾隆五十一年十一月二十九日辰刻攻城、午刻城陷' }
+      ] },
+      { bullet: true, parts: [
+        { t: '奏報者：福建水師提督黃仕簡，具奏於十二月初十日' }
+      ] },
+      { gap: true, parts: [
+        { t: '「' }, { t: '皇帝的回應', cite: true }, { t: '」：硃25 於十二月二十七日收悉，同日並以上諭' },
+        { t: '（諭13）', cite: true },
+        { t: ' 回應；諭13 提及黃仕簡帶兵渡臺一事，獎勉之餘並囑「仍加意調攝，勿過勞」，與硃25批語用意相呼應。' }
+      ] },
+      { gap: true, parts: [
+        { t: '另據已上載的' }, { t: '二手研究', cite: true }, { t: '：' },
+        { t: '〈林爽文事件中的彰化戰役：兼論人羣對立與官方剿撫策略〉(2018)', cite: true },
+        { t: ' 可補充彰化戰役中官方的剿撫策略。' }
+      ] }
+    ];
+    const ANSWER_PLAIN = ANSWER_LINES.map((l) => l.parts.map((p) => p.t).join('')).join('');
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // 依「已打出幾個字」重建整段回覆的 HTML（保留分行、項目符號、部分間距與標示樣式）
+    function renderAnswer(count) {
+      let left = count;
+      let html = '';
+      for (const line of ANSWER_LINES) {
+        if (left <= 0) break;
+        let inner = '';
+        for (const part of line.parts) {
+          if (left <= 0) break;
+          const slice = part.t.slice(0, left);
+          if (part.cite) inner += `<span class="cite">${slice}</span>`;
+          else inner += slice;
+          left -= slice.length;
+        }
+        html += `<span class="ln${line.bullet ? ' bul' : ''}${line.gap ? ' gap' : ''}">${inner}</span>`;
+      }
+      answerBody.innerHTML = html;
+    }
+
+    function render(elapsed) {
+      const t = Math.min(elapsed, T_ANSWER_END); // 只播一次，結束後停在最終狀態
+
+      // 1) 提問逐字（打完游標就收起來，像訊息已送出）
+      if (t < T_ASK_END) {
+        const n = Math.floor((t / ASK_MS) * QUESTION.length);
+        askText.textContent = QUESTION.slice(0, n);
+        if (caret) caret.classList.add('is-on');
+      } else {
+        askText.textContent = QUESTION;
+        if (caret) caret.classList.remove('is-on');
+      }
+
+      const thinking = t >= T_SEND_END && t < T_THINK_END;
+      const tp = Math.min(1, Math.max(0, (t - T_SEND_END) / THINK_MS)); // 思考進度 0–1
+
+      // 2) 思考中：節點逐波亮起，紫光在每條線上多向、來回反覆跑
+      const waveFront = Math.min(1, tp / .7) * (MAX_WAVE + 1);
+      nodeEls.forEach((n) => {
+        n.el.classList.toggle('is-lit', t >= T_SEND_END && waveFront >= n.wave + .35);
+      });
+      edgeEls.forEach((e) => {
+        if (!thinking) {
+          // 思考結束：脈衝收起來，走過的線維持點亮
+          e.pulse.classList.remove('is-running');
+          e.el.classList.toggle('is-lit', t >= T_THINK_END);
+          return;
+        }
+        // 每條線有自己的起始相位與速度，所以會此起彼落、不同步；
+        // 每跑完一趟就換一次方向，看起來像訊號在網絡裡來回傳遞。
+        const cycle = (t - T_SEND_END) / e.period + e.phase;
+        const pass = Math.floor(cycle);
+        const local = cycle - pass;                    // 這一趟跑到哪裡（0–1）
+        const forward = (pass % 2 === 0) === e.forward; // 逐趟交替方向
+        const travelled = forward ? local : 1 - local;
+        e.pulse.classList.add('is-running');
+        e.pulse.setAttribute('stroke-dashoffset', String(e.len - travelled * (e.len + 18)));
+        e.el.classList.toggle('is-lit', waveFront >= e.wave + .35);
+      });
+
+      // 3) 輸出區：思考中顯示 Thinking 狀態字，思考完整段換成答案並逐字打出；
+      //    思考完成後在最上面顯示「已思考 N 秒 ›」，
+      //    整段答案打完後才淡入底部的複製／讚／不讚／分享工具列。
+      if (workedRow) workedRow.classList.toggle('is-shown', t >= T_THINK_END);
+      if (workedText && (t === T_THINK_END || (t > T_THINK_END && workedText.dataset.set !== '1'))) {
+        workedText.textContent = '已思考 ' + (THINK_MS / 1000).toFixed(1) + ' 秒';
+        workedText.dataset.set = '1';
+      }
+      if (toolsRow) toolsRow.classList.toggle('is-shown', t >= T_ANSWER_END);
+
+      if (t < T_SEND_END) {
+        answerBody.innerHTML = '';
+      } else if (thinking) {
+        const step = THINKING_STEPS[Math.min(
+          THINKING_STEPS.length - 1,
+          Math.floor(tp * THINKING_STEPS.length)
+        )];
+        answerBody.innerHTML = `<span class="part3-wiki-thinking">${step}</span>`;
+      } else {
+        const n = Math.floor(((t - T_THINK_END) / ANSWER_MS) * ANSWER_PLAIN.length);
+        renderAnswer(Math.min(ANSWER_PLAIN.length, n));
+      }
+    }
+
+    if (reduceMotion) {
+      render(T_ANSWER_END); // 直接顯示最終狀態
+      return;
+    }
+
+    /* 只播一次：捲到畫面內才開始，跑完就停在最終狀態；
+       之後再捲走、捲回來都不會重播，要重看必須重新整理頁面。 */
+    render(0);
+    let raf = null;
+    let started = false;
+    let finished = false;
+    let start = 0;
+
+    function loop(now) {
+      const elapsed = now - start;
+      render(elapsed);
+      if (elapsed >= T_ANSWER_END) {
+        finished = true;
+        raf = null;
+        return;
+      }
+      raf = requestAnimationFrame(loop);
+    }
+
+    function play() {
+      if (started || finished) return;
+      started = true;
+      start = performance.now();
+      raf = requestAnimationFrame(loop);
+    }
+
+    if (typeof IntersectionObserver === 'function') {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          play();
+          io.disconnect(); // 播過就不再監看
+        });
+      }, { threshold: .25 });
+      io.observe(visual);
+    } else {
+      play();
+    }
+  });
+};
+initPart3WikiVisual();
+
 const initPart3ToolsChecklist = () => {
   document.querySelectorAll('[data-part3-tools-checklist]').forEach((workbench) => {
     const rows = [...workbench.querySelectorAll('[data-part3-tool-id]')];
@@ -2774,6 +3070,12 @@ const initPart3TryIt = () => {
   const switchHosts = [...document.querySelectorAll('[data-part3-try-switch]')];
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* The desktop PDF stack sizes itself from the image's intrinsic width.
+     Lazy loading can leave that fit-content stack at 0px wide until the user
+     clicks a page button, so the interactive viewer must load its first page
+     immediately. */
+  imgEl.loading = 'eager';
+
   let mode = 'printed';
   let phase = 1;
   let cur = 0;
@@ -2847,22 +3149,17 @@ const initPart3TryIt = () => {
     return Number(counts[page]) === 3 ? 3 : 2;
   };
   const pairCountFor = (count) => count === 3 ? 2 : 1;
-  const isBlankFinalTryPage = (set, page, featureImage) => !featureImage
-    && desktopPagesFor(set).length > 1
-    && page === desktopPagesFor(set).length - 1;
-  const tryPairCountFor = (set, page, featureImage) => isBlankFinalTryPage(set, page, featureImage)
-    ? 1 : pairCountFor(foldCountFor(set, page, featureImage));
+  const tryPairCountFor = (set, page, featureImage) => pairCountFor(foldCountFor(set, page, featureImage));
 
   /* 試一試的手寫字圖片與 8 辨識手寫字共用同一種「風琴摺」視覺。
-     每一張 desktopPages 都保留自己的摺子；目前頁面的兩摺展開，其餘頁面
-     收成紙邊。這樣按左右箭頭時，舊頁會收起、新頁會展開，而不是整個
-     viewer 突然換圖。兩摺合成圖用 2 摺，三摺合成圖用右＋中／中＋左。 */
+     每一張 desktopPages 都保留自己的摺子；一般掃描頁是兩摺合成圖，
+     特徵示意圖仍使用三摺原圖。按左右箭頭時，舊頁會收起、新頁會展開，
+     而不是整個 viewer 突然換圖。 */
   const renderTryFolded = (set, currentPage, featureSource, count, pair) => {
     if (!tryFoldStrip) return;
     const pages = desktopPagesFor(set);
     const safeCount = count === 3 ? 3 : 2;
-    const blankFinal = isBlankFinalTryPage(set, currentPage, Boolean(featureSource));
-    const safePair = Math.max(0, Math.min(blankFinal ? 0 : pairCountFor(safeCount) - 1, pair));
+    const safePair = Math.max(0, Math.min(pairCountFor(safeCount) - 1, pair));
     const requiredPanels = pages.length * 3;
     if (tryFoldStrip.children.length !== requiredPanels) {
       tryFoldStrip.innerHTML = '';
@@ -2889,13 +3186,13 @@ const initPart3TryIt = () => {
       const pageCount = isCurrent && featureSource
         ? 3 : foldCountFor(set, page, false);
       const source = isCurrent && featureSource ? featureSource : `${set.assetDir || ''}${pages[page]}`;
-      const blankPanel = isCurrent && blankFinal && part === 1;
-      const unused = part >= pageCount || (blankFinal && part === 0);
+      const unused = part >= pageCount;
       const open = isCurrent && !unused && openParts.includes(part);
+      panel.classList.toggle('is-current', isCurrent);
       panel.classList.toggle('is-unused', unused);
       panel.classList.toggle('is-open', open);
-      panel.classList.toggle('is-blank', blankPanel);
-      panel.style.setProperty('--src', unused || blankPanel ? 'none' : `url("${source}")`);
+      panel.classList.remove('is-blank');
+      panel.style.setProperty('--src', unused ? 'none' : `url("${source}")`);
       panel.style.setProperty('--try-fold-size', `${pageCount * 100}%`);
       panel.style.setProperty('--posx', `${(part / (pageCount - 1)) * 100}%`);
     });

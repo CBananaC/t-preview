@@ -8,10 +8,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Serif+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="storymap.css?v=20260810-codex-try-folded-01">
-  <link rel="stylesheet" href="storymap-cards.css?v=20260810-claude-chain-ring-03">
+  <link rel="stylesheet" href="storymap-cards.css?v=20260811-claude-wiki-visual-01">
   <link rel="stylesheet" href="part-1-interface.css">
   <link rel="stylesheet" href="part-3-question-gallery.css">
-  <script src="storymap.js?v=20260810-claude-chain-ring-03" defer></script>
+  <script src="storymap.js?v=20260811-claude-wiki-visual-01" defer></script>
   <!-- 第一部分的介面複本：資料模組先載入，行為模組再依它組裝畫面。 -->
   <script src="part-1-interface-data.js" defer></script>
   <script src="part-1-interface.js" defer></script>
@@ -1622,7 +1622,7 @@
                   <div class="part3-fx-doc part3-try-doc">
                     <div class="part3-try-pagestack" data-try-pagestack>
                       <div class="part3-fx-page">
-                        <img data-try-img alt="試一試史料頁面" loading="lazy" decoding="async">
+                        <img data-try-img alt="試一試史料頁面" loading="eager" decoding="async">
                         <div data-try-hls></div>
                       </div>
                       <div class="part3-try-folded" data-try-folded aria-hidden="true">
@@ -1742,15 +1742,15 @@
                       "href": "試一試/手寫字/為請酌籌加調官兵協力進剿事_手寫字.pdf",
                       "assetDir": "試一試/手寫字/",
                       "pages": ["page1.png", "page2.png", "page3.png"],
-                      "desktopPages": ["1b1a.png", "2a1c.png", "2c2b.png", "3c3b3a.png"],
-                      "desktopFoldCounts": [2, 2, 2, 3],
+                      "desktopPages": ["1b1a.png", "2a1c.png", "2c2b.png", "3b3a.png", "empty3c.png"],
+                      "desktopFoldCounts": [2, 2, 2, 2, 2],
                       "features": {
                         "column":   {"page": 0, "desktopPage": 0, "foldPair": 0, "image": "直欄.png", "colour": "#cfe3d4", "box": {"left": "14%", "top": "12%", "width": "62%", "height": "70%"}},
                         "author":   {"page": 0, "desktopPage": 0, "foldPair": 0, "image": "作者.png", "colour": "#cfe0ef", "box": {"left": "68%", "top": "10%", "width": "20%", "height": "20%"}},
                         "minor":    {"page": 0, "desktopPage": 0, "foldPair": 1, "image": "臣字.png", "colour": "#f5e6bd", "box": {"left": "30%", "top": "40%", "width": "12%", "height": "14%"}},
                         "rescript": {"page": 2, "desktopPage": 3, "foldPair": 0, "image": "硃批.png", "colour": "#f0d6d0", "box": {"left": "20%", "top": "16%", "width": "26%", "height": "34%"}},
                         "sendDate": {"page": 2, "desktopPage": 3, "foldPair": 0, "image": "奏報日期.png", "colour": "#e3d4b8", "box": {"left": "60%", "top": "10%", "width": "22%", "height": "20%"}},
-                        "stamp":    {"page": 2, "desktopPage": 3, "foldPair": 1, "image": "水印.png", "colour": "#ddd6ea", "box": {"left": "50%", "top": "60%", "width": "22%", "height": "22%"}}
+                        "stamp":    {"page": 2, "desktopPage": 4, "foldPair": 1, "image": "水印.png", "colour": "#ddd6ea", "box": {"left": "50%", "top": "60%", "width": "22%", "height": "22%"}}
                       },
                       "steps": [
                         {"kind": "advance", "k": "撰寫 Prompt",
@@ -1991,23 +1991,41 @@
             <div class="section-hero-content"><p class="eyebrow">步驟八</p><h1 id="part-3-wiki-title">後續功能：LLM Wiki</h1></div>
           </section>
 
-          <section class="story surface-a" id="part-3-wiki-intro" data-tab="part-3" data-nav="#part-3-wiki-intro">
+          <section class="story surface-a" id="part-3-wiki-data" data-tab="part-3" data-nav="#part-3-wiki-data">
             <div class="story-inner">
-              <article class="copybox blk" id="part-3-wiki-intro-card"><div class="body"><p>完成 AI 分析及研究者審核後，研究者可進一步將本平台與 LLM Wiki 整合，擴展平台的應用功能。LLM Wiki 可視為大型語言模型的知識庫，讓 AI 在回答問題前，先搜尋其中的相關資料，再根據搜尋結果生成答案，以減少 AI 幻覺，提升回答的準確度。</p></div></article>
+              <div class="part3-wiki-layout">
+                <div class="part3-wiki-copy">
+                  <div class="part3-two-card-grid">
+                    <article class="copybox blk" id="part-3-wiki-intro-card"><div class="title-row"><span class="option-number">1</span><h2>LLM Wiki</h2></div><div class="body"><p>完成 AI 分析及研究者審核後，研究者可進一步將本平台與 LLM Wiki 整合，擴展平台的應用功能。LLM Wiki 可視為大型語言模型的知識庫，讓 AI 在回答問題前，先搜尋其中的相關資料，再根據搜尋結果生成答案，以減少 AI 幻覺，提升回答的準確度。</p></div></article>
+                    <article class="copybox blk" id="part-3-wiki-data-card"><div class="title-row"><span class="option-number">2</span><h2>LLM Wiki 與歷史研究</h2></div><div class="body"><p>研究者可將已審核的資料按類型匯出為多份結構化資料，包括已確認的事件、事件資訊來源、皇帝及後續官員的回應等，一同匯入至 LLM Wiki，為 AI 建立研究主題的專屬知識庫。</p><p>LLM Wiki 於是可以利用這些結構化資料進行更複雜的資訊整合及推理，協助研究者深化史料分析、整理研究成果和撰寫論文。</p></div></article>
+                  </div>
+                </div>
+                <div class="part3-wiki-visual" data-part3-wiki-visual role="group" aria-label="LLM Wiki 知識網絡示意：研究者提問後，網絡沿原始資料、二手研究、已抽取的資料等節點檢索，AI 依檢索結果作答">
+                  <div class="part3-wiki-ask">
+                    <div class="part3-wiki-ask-bubble"><span data-part3-wiki-ask-text></span><span class="part3-wiki-caret" data-part3-wiki-caret></span></div>
+                  </div>
+                  <div class="part3-wiki-graph-wrap">
+                    <svg class="part3-wiki-graph" viewBox="0 0 480 360" aria-hidden="true">
+                      <g data-part3-wiki-edges></g>
+                      <g data-part3-wiki-pulses></g>
+                      <g data-part3-wiki-nodes></g>
+                    </svg>
+                  </div>
+                  <div class="part3-wiki-answer">
+                    <div class="part3-wiki-answer-worked" data-part3-wiki-worked><span data-part3-wiki-worked-text>已思考 3.4 秒</span><span class="part3-wiki-chev">›</span></div>
+                    <div class="part3-wiki-answer-body" data-part3-wiki-answer-body></div>
+                    <div class="part3-wiki-answer-tools" data-part3-wiki-tools aria-hidden="true">
+                      <svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>
+                      <svg viewBox="0 0 24 24"><path d="M7 10v10H4V10zM7 10l4-7a2 2 0 0 1 3 2l-1 5h5a2 2 0 0 1 2 2.4l-1.3 6A2 2 0 0 1 16.7 20H7z"/></svg>
+                      <svg viewBox="0 0 24 24"><path d="M17 14V4h3v10zM17 14l-4 7a2 2 0 0 1-3-2l1-5H6a2 2 0 0 1-2-2.4l1.3-6A2 2 0 0 1 7.3 4H17z"/></svg>
+                      <svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
 
-          <section class="story surface-b" id="part-3-wiki-data" data-tab="part-3" data-nav="#part-3-wiki-data">
-            <div class="story-inner">
-              <article class="copybox blk" id="part-3-wiki-data-card"><div class="body"><p>研究者可將已審核的資料按類型匯出為多份結構化資料，包括已確認的事件、事件資訊來源、皇帝及後續官員的回應等，一同匯入至 LLM Wiki，為 AI 建立研究主題的專屬知識庫。</p></div></article>
-            </div>
-          </section>
-
-          <section class="story surface-c" id="part-3-wiki-analysis" data-tab="part-3" data-nav="#part-3-wiki-analysis">
-            <div class="story-inner">
-              <article class="copybox blk" id="part-3-wiki-analysis-card"><div class="body"><p>LLM Wiki 於是可以利用這些結構化資料進行更複雜的資訊整合及推理，協助研究者深化史料分析、整理研究成果和撰寫論文。</p></div></article>
-            </div>
-          </section>
         </section>
       </div>
     </section>

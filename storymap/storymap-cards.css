@@ -916,7 +916,7 @@
      Part 3.5.4  Google Cloud
    Part 3.6  後續功能：LLM Wiki
      Part 3.6.1  Stage bar: #part-3-wiki
-     Part 3.6.2–3.6.4  Wiki intro, data, and analysis cards
+     Part 3.6.2–3.6.3  Wiki intro and research cards
    Part 3.7  Accent colours
 
    To adjust an individual card, find its numbered block below and edit only
@@ -1937,10 +1937,9 @@
   --gallery-fit: contain;
 }
 
-/* Part 3.6.2–3.6.4 — Section defaults: LLM Wiki */
-#part-3-wiki-intro,
-#part-3-wiki-data,
-#part-3-wiki-analysis {
+/* Part 3.6.2–3.6.3 — Section defaults: LLM Wiki (兩張文字卡＋知識網絡視覺元素
+   合併在同一個 #part-3-wiki-data 區塊裡，左文右圖，比照 #part-3-ai-chain) */
+#part-3-wiki-data {
   --part3-card-width: 100%;
   --part3-card-max-width: 74ch;
   --part3-card-height: auto;
@@ -1949,6 +1948,149 @@
   --part3-title-size: clamp(27px, 3.4vw, 46px);
   --part3-body-size: calc(16px * var(--font-scale));
   --part3-body-line-height: 1.9;
+  --part3-wiki-visual-width: 42%;
+}
+
+/* 左：兩張文字卡直向堆疊；右：知識網絡視覺元素——研究者提問後網絡「啟動」，
+   紫光沿連線多向跑過原始資料／二手研究／已抽取的資料等節點，AI 依檢索
+   結果打出帶引註的答案。動畫邏輯在 storymap.js 的 initPart3WikiVisual()，
+   只播一次（捲入畫面才開始），資料來源見 wiki 視覺草稿
+   （intro Website/Website/UI Idea/29-llm-wiki-network-animation-draft.html）。 */
+#part-3-wiki-data .part3-wiki-layout {
+  display: grid;
+  grid-template-columns: minmax(0, calc(100% - var(--part3-wiki-visual-width) - var(--col-gap))) minmax(280px, var(--part3-wiki-visual-width));
+  align-items: start;
+  gap: var(--col-gap);
+}
+#part-3-wiki-data .part3-wiki-copy,
+#part-3-wiki-data .part3-wiki-visual {
+  min-width: 0;
+}
+#part-3-wiki-data .part3-wiki-copy .part3-two-card-grid {
+  grid-template-columns: 1fr;
+}
+
+#part-3-wiki-data .part3-wiki-visual {
+  --part3-wiki-visual-max-width: none;
+  --part3-wiki-visual-margin: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: calc(10px * var(--font-scale));
+  width: 100%;
+  max-width: var(--part3-wiki-visual-max-width);
+  margin: var(--part3-wiki-visual-margin);
+  padding: clamp(16px, 1.8vw, 22px);
+  color: #f7f3ea;
+  background: var(--ink);
+  border: 1px solid rgba(22, 61, 63, .22);
+  box-shadow: 0 10px 26px rgba(22, 61, 63, .14);
+}
+
+/* 1) 提問聊天氣泡：靠右、圓角、右下角收尖角，色調用本站紙色系 */
+#part-3-wiki-data .part3-wiki-ask { display: flex; justify-content: flex-end; }
+#part-3-wiki-data .part3-wiki-ask-bubble {
+  max-width: 86%;
+  padding: 10px 15px;
+  background: rgba(247, 243, 234, .12);
+  border: 1px solid rgba(247, 243, 234, .16);
+  border-radius: 16px 16px 4px 16px;
+  font: 500 calc(15px * var(--font-scale))/1.65 var(--serif);
+  color: rgba(247, 243, 234, .94);
+}
+#part-3-wiki-data .part3-wiki-caret {
+  display: inline-block; width: 6px; height: 12px; margin-left: 2px;
+  background: #a97bf5; vertical-align: -2px; opacity: 0;
+}
+#part-3-wiki-data .part3-wiki-caret.is-on { opacity: 1; animation: part3-wiki-blink 1s steps(1) infinite; }
+@keyframes part3-wiki-blink { 50% { opacity: 0; } }
+
+/* 2) 知識網絡（Obsidian graph 風格） */
+#part-3-wiki-data .part3-wiki-graph-wrap { position: relative; width: 100%; aspect-ratio: 4 / 3; }
+#part-3-wiki-data .part3-wiki-graph { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+#part-3-wiki-data .part3-wiki-edge { fill: none; stroke: rgba(247,243,234,.16); stroke-width: 1.2; transition: stroke .3s; }
+#part-3-wiki-data .part3-wiki-edge.is-lit { stroke: rgba(169, 123, 245, .55); }
+#part-3-wiki-data .part3-wiki-pulse {
+  fill: none; stroke: #a97bf5; stroke-width: 2.2; stroke-linecap: round;
+  opacity: 0; filter: drop-shadow(0 0 4px rgba(169,123,245,.9));
+}
+#part-3-wiki-data .part3-wiki-pulse.is-running { opacity: 1; }
+#part-3-wiki-data .part3-wiki-node-dot {
+  fill: rgba(22,61,63,.95); stroke: rgba(247,243,234,.35); stroke-width: 1.4;
+  transition: fill .3s, stroke .3s, r .3s;
+}
+#part-3-wiki-data .part3-wiki-node.is-lit .part3-wiki-node-dot {
+  fill: rgba(169,123,245,.9); stroke: #e4d7ff; stroke-width: 1.8;
+  filter: drop-shadow(0 0 6px rgba(169,123,245,.85));
+}
+#part-3-wiki-data .part3-wiki-node-label {
+  fill: rgba(247,243,234,.6); font: 700 calc(10px * var(--font-scale)) var(--sans);
+  text-anchor: middle; transition: fill .3s;
+  paint-order: stroke; stroke: rgba(18,40,42,.85); stroke-width: 2.4px; stroke-linejoin: round;
+}
+#part-3-wiki-data .part3-wiki-node.is-lit .part3-wiki-node-label { fill: #efe6ff; }
+#part-3-wiki-data .part3-wiki-node[data-group="source"] .part3-wiki-node-dot { stroke: rgba(243,201,103,.5); }
+#part-3-wiki-data .part3-wiki-node[data-group="second"] .part3-wiki-node-dot { stroke: rgba(196,93,56,.55); }
+#part-3-wiki-data .part3-wiki-node[data-group="extract"] .part3-wiki-node-dot { stroke: rgba(122,199,166,.5); }
+#part-3-wiki-data .part3-wiki-node[data-group="ask"] .part3-wiki-node-dot { stroke: rgba(169,123,245,.6); }
+
+/* 3) AI 回答：仿 AI App 回覆版面——「已思考 N 秒 ›」列＋分隔線、分段帶項目
+   符號的內文（三個部分之間留白）、底部複製／讚／不讚／分享圖示（純示意）。 */
+#part-3-wiki-data .part3-wiki-answer { display: flex; flex-direction: column; min-height: 150px; }
+#part-3-wiki-data .part3-wiki-answer-worked {
+  display: flex; align-items: center; gap: 5px;
+  padding-bottom: 7px; margin-bottom: 9px;
+  border-bottom: 1px solid rgba(247,243,234,.12);
+  color: rgba(247,243,234,.42); font: 600 calc(12px * var(--font-scale))/1.4 var(--sans);
+  opacity: 0; transition: opacity .3s;
+}
+#part-3-wiki-data .part3-wiki-answer-worked.is-shown { opacity: 1; }
+#part-3-wiki-data .part3-wiki-chev { font-size: 10px; opacity: .8; }
+#part-3-wiki-data .part3-wiki-answer-body {
+  flex: 1; min-width: 0;
+  font: 500 calc(15px * var(--font-scale))/1.8 var(--serif);
+  color: rgba(247,243,234,.88);
+}
+#part-3-wiki-data .part3-wiki-answer-tools {
+  display: flex; align-items: center; gap: 13px;
+  margin-top: 10px; padding-top: 2px;
+  opacity: 0; transition: opacity .4s;
+}
+#part-3-wiki-data .part3-wiki-answer-tools.is-shown { opacity: 1; }
+#part-3-wiki-data .part3-wiki-answer-tools svg {
+  width: 13px; height: 13px; stroke: rgba(247,243,234,.42); fill: none;
+  stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
+}
+#part-3-wiki-data .part3-wiki-answer-body .ln { display: block; }
+/* 三個「部分」之間的間距：已確認的事件（含兩點列）／皇帝的回應／二手研究 */
+#part-3-wiki-data .part3-wiki-answer-body .ln.gap { margin-top: 14px; }
+#part-3-wiki-data .part3-wiki-answer-body .ln.bul { padding-left: 13px; text-indent: -13px; }
+#part-3-wiki-data .part3-wiki-answer-body .ln.bul::before { content: "・"; color: #a97bf5; }
+#part-3-wiki-data .part3-wiki-answer-body .cite {
+  color: #d9c6ff; border-bottom: 1px dotted rgba(217,198,255,.5);
+}
+/* 思考中：文字用淺淡的流光掃過，像 AI App 的 Thinking… 狀態 */
+#part-3-wiki-data .part3-wiki-thinking {
+  display: inline-block;
+  background: linear-gradient(90deg, rgba(247,243,234,.35) 0%, rgba(217,198,255,.95) 50%, rgba(247,243,234,.35) 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent;
+  animation: part3-wiki-shimmer 1.5s linear infinite;
+  font: 700 calc(14px * var(--font-scale))/1.8 var(--sans);
+}
+@keyframes part3-wiki-shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+
+@media (max-width: 1040px) {
+  #part-3-wiki-data .part3-wiki-layout { grid-template-columns: 1fr; }
+  #part-3-wiki-data .part3-wiki-visual { --part3-wiki-visual-max-width: 640px; --part3-wiki-visual-margin: 0 auto; }
+}
+@media (max-width: 620px) {
+  #part-3-wiki-data .part3-wiki-graph-wrap { aspect-ratio: 1 / 1; }
+  #part-3-wiki-data .part3-wiki-node-label { font-size: 9px; }
+  #part-3-wiki-data .part3-wiki-ask-bubble { max-width: 94%; font-size: 14px; }
+  #part-3-wiki-data .part3-wiki-answer-body { font-size: 14px; }
+  #part-3-wiki-data .part3-wiki-thinking { font-size: 13px; }
 }
 
 /* Part 3.0.2 — Shared chart, workflow, and question-gallery layer */
@@ -2205,18 +2347,6 @@
   --part3-body-line-height: 1.9;
 }
 
-/* Part 3.6.4 — Card: #part-3-wiki-analysis-card */
-#part-3-wiki-analysis-card {
-  --part3-card-width: 100%;
-  --part3-card-max-width: 74ch;
-  --part3-card-height: auto;
-  --part3-card-min-height: 0;
-  --part3-card-padding: clamp(18px, 1.8vw, 26px);
-  --part3-title-size: clamp(27px, 3.4vw, 46px);
-  --part3-body-size: calc(16px * var(--font-scale));
-  --part3-body-line-height: 1.9;
-}
-
 /* Part 3.7.1 — Accent colours: OCR sections */
 #part-3-ocr-definition,
 #part-3-paddleocr,
@@ -2235,9 +2365,7 @@
 #part-3-cloud { --card-accent: #7e6a39; }
 
 /* Part 3.7.3 — Accent colours: LLM Wiki */
-#part-3-wiki-intro,
-#part-3-wiki-data,
-#part-3-wiki-analysis { --card-accent: #a45e4c; }
+#part-3-wiki-data { --card-accent: #a45e4c; }
 
 /* =========================================================================
    Part 3.4.10 — 試一試（#part-3-try）
@@ -2474,7 +2602,10 @@
     display: flex;
     flex-direction: row-reverse;
     align-items: stretch;
-    justify-content: flex-start;
+    /* Open folds have an intrinsic width, so right-aligning the
+       row-reverse strip leaves the paper shifted off-screen. Center the
+       visible pair within the available document area. */
+    justify-content: center;
     width: 100%;
     height: 100%;
     max-height: 100%;
@@ -2486,6 +2617,9 @@
   #part-3-try-explorer[data-try-mode="handwritten"] [data-try-fold-strip] .part3-fx-panel {
     background-size: var(--try-fold-size, 300%) 100%;
     background-repeat: no-repeat;
+  }
+  #part-3-try-explorer[data-try-mode="handwritten"] [data-try-fold-strip] .part3-fx-panel:not(.is-current) {
+    display: none;
   }
   #part-3-try-explorer[data-try-mode="handwritten"] [data-try-fold-strip] .part3-fx-panel:not(.is-open) {
     background-color: transparent;
