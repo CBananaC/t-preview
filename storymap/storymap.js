@@ -1430,7 +1430,7 @@ const initPart3WikiVisual = () => {
       { id: 'src', label: '事件資訊來源',       x: 186, y: 196, r: 8.5, group: 'extract', wave: 1 },
       { id: 'rsp', label: '皇帝及後續官員的回應', x: 196, y: 296, r: 8.5, group: 'extract', wave: 1 },
 
-      { id: 'z25', label: '硃25',   x: 330, y: 58,  r: 6.5, group: 'source', wave: 2 },
+      { id: 'z25', label: '起居注',   x: 330, y: 58,  r: 6.5, group: 'source', wave: 2 },
       { id: 'z1',  label: '硃批',   x: 356, y: 138, r: 6.5, group: 'source', wave: 2 },
       { id: 'y1',  label: '上諭',   x: 344, y: 226, r: 6.5, group: 'source', wave: 2 },
       { id: 'a1',  label: '奏摺',   x: 328, y: 306, r: 6.5, group: 'source', wave: 2 },
@@ -1532,8 +1532,8 @@ const initPart3WikiVisual = () => {
 
     /* AI 回答：做成聊天回覆的口吻，分三個部分（各自留空隙）、帶項目符號，逐字打出。
        內容只使用資料庫中確實存在的欄位值：
-       - 事件、日期、具奏人 → 取自 doc_id 硃25 的欄位
-       - 該上諭 → 與硃25 同日、同收文人，依內容比對推斷（非 confirmed-pairs 已確認配對，
+       - 事件、日期、具奏人 → 取自起居注資料的欄位
+       - 該上諭 → 與起居注同日、同收文人，依內容比對推斷（非 confirmed-pairs 已確認配對，
          此不確定性完整記錄於 UI Idea/29-llm-wiki-network-animation-draft.html 的
          note-list／source-note，聊天回覆本文為求簡潔口語不逐句重複）
        - 二手研究引用 → 吳正龍 2018〈林爽文事件中的彰化戰役〉既有著錄
@@ -1549,9 +1549,9 @@ const initPart3WikiVisual = () => {
         { t: '奏報者：福建水師提督黃仕簡，具奏於十二月初十日' }
       ] },
       { gap: true, parts: [
-        { t: '「' }, { t: '皇帝的回應', cite: true }, { t: '」：硃25 於十二月二十七日收悉，同日並以上諭' },
+        { t: '「' }, { t: '皇帝的回應', cite: true }, { t: '」：起居注於十二月二十七日收悉，同日並以上諭' },
         { t: '（諭閩浙總督常青等嚴行殲戮林爽文等並防餘衆四散內渡）', cite: true },
-        { t: ' 回應；上諭提及黃仕簡帶兵渡臺一事，獎勉之餘並囑「仍加意調攝，勿過勞」，與硃25批語用意相呼應。' }
+        { t: ' 回應；上諭提及黃仕簡帶兵渡臺一事，獎勉之餘並囑「仍加意調攝，勿過勞」，與起居注批語用意相呼應。' }
       ] },
       { gap: true, parts: [
         { t: '另據已上載的' }, { t: '二手研究', cite: true }, { t: '：' },
@@ -2268,6 +2268,14 @@ const scrollAgenticHostToBottom = (host) => {
   }
 };
 
+const scrollAgenticHostToTop = (host) => {
+  let current = host;
+  while (current && current !== document.body) {
+    if (current.scrollHeight > current.clientHeight) current.scrollTop = 0;
+    current = current.parentElement;
+  }
+};
+
 // 把一行（可能包含 <span class="..."> 這類語法標色標籤）逐字顯示出來。
 // 做法：先把整行內容放進 DOM（標籤結構都在），再把每個文字節點清空，
 // 之後照文件順序一個字一個字補回去，這樣顏色標籤不會被字元切斷。
@@ -2394,6 +2402,9 @@ initPart3FeatureExplorers();
 // 只保留安裝結果。離開可視範圍時取消本次播放，重新進入時從頭開始。
 const renderAgenticLines = (host, lines) => {
   host.innerHTML = lines.map((line) => `<span class="line">${line}</span>`).join('');
+  // The result phase replaces a previously scrolled thinking phase. Start at
+  // the result's first line so the opening sentence is visible immediately.
+  scrollAgenticHostToTop(host);
 };
 
 const typeAgenticCodexPhases = (thinkingPhase, thinkingHost, resultPhase, resultHost, thinkingLines, resultLines, options = {}) => {
