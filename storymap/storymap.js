@@ -127,6 +127,7 @@ const introDropdown = document.querySelector('.nav-dropdown');
 const introDropdownTrigger = introDropdown.querySelector('.nav-dropdown-trigger');
 const introDropdownMenu = introDropdown.querySelector('.nav-dropdown-menu');
 const workflowNodes = [...document.querySelectorAll('.workflow-node')];
+const part2FlowNodes = [...document.querySelectorAll('.part2-flow-node')];
 let introDropdownCloseTimer;
 const setIntroDropdownOpen = (open) => {
   window.clearTimeout(introDropdownCloseTimer);
@@ -150,9 +151,19 @@ introDropdown.addEventListener('focusout', scheduleIntroDropdownClose);
 const panelForHash = (hash) => {
   if (hash === '#intro' || hash.startsWith('#intro-')) return 'intro';
   if (hash === '#part-1') return 'part-1';
-  if (hash === '#part-2') return 'part-2';
+  if (hash === '#part-2' || hash.startsWith('#part-2-')) return 'part-2';
   if (hash === '#part-3' || hash.startsWith('#part-3-')) return 'part-3';
   return 'cover';
+};
+const scrollToNestedTarget = (target) => {
+  const element = document.querySelector(target);
+  if (!element) return;
+  const header = document.querySelector('.topbar');
+  const headerHeight = header?.getBoundingClientRect().height
+    || parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bar-h'))
+    || 0;
+  const top = element.getBoundingClientRect().top + window.scrollY - headerHeight;
+  window.scrollTo({ top: Math.max(0, top), behavior: 'auto' });
 };
 const setActiveTab = (tabName, { updateHash = true, scrollTarget = null } = {}) => {
   const panel = tabPanels.find((item) => item.dataset.tabPanel === tabName);
@@ -164,7 +175,7 @@ const setActiveTab = (tabName, { updateHash = true, scrollTarget = null } = {}) 
   setCompactMenuOpen(false);
   if (updateHash) history.pushState(null, '', scrollTarget || `#${tabName}`);
   if (scrollTarget) {
-    window.requestAnimationFrame(() => document.querySelector(scrollTarget)?.scrollIntoView({ block: 'start' }));
+    window.requestAnimationFrame(() => scrollToNestedTarget(scrollTarget));
   } else {
     window.scrollTo(0, 0);
   }
@@ -186,6 +197,13 @@ introDropdown.querySelectorAll('.nav-dropdown-menu a').forEach((link) => {
     const tabName = panelForHash(target);
     const scrollTarget = tabName === 'intro' && target.startsWith('#intro-') ? target : null;
     setActiveTab(tabName, { scrollTarget });
+  });
+});
+part2FlowNodes.forEach((node) => {
+  node.addEventListener('click', (event) => {
+    event.preventDefault();
+    const target = node.getAttribute('href');
+    if (target) setActiveTab(panelForHash(target), { scrollTarget: target });
   });
 });
 workflowNodes.forEach((node) => {
@@ -2252,7 +2270,7 @@ const initPart3FlowNavigation = () => {
 initPart3FlowNavigation();
 
 /* ---------------------------------------------------------------------------
-   Agentic AI 動畫場景：四個實際專案工作視窗逐字「打出來」再整段清空重播。
+   Agentic AI 動畫場景：四個實際專案工作視窗逐字「打出來」一次，完成後保留全文。
    每個視窗的內容（含語法標色用的 <span>）寫在 storymap-example.html 裡
    對應的 <script type="application/json"> 區塊，這裡只負責播放。
    --------------------------------------------------------------------------- */
@@ -2310,33 +2328,44 @@ const revealAgenticLine = (host, html, charDelay) => new Promise((resolve) => {
   typeNextChar();
 });
 
-// 播放一組行：逐行打出來、停留一段時間（含閃爍游標），再清空重新開始。
-// 回傳一個「停止」函式，畫面離開可視範圍時呼叫它暫停，不必真的移除內容。
+// 播放一組行一次：逐行打出來、停留一段時間（含閃爍游標），完成後保留全文。
+// 同一頁面生命週期內不重播；重新載入頁面才會重新開始。
 const typeAgenticSequence = (host, lines, { charDelay = 26, lineDelay = 450, holdTime = 2600, clearDelay = 500 } = {}) => {
+  if (host.dataset.agenticOnceStarted === 'true') return () => {};
+  host.dataset.agenticOnceStarted = 'true';
   let cancelled = false;
+  let completed = false;
+
+  const renderStatic = () => {
+    host.innerHTML = lines.map((line) => `<span class="line">${line}</span>`).join('');
+    completed = true;
+    host.dataset.agenticOnceComplete = 'true';
+  };
 
   const run = async () => {
-    while (!cancelled) {
-      host.innerHTML = '';
-      for (let i = 0; i < lines.length; i += 1) {
-        if (cancelled) return;
-        await revealAgenticLine(host, lines[i], charDelay);
-        if (cancelled) return;
-        if (i < lines.length - 1) await wait(lineDelay);
-      }
+    host.innerHTML = '';
+    for (let i = 0; i < lines.length; i += 1) {
       if (cancelled) return;
-      const caret = document.createElement('span');
-      caret.className = 'agentic-caret';
-      host.appendChild(caret);
-      await wait(holdTime);
+      await revealAgenticLine(host, lines[i], charDelay);
       if (cancelled) return;
-      caret.remove();
-      await wait(clearDelay);
+      if (i < lines.length - 1) await wait(lineDelay);
     }
+    if (cancelled) return;
+    const caret = document.createElement('span');
+    caret.className = 'agentic-caret';
+    host.appendChild(caret);
+    await wait(holdTime);
+    if (cancelled) return;
+    caret.remove();
+    completed = true;
+    host.dataset.agenticOnceComplete = 'true';
   };
   run();
 
-  return () => { cancelled = true; };
+  return () => {
+    cancelled = true;
+    if (!completed) renderStatic();
+  };
 };
 
 // 讀取一個元素內第一個 <script type="application/json"> 的內容並解析成陣列。
@@ -2674,7 +2703,20 @@ const initOcrScanScene = () => {
 };
 initOcrScanScene();
 
-/* 9. 輸出格式：JSON — 標籤點擊捲動＋持續反白，段落二展開／收合。
+/* 9. 輸出格式：JSON — 放到 Part 2 的「輸入結構化資料」右側，
+   保留 Part 3 的原始標記以方便維護；互動初始化前先搬移一次。 */
+const placeJsonViewerBesidePart2Input = () => {
+  const sourceSlot = document.querySelector('#part-3-json .lay-visual');
+  const targetSlot = document.querySelector('#part-2-input-json-visual');
+  const viewer = sourceSlot?.querySelector('#part-3-json-chart');
+  if (!sourceSlot || !targetSlot || !viewer) return;
+
+  targetSlot.appendChild(viewer);
+  sourceSlot.classList.add('is-moved');
+};
+placeJsonViewerBesidePart2Input();
+
+/* 標籤點擊捲動＋持續反白，段落二展開／收合。
    純互動，沒有動畫迴圈，不需要 IntersectionObserver。 */
 const initJsonViewer = () => {
   const wrap = document.querySelector('.part3-json-viewer-wrap');
@@ -4011,6 +4053,7 @@ const activateFromLocation = () => {
   const hash = window.location.hash || '#cover';
   const tabName = panelForHash(hash);
   const nestedTarget = (tabName === 'intro' && hash.startsWith('#intro-'))
+    || (tabName === 'part-2' && hash !== '#part-2')
     || (tabName === 'part-3' && hash !== '#part-3') ? hash : null;
   setActiveTab(tabName, { updateHash: false, scrollTarget: nestedTarget });
 };

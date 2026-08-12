@@ -980,7 +980,7 @@
   font-size: var(--part3-stage-title-size, clamp(26px, 3.4vw, 44px));
 }
 
-/* Part 3.5.1 — Stage bar: 運用 AI 抽取資訊 */
+/* Part 3.5.1 — Stage bar: 使用 AI 從原文中抽取資訊 */
 #part-3-ai {
   --part3-stage-title-size: clamp(26px, 3.4vw, 44px);
   --part3-stage-bar-height: clamp(140px, 19vh, 195px);
@@ -1623,7 +1623,7 @@
   --part3-ai-skills-frame-height: clamp(680px, 48vw, 800px);
 }
 
-/* Part 3.5.2.3 — 修改、建立 AI Skills：使用 Codex 對話建立每日事件分類 Skill
+/* Part 3.5.2.3 — 修改、建立 AI Skills：使用 Codex 對話建立硃批—回應配對 Skill
    手動調整視窗：以下 base／窄版／手機三組變數分別控制 VS Code 與 Codex
    的 left、top、width、height、標題字級及內容字級。 */
 #part-3-ai-skills .part3-ai-skills-layout {
@@ -1652,16 +1652,16 @@
   border: 0;
   box-shadow: none;
   --visual-h: var(--part3-ai-skills-frame-height);
-  --agentic-vscode-left: 3%;
-  --agentic-vscode-top: 5%;
+  --agentic-vscode-left: 2%;
+  --agentic-vscode-top: 3%;
   --agentic-vscode-width: 92%;
   --agentic-vscode-height: 89%;
   --agentic-vscode-font-size: 20px;
   --agentic-vscode-title-size: 15px;
-  --agentic-codex-left: 20%;
-  --agentic-codex-top: 30%;
-  --agentic-codex-width: 92%%;
-  --agentic-codex-height: 76%;
+  --agentic-codex-left: 15%;
+  --agentic-codex-top: 25%;
+  --agentic-codex-width: 78%;
+  --agentic-codex-height: 70%;
   --agentic-codex-font-size: 15px;
   --agentic-codex-text-size: 20px;
 }
@@ -1719,15 +1719,15 @@
   #part-3-ai-skills .part3-ai-skills-frame {
     --part3-ai-skills-frame-height: clamp(620px, 96vw, 740px);
     --agentic-vscode-left: 2%;
-    --agentic-vscode-top: 4%;
-    --agentic-vscode-width: 85%;
-    --agentic-vscode-height: 80%;
+    --agentic-vscode-top: 3%;
+    --agentic-vscode-width: 94%;
+    --agentic-vscode-height: 84%;
     --agentic-vscode-font-size: 20px;
     --agentic-vscode-title-size: 9px;
-    --agentic-codex-left: 20%;
-    --agentic-codex-top: 30%;
-    --agentic-codex-width: 80%;
-    --agentic-codex-height: 78%;
+    --agentic-codex-left: 10%;
+    --agentic-codex-top: 22%;
+    --agentic-codex-width: 84%;
+    --agentic-codex-height: 72%;
     --agentic-codex-font-size: 20px;
     --agentic-codex-text-size: 20px;
   }
@@ -1737,15 +1737,15 @@
   #part-3-ai-skills .part3-ai-skills-frame {
     --part3-ai-skills-frame-height: clamp(700px, 190vw, 820px);
     --agentic-vscode-left: 2%;
-    --agentic-vscode-top: 3%;
-    --agentic-vscode-width: 94%;
-    --agentic-vscode-height: 84%;
+    --agentic-vscode-top: 2%;
+    --agentic-vscode-width: 96%;
+    --agentic-vscode-height: 86%;
     --agentic-vscode-font-size: 15px;
     --agentic-vscode-title-size: 9px;
-    --agentic-codex-left: 8%;
-    --agentic-codex-top: 22%;
-    --agentic-codex-width: 90%;
-    --agentic-codex-height: 75%;
+    --agentic-codex-left: 7%;
+    --agentic-codex-top: 20%;
+    --agentic-codex-width: 88%;
+    --agentic-codex-height: 73%;
     --agentic-codex-font-size: 15px;
     --agentic-codex-text-size: 15px;
   }
@@ -2114,6 +2114,1111 @@
   #part-3-wiki-data .part3-wiki-ask-bubble { max-width: 94%; font-size: 14px; }
   #part-3-wiki-data .part3-wiki-answer-body { font-size: 14px; }
   #part-3-wiki-data .part3-wiki-thinking { font-size: 13px; }
+}
+
+/* Part 1 — 平台介面：五個獨立 topic bar 與滿版複本
+   每一個介面區域都使用同一套 source-backed demo data，但在自己的視覺
+   視窗中只顯示對應區域。數值集中在這裡，方便之後按整個分頁的比例微調。 */
+#part-1-content .part1-topic-bar {
+  --part1-topic-bar-height: clamp(140px, 19vh, 195px);
+  --part1-topic-bar-padding: 28px 0;
+  --part1-topic-title-size: clamp(26px, 3.4vw, 44px);
+}
+#part-1-content .part1-topic-content {
+  --part1-card-padding: clamp(20px, 2.1vw, 32px);
+  --part1-body-size: calc(16px * var(--font-scale));
+  --part1-body-line-height: 1.9;
+}
+#part-1-content .part1-section-visual {
+  --part1-visual-width: 90vw;
+  --part1-visual-max-width: 1480px;
+}
+
+/* Part 2 — 平台運作流程：主題帶、編號卡與逐段閱讀。 */
+#part-2-content {
+  /* 調整這三項即可控制本分頁的文字卡：一般卡片寬度、總結文書卡寬度，以及兩段之間的留白。 */
+  --part2-text-card-width: 66ch;
+  --part2-summary-card-width: 60ch;
+  --part2-summary-paragraph-gap: 1.35em;
+}
+#part-2-content .part2-stage {
+  border-top: 1px solid rgba(22, 61, 63, .16);
+}
+#part-2-content .part2-topic-bar {
+  min-height: var(--part2-topic-bar-height, clamp(140px, 19vh, 195px));
+  padding: var(--part2-topic-bar-padding, 28px 0);
+  --hero-pad-t: 28px;
+  --hero-pad-b: 28px;
+  border-bottom: 1px solid rgba(255, 255, 255, .16);
+  isolation: isolate;
+}
+#part-2-content #part-2-input-bar {
+  --part2-topic-bar-height: clamp(230px, 30vh, 300px);
+}
+#part-2-content #part-2-ai-bar {
+  --part2-topic-bar-height: clamp(230px, 30vh, 300px);
+}
+#part-2-content #part-2-communication-bar {
+  --part2-topic-bar-height: clamp(260px, 34vh, 340px);
+}
+#part-2-content .part2-topic-bar::before { content: none; }
+#part-2-content .part2-topic-bar h1 {
+  font-size: var(--part2-topic-title-size, clamp(26px, 3.4vw, 44px));
+}
+#part-2-content .part2-topic-content {
+  padding: var(--part-pad-y) var(--part-pad-x);
+  border-bottom: 1px solid rgba(22, 61, 63, .16);
+  scroll-margin-top: var(--bar-h);
+}
+#part-2-content .part2-card-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(16px, 1.8vw, 24px);
+  width: 100%;
+}
+#part-2-content .part2-text-card {
+  box-sizing: border-box;
+  width: min(100%, var(--part2-text-card-width, 78ch));
+  max-width: none;
+  margin: 0;
+  padding: var(--part2-card-padding, clamp(18px, 1.8vw, 26px));
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+#part-2-content .part2-text-card .body > p {
+  margin: 0;
+  color: var(--text);
+  font: var(--body-weight) calc(16px * var(--font-scale))/1.9 var(--serif);
+}
+#part-2-content .part2-summary-card {
+  width: min(100%, var(--part2-summary-card-width, var(--part2-text-card-width, 78ch)));
+}
+#part-2-content .part2-summary-card .body > p + p {
+  margin-top: var(--part2-summary-paragraph-gap, 1.35em);
+}
+#part-2-content .part2-wide-text {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+#part-2-content .part2-wide-text .body {
+  width: 100%;
+  max-width: none;
+}
+#part-2-content .part2-wide-text .body > p {
+  margin: 0;
+  color: var(--text);
+  font: var(--body-weight) calc(16px * var(--font-scale))/1.9 var(--serif);
+}
+#part-2-content .part2-input-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, var(--part2-input-visual-width, 56%));
+  align-items: start;
+  gap: var(--col-gap);
+}
+#part-2-content .part2-input-layout > .part2-wide-text {
+  grid-column: 1 / -1;
+}
+#part-2-content .part2-input-copy,
+#part-2-content .part2-input-visual {
+  min-width: 0;
+}
+#part-2-content .part2-input-visual {
+  width: 100%;
+}
+#part-2-content .part2-input-visual .part3-json-viewer-wrap {
+  width: 100%;
+}
+
+/* Part 2.5 — 研究者指定的 AI Skills：文字卡左、真實 Skill 摘要的 VS Code 視窗右。 */
+#part-2-content .part2-skill-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, var(--part2-skill-visual-width, 52%));
+  align-items: start;
+  gap: var(--col-gap);
+}
+#part-2-content .part2-skill-copy,
+#part-2-content .part2-skill-visual {
+  min-width: 0;
+}
+#part-2-content .part2-skill-copy .part2-card-stack {
+  align-items: stretch;
+}
+#part-2-content .part2-skill-copy .part2-text-card {
+  width: 100%;
+}
+#part-2-content .part2-skill-visual {
+  position: sticky;
+  top: calc(var(--bar-h) + 18px);
+  width: 100%;
+  height: var(--part2-skill-frame-height, clamp(480px, 42vw, 640px));
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  --visual-h: var(--part2-skill-frame-height, clamp(480px, 42vw, 640px));
+  --agentic-vscode-left: 0;
+  --agentic-vscode-top: 0;
+  --agentic-vscode-width: 100%;
+  --agentic-vscode-height: 100%;
+  --agentic-vscode-font-size: 12px;
+  --agentic-vscode-title-size: 12px;
+}
+#part-2-content .part2-skill-visual > .part2-skill-scene {
+  min-height: 0;
+  background: transparent;
+}
+#part-2-content .part2-skill-window {
+  opacity: 1;
+  cursor: default;
+  box-shadow: 0 22px 38px rgba(0, 0, 0, .24);
+}
+#part-2-content .part2-skill-window .agentic-window-body {
+  line-height: 1.48;
+}
+#part-2-content .part2-skill-window .agentic-vscode-tabs {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+#part-2-content .part2-skill-window .agentic-vscode-tabs::-webkit-scrollbar { display: none; }
+
+@media (max-width: 1040px) {
+  #part-2-content .part2-skill-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #part-2-content .part2-skill-visual {
+    position: static;
+    height: clamp(520px, 86vw, 700px);
+    --visual-h: clamp(520px, 86vw, 700px);
+    --agentic-vscode-font-size: 13px;
+    --agentic-vscode-title-size: 12px;
+  }
+}
+
+@media (max-width: 620px) {
+  #part-2-content .part2-skill-visual {
+    height: clamp(500px, 142vw, 700px);
+    --visual-h: clamp(500px, 142vw, 700px);
+    --agentic-vscode-font-size: 11px;
+    --agentic-vscode-title-size: 10px;
+  }
+  #part-2-content .part2-skill-window .agentic-window-body {
+    padding: 11px 12px;
+  }
+}
+
+/* Part 2.3b — Layer-3 substage cover（重建通信關係之下：辨識奏摺所回應的上諭／硃批）。
+   刻意與 layer 2 的 .part2-topic-bar 沿用同一組漸層與底部強調線，維持家族關係可辨識，
+   但改為：貼齊螢幕左側（負左邊距抵消 section 本身的 --part-pad-x，且無上邊距，直接接
+   上前一節的底線）、寬度僅約螢幕的 68%、左側完全不淡出（文字區維持完全不透明），右側
+   從約 55% 起以 20 級平滑曲線長距離淡出至完全透明（非硬邊）。與下方內文卡片之間保留
+   34px 間距。
+   數字標記（2-1 之一／2-2 之二）取代 layer 2 的小型 eyebrow，作為主要的子階段辨識線索。
+   刻意不放入 .part2-text-card／.part2-numbered-card，避免與一般內文卡片混淆。 */
+#part-2-content .part2-substage-cover {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  width: min(980px, 68vw);
+  min-width: 420px;
+  margin: calc(-1 * var(--part-pad-y)) 0 34px calc(-1 * var(--part-pad-x));
+  padding: 32px 38px 32px calc(var(--part-pad-x) + 4px);
+  color: #f7f3ea;
+  background: linear-gradient(120deg, #173b3f 5%, #456e69 50%, #b36f58 145%);
+  -webkit-mask-image: linear-gradient(to right,
+    black 0%, black 55%,
+    rgba(0, 0, 0, .997) 57.3%,
+    rgba(0, 0, 0, .988) 59.5%,
+    rgba(0, 0, 0, .972) 61.8%,
+    rgba(0, 0, 0, .951) 64%,
+    rgba(0, 0, 0, .924) 66.3%,
+    rgba(0, 0, 0, .891) 68.5%,
+    rgba(0, 0, 0, .853) 70.8%,
+    rgba(0, 0, 0, .809) 73%,
+    rgba(0, 0, 0, .76) 75.3%,
+    rgba(0, 0, 0, .707) 77.5%,
+    rgba(0, 0, 0, .649) 79.8%,
+    rgba(0, 0, 0, .588) 82%,
+    rgba(0, 0, 0, .523) 84.3%,
+    rgba(0, 0, 0, .454) 86.5%,
+    rgba(0, 0, 0, .383) 88.8%,
+    rgba(0, 0, 0, .309) 91%,
+    rgba(0, 0, 0, .233) 93.3%,
+    rgba(0, 0, 0, .156) 95.5%,
+    rgba(0, 0, 0, .078) 97.8%,
+    rgba(0, 0, 0, 0) 100%);
+          mask-image: linear-gradient(to right,
+    black 0%, black 55%,
+    rgba(0, 0, 0, .997) 57.3%,
+    rgba(0, 0, 0, .988) 59.5%,
+    rgba(0, 0, 0, .972) 61.8%,
+    rgba(0, 0, 0, .951) 64%,
+    rgba(0, 0, 0, .924) 66.3%,
+    rgba(0, 0, 0, .891) 68.5%,
+    rgba(0, 0, 0, .853) 70.8%,
+    rgba(0, 0, 0, .809) 73%,
+    rgba(0, 0, 0, .76) 75.3%,
+    rgba(0, 0, 0, .707) 77.5%,
+    rgba(0, 0, 0, .649) 79.8%,
+    rgba(0, 0, 0, .588) 82%,
+    rgba(0, 0, 0, .523) 84.3%,
+    rgba(0, 0, 0, .454) 86.5%,
+    rgba(0, 0, 0, .383) 88.8%,
+    rgba(0, 0, 0, .309) 91%,
+    rgba(0, 0, 0, .233) 93.3%,
+    rgba(0, 0, 0, .156) 95.5%,
+    rgba(0, 0, 0, .078) 97.8%,
+    rgba(0, 0, 0, 0) 100%);
+}
+#part-2-content .part2-substage-num {
+  flex: 0 0 auto;
+  font: 500 44px/1 var(--serif);
+  color: rgba(247, 243, 234, .38);
+  letter-spacing: -.02em;
+}
+#part-2-content .part2-substage-num small {
+  display: block;
+  margin-top: 3px;
+  font: 700 9.5px/1 var(--sans);
+  letter-spacing: .16em;
+  color: var(--yellow);
+}
+#part-2-content .part2-substage-divider {
+  flex: 0 0 auto;
+  width: 1px;
+  align-self: stretch;
+  background: rgba(247, 243, 234, .28);
+}
+#part-2-content .part2-substage-copy { min-width: 0; }
+#part-2-content .part2-substage-crumb {
+  margin: 0 0 5px;
+  font: 700 10px/1 var(--sans);
+  letter-spacing: .14em;
+  color: var(--yellow);
+}
+#part-2-content .part2-substage-copy h2 {
+  margin: 0;
+  font: 500 clamp(26px, 3.4vw, 44px)/1.16 var(--serif);
+  letter-spacing: -.035em;
+  color: #f7f3ea;
+}
+/* Each substage cover sits flush against the border-bottom of whatever
+   section immediately precedes it (pulled up via the negative --part-pad-y
+   margin above), so those seam lines are now redundant right where a cover
+   starts — hide them without touching border-bottom elsewhere (width/layout
+   unchanged, only the section directly before each cover is affected):
+   通信關係 2-1 上諭配對 → 2-2 硃批配對 → 2-3 上諭來源配對；
+   抽取奏摺的資訊 3-1 事件抽取 → 3-2 來源鏈追溯。 */
+#part-2-content #part-2-communication-content,
+#part-2-content #part-2-yu-response,
+#part-2-content #part-2-zhu-response,
+#part-2-content #part-2-extract-content,
+#part-2-content #part-2-events {
+  border-bottom-color: transparent;
+}
+@media (max-width: 720px) {
+  #part-2-content .part2-substage-cover {
+    width: calc(100% + var(--part-pad-x));
+    padding: 24px 20px 24px calc(var(--part-pad-x) + 2px);
+    gap: 14px;
+  }
+  #part-2-content .part2-substage-num { font-size: 34px; }
+  #part-2-content .part2-substage-copy h2 { font-size: clamp(22px, 6.4vw, 30px); }
+}
+
+/* Part 2.4 — 辨識奏摺所回應的上諭：文字卡左、通信關係視覺右。 */
+#part-2-content #part-2-yu-response .part2-yu-response-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 52%);
+  align-items: start;
+  gap: var(--col-gap);
+}
+#part-2-content #part-2-yu-response .part2-yu-response-copy,
+#part-2-content #part-2-yu-response .part2-communication-visual {
+  min-width: 0;
+}
+#part-2-content #part-2-yu-response .part2-yu-response-copy .part2-card-stack {
+  align-items: stretch;
+}
+#part-2-content #part-2-yu-response .part2-yu-response-card {
+  width: 100%;
+}
+#part-2-content #part-2-yu-response .part2-communication-visual {
+  position: sticky;
+  top: calc(var(--bar-h) + 18px);
+  margin: 0;
+  padding: clamp(16px, 1.8vw, 24px);
+  color: var(--ink);
+  background: linear-gradient(145deg, #f7f0e5, #e8dfd1);
+  border: 1px solid rgba(22, 61, 63, .18);
+  box-shadow: 0 14px 28px rgba(60, 44, 20, .12);
+}
+#part-2-content #part-2-yu-response .part2-communication-visual-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(22, 61, 63, .18);
+}
+#part-2-content #part-2-yu-response .part2-communication-visual-index {
+  color: #c46a2b;
+  font: 800 12px/1 var(--sans);
+  letter-spacing: .12em;
+}
+#part-2-content #part-2-yu-response .part2-communication-visual-head strong {
+  font: 600 clamp(20px, 2vw, 28px)/1.2 var(--serif);
+}
+#part-2-content #part-2-yu-response .part2-communication-visual-caption {
+  margin-left: auto;
+  color: var(--muted);
+  font: 700 11px/1.2 var(--sans);
+  letter-spacing: .08em;
+}
+#part-2-content #part-2-yu-response .part2-communication-diagram {
+  display: grid;
+  grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr) minmax(0, .82fr);
+  align-items: center;
+  gap: clamp(10px, 1.2vw, 18px);
+  margin: 18px 0;
+}
+#part-2-content #part-2-yu-response .part2-communication-column {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+#part-2-content #part-2-yu-response .part2-communication-node {
+  position: relative;
+  padding: 11px 10px;
+  background: rgba(255, 253, 248, .9);
+  border: 1px solid rgba(22, 61, 63, .16);
+  box-shadow: 0 7px 16px rgba(60, 44, 20, .08);
+}
+#part-2-content #part-2-yu-response .part2-communication-column-left .part2-communication-node::after,
+#part-2-content #part-2-yu-response .part2-communication-column-right .part2-communication-node::before {
+  position: absolute;
+  top: 50%;
+  color: #c46a2b;
+  font: 700 20px/1 var(--sans);
+  transform: translateY(-50%);
+}
+#part-2-content #part-2-yu-response .part2-communication-column-left .part2-communication-node::after {
+  right: -22px;
+  content: "→";
+}
+#part-2-content #part-2-yu-response .part2-communication-column-right .part2-communication-node::before {
+  left: -22px;
+  content: "←";
+}
+#part-2-content #part-2-yu-response .part2-communication-node span {
+  display: block;
+  margin-bottom: 5px;
+  color: #8a6a2e;
+  font: 700 10px/1.3 var(--sans);
+  letter-spacing: .04em;
+}
+#part-2-content #part-2-yu-response .part2-communication-node strong {
+  display: block;
+  color: var(--ink);
+  font: 700 18px/1.1 var(--serif);
+}
+#part-2-content #part-2-yu-response .part2-communication-node small,
+#part-2-content #part-2-yu-response .part2-communication-document small {
+  display: block;
+  color: var(--muted);
+  font: 11px/1.45 var(--sans);
+}
+#part-2-content #part-2-yu-response .part2-communication-document {
+  min-height: 212px;
+  padding: 15px 14px;
+  background: #fffdf8;
+  border: 1px solid #e5dacb;
+  box-shadow: 0 12px 24px rgba(60, 44, 20, .14);
+}
+#part-2-content #part-2-yu-response .part2-communication-document-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  color: var(--ink);
+  font: 700 22px/1.1 var(--serif);
+}
+#part-2-content #part-2-yu-response .part2-communication-badge {
+  padding: 3px 6px;
+  color: #fff;
+  background: #c46a2b;
+  border-radius: 4px;
+  font: 800 12px/1 var(--sans);
+}
+#part-2-content #part-2-yu-response .part2-communication-document p {
+  margin: 14px 0 0;
+  padding-top: 12px;
+  color: #4b4033;
+  border-top: 1px solid #e8dfd1;
+  font: var(--body-weight) 14px/1.7 var(--serif);
+}
+#part-2-content #part-2-yu-response .part2-communication-visual-foot {
+  margin: 0;
+  padding-top: 12px;
+  color: var(--muted);
+  border-top: 1px solid rgba(22, 61, 63, .14);
+  font: 600 12px/1.65 var(--sans);
+}
+
+/* Part 2.6 — 辨識奏摺所回應的硃批：文字卡左、引言通信視覺右。 */
+#part-2-content #part-2-zhu-response .part2-zhu-response-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(460px, 56%);
+  align-items: start;
+  gap: var(--col-gap);
+}
+#part-2-content #part-2-zhu-response .part2-zhu-response-copy,
+#part-2-content #part-2-zhu-response .part2-source-visual {
+  min-width: 0;
+}
+#part-2-content #part-2-zhu-response .part2-zhu-response-copy .part2-card-stack {
+  align-items: stretch;
+}
+#part-2-content #part-2-zhu-response .part2-zhu-response-card {
+  width: 100%;
+}
+#part-2-content #part-2-zhu-response .part2-source-visual {
+  position: sticky;
+  top: calc(var(--bar-h) + 18px);
+  width: 100%;
+  height: clamp(600px, 58vw, 820px);
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  --source-panel-width: 100%;
+  --source-panel-height: 100%;
+  --source-panel-margin-top: 0px;
+  --source-panel-margin-right: 0px;
+  --source-panel-margin-bottom: 0px;
+  --source-panel-margin-left: 0px;
+  --source-panel-source-space: clamp(78px, 15%, 132px);
+  --source-flow-top-gap: 0px;
+}
+#part-2-content #part-2-zhu-response .part2-source-flow-visual {
+  height: 100%;
+  padding-top: 0;
+  --source-flow-top-gap: 0px;
+}
+#part-2-content #part-2-zhu-response .part2-source-flow-visual .source-flow-document {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+#part-2-content #part-2-zhu-response .part2-source-flow-visual .source-callouts {
+  width: clamp(92px, 17%, 148px);
+}
+#part-2-content #part-2-zhu-response .part2-source-flow-visual .source-callout-detail {
+  display: none;
+}
+#part-2-content #part-2-zhu-response .part2-source-flow-visual .source-callout {
+  top: var(--source-bubble-top, auto) !important;
+}
+
+@media (max-width: 1040px) {
+  #part-2-content #part-2-zhu-response .part2-zhu-response-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #part-2-content #part-2-zhu-response .part2-source-visual {
+    position: static;
+    height: clamp(600px, 95vw, 820px);
+  }
+}
+
+@media (max-width: 620px) {
+  #part-2-content #part-2-zhu-response .part2-source-visual {
+    height: clamp(580px, 178vw, 760px);
+  }
+  #part-2-content #part-2-zhu-response .part2-source-flow-visual {
+    --source-flow-top-gap: 0px;
+    padding-top: 0;
+  }
+  #part-2-content #part-2-zhu-response .part2-source-flow-visual .source-flow-document {
+    height: calc(100% - 0px);
+  }
+}
+
+/* JSON 的互動視覺已移到 Part 2；Part 3 保留文字說明及錨點。 */
+#part-3-content #part-3-json .lay-split {
+  grid-template-columns: minmax(0, 1fr);
+}
+#part-3-content #part-3-json .lay-visual.is-moved {
+  display: none;
+}
+#part-2-content .part2-numbered-card .title-row {
+  align-items: center;
+  margin-bottom: 16px;
+}
+#part-2-content .part2-numbered-card .title-row h2 {
+  margin: 0;
+  color: var(--ink);
+  font: 500 clamp(24px, 2.9vw, 40px)/1.14 var(--serif);
+  letter-spacing: -.03em;
+  overflow-wrap: anywhere;
+}
+#part-2-content .part2-numbered-card .body > p { margin: 0; }
+
+@media (max-width: 620px) {
+  #part-2-content .part2-topic-content {
+    padding: 28px 16px 36px;
+  }
+  #part-2-content .part2-card-stack { gap: 14px; }
+  #part-2-content .part2-text-card { width: min(100%, var(--part2-text-card-width, 78ch)); }
+  #part-2-content .part2-numbered-card .title-row { align-items: flex-start; }
+  #part-2-content .part2-numbered-card .title-row h2 { font-size: clamp(22px, 7vw, 30px); }
+  #part-2-content #part-2-yu-response .part2-communication-visual-head { align-items: flex-start; flex-wrap: wrap; }
+  #part-2-content #part-2-yu-response .part2-communication-visual-caption { width: 100%; margin-left: 0; }
+  #part-2-content #part-2-yu-response .part2-communication-diagram { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); }
+  #part-2-content #part-2-yu-response .part2-communication-column-right { grid-column: 1 / -1; flex-direction: row; }
+  #part-2-content #part-2-yu-response .part2-communication-column-right .part2-communication-node { flex: 1; }
+  #part-2-content #part-2-yu-response .part2-communication-column-right .part2-communication-node::before { top: -18px; left: 50%; content: "↑"; transform: translateX(-50%); }
+}
+
+@media (max-width: 980px) {
+  #part-2-content .part2-input-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #part-2-content .part2-input-copy { order: 1; }
+  #part-2-content .part2-input-visual { order: 2; }
+  #part-2-content #part-2-yu-response .part2-yu-response-layout { grid-template-columns: minmax(0, 1fr); }
+  #part-2-content #part-2-yu-response .part2-communication-visual { position: static; }
+}
+
+/* Part 2.2 — 運作流程圖：標題與說明沿用 Part 3 的滿版文字排版，不使用卡片背景。 */
+#part-2-flow .lay-stack > .blk {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+}
+#part-2-flow .lay-stack > .blk .title-row h2 {
+  font-size: clamp(27px, 3.4vw, 46px);
+  line-height: 1.12;
+}
+#part-2-flow .lay-stack > .blk .body {
+  width: 100%;
+  max-width: none;
+}
+#part-2-flow .lay-stack > .blk .body > p {
+  font-size: calc(16px * var(--font-scale));
+  line-height: 1.9;
+}
+
+/* Part 2 — 運作流程圖：選定題目與史料 → OCR 並結構化史料 → 輸入結構化史料
+   → 使用AI抽取資訊 → 四組 AI Skills → 視覺化分析的結果。
+   桌面版用水平匯流排＋支線呈現分支／匯合；窄螢幕改用直向排列，四組 Skills
+   收在一個虛線群組內，避免同時畫四條斜線造成擁擠。 */
+#part-2-content .part2-flow-shell {
+  /* 背板沿用 Part 3「甚麼是 OCR？」ocr-scan-scene 的深色漸層卡片樣式。 */
+  --part2-flow-stub: clamp(20px, 2.4vw, 40px);
+  margin-top: clamp(22px, 2.6vw, 34px);
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: clamp(22px, 3vw, 34px) clamp(14px, 2.4vw, 28px);
+  background: radial-gradient(circle at 22% 16%, rgba(91, 141, 239, .14), transparent 46%),
+              linear-gradient(150deg, #12363a 0%, #1c464a 55%, #3a5f5a 100%);
+  border: 1px solid var(--line);
+  box-shadow: 0 16px 34px rgba(22, 61, 63, .18);
+}
+#part-2-content .part2-flow-chart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
+  min-width: 100%;
+}
+#part-2-content .part2-flow-node {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px clamp(16px, 1.8vw, 22px);
+  background: var(--card);
+  border: 1px solid var(--line);
+  text-decoration: none;
+  transition: border-color .2s, box-shadow .2s, background-color .2s, transform .2s;
+}
+#part-2-content .part2-flow-node:hover,
+#part-2-content .part2-flow-node:focus-visible {
+  background: #fffdf8;
+  border-color: var(--accent);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .32);
+  transform: translateY(-2px);
+}
+#part-2-content .part2-flow-node:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+#part-2-content .part2-flow-node-eyebrow {
+  color: var(--accent);
+  font: 700 calc(10.5px * var(--font-scale))/1 var(--sans);
+  letter-spacing: .1em;
+}
+#part-2-content .part2-flow-node-title {
+  color: var(--ink);
+  font: 600 calc(15px * var(--font-scale))/1.42 var(--serif);
+  letter-spacing: -.01em;
+}
+#part-2-content .part2-flow-node-solo { min-width: clamp(148px, 14vw, 204px); }
+#part-2-content .part2-flow-node-stack { min-width: clamp(186px, 16vw, 236px); }
+
+/* 平台以外完成的前置步驟（選定研究主題與史料／OCR 並結構化原始史料）：
+   半透明卡片，融入深色背板，跟後面實心米色的平台步驟區分開來；
+   滑鼠移入／聚焦時比照一般節點變回實心米色卡片，維持互動一致。 */
+#part-2-content .part2-flow-node-pre {
+  background: rgba(247, 243, 234, .14);
+  border: 1px solid rgba(247, 243, 234, .3);
+}
+#part-2-content .part2-flow-node-pre .part2-flow-node-eyebrow { color: rgba(247, 243, 234, .62); }
+#part-2-content .part2-flow-node-pre .part2-flow-node-title { color: #f7f3ea; }
+#part-2-content .part2-flow-node-pre:hover .part2-flow-node-eyebrow,
+#part-2-content .part2-flow-node-pre:focus-visible .part2-flow-node-eyebrow { color: var(--accent); }
+#part-2-content .part2-flow-node-pre:hover .part2-flow-node-title,
+#part-2-content .part2-flow-node-pre:focus-visible .part2-flow-node-title { color: var(--ink); }
+
+#part-2-content .part2-flow-pre-stack {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: clamp(8px, 1vw, 12px);
+  width: clamp(148px, 14vw, 204px);
+}
+#part-2-content .part2-flow-pre-stack .part2-flow-node-solo {
+  width: 100%;
+  min-width: 0;
+}
+#part-2-content .part2-flow-arrow {
+  flex: 0 0 var(--part2-flow-stub);
+  align-self: center;
+  height: 1px;
+  background: rgba(247, 243, 234, .3);
+  position: relative;
+}
+#part-2-content .part2-flow-arrow::after {
+  content: "";
+  position: absolute; right: -1px; top: 50%;
+  transform: translateY(-50%);
+  border-left: 7px solid var(--yellow);
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+}
+
+/* 分支僅用留白區隔四組 Skills，左右已移除匯流排／支線，避免視覺過於擁擠。 */
+#part-2-content .part2-flow-branch {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: stretch;
+  padding: 0 var(--part2-flow-stub);
+}
+#part-2-content .part2-flow-branch-label { display: none; }
+
+#part-2-content .part2-flow-stack {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(10px, 1.2vw, 18px);
+}
+#part-2-content .part2-flow-node-stack { position: relative; }
+
+/* 窄螢幕／手機：改為直向排列，四組 Skills 收進同一個虛線群組，
+   群組上／下各接一條垂直箭頭；第一組維持在第二組上方。 */
+@media (max-width: 900px) {
+  #part-2-content .part2-flow-shell {
+    overflow-x: visible;
+    padding: clamp(20px, 6vw, 28px) clamp(12px, 4vw, 20px);
+  }
+  #part-2-content .part2-flow-chart {
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    min-width: 0;
+  }
+  #part-2-content .part2-flow-node {
+    align-items: center;
+    text-align: center;
+  }
+  #part-2-content .part2-flow-node-solo {
+    width: fit-content;
+    max-width: min(84vw, 320px);
+    min-width: 0;
+  }
+
+  #part-2-content .part2-flow-arrow {
+    flex: 0 0 clamp(22px, 6vw, 32px);
+    align-self: center;
+    width: 1px;
+    height: clamp(22px, 6vw, 32px);
+  }
+  #part-2-content .part2-flow-arrow::after {
+    right: auto; top: auto;
+    left: 50%; bottom: -1px;
+    transform: translateX(-50%);
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 7px solid var(--yellow);
+  }
+
+  #part-2-content .part2-flow-branch {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    max-width: 420px;
+    padding: clamp(30px, 9vw, 40px) clamp(16px, 4.4vw, 24px) clamp(14px, 3.4vw, 18px);
+    border: 1px dashed rgba(247, 243, 234, .32);
+    background: rgba(247, 243, 234, .05);
+  }
+  #part-2-content .part2-flow-branch-label {
+    display: block;
+    position: absolute; top: 12px; left: 50%;
+    transform: translateX(-50%);
+    color: rgba(247, 243, 234, .6);
+    font: 700 calc(10.5px * var(--font-scale))/1 var(--sans);
+    letter-spacing: .1em;
+    white-space: nowrap;
+  }
+  /* 恢復手機版的「田」字排列：1、2 在上排，3、4 在下排；四格同寬同高，
+     只是排版分布，不是表格元素。 */
+  #part-2-content .part2-flow-stack {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: 1fr;
+    gap: clamp(10px, 3vw, 16px);
+    width: 100%;
+  }
+  #part-2-content .part2-flow-node-stack {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    min-height: clamp(84px, 24vw, 104px);
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  #part-2-content .part2-flow-node-stack::before,
+  #part-2-content .part2-flow-node-stack::after { display: none; }
+  #part-2-content .part2-flow-pre-stack {
+    width: fit-content;
+    max-width: min(84vw, 320px);
+  }
+}
+
+/* Part 2.3 — 分析階段一「總結文書」互動示範：VS Code 風格 Skill 視窗
+   （quick-summary.md／divide-into-parts.md）疊在文書面板複本（硃40）
+   之上。行為與拖曳／縮放邏輯在 part2-summary-visual.js，這裡只放外觀。
+   桌面：兩段說明文字在左，示範視窗在右；窄螢幕：直向堆疊。 ------- */
+#part-2-content .part2-summary-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, .8fr) minmax(560px, 1.35fr);
+  gap: clamp(24px, 3vw, 44px);
+  align-items: start;
+  width: 100%;
+}
+#part-2-content .part2-summary-layout .part2-card-stack { width: 100%; }
+
+#part-2-content .part2-summary-visual {
+  --p2sv-sample-orange: #c86138;
+  position: relative;
+}
+#part-2-content .part2-summary-stage {
+  position: relative;
+  min-height: 640px;
+  padding: 6px 4px 30px;
+  overflow: visible;
+}
+
+/* -------- VS Code 風格視窗（兩個 Skill） -------- */
+#part-2-content .part2-summary-skill-win {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 480px;
+  height: 380px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #1e1e1e;
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 10px;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, .28);
+  z-index: 1;
+  cursor: pointer;
+  transition: box-shadow .3s, filter .3s;
+}
+#part-2-content .part2-summary-skill-win.is-top { z-index: 5; box-shadow: 0 26px 48px rgba(0, 0, 0, .4); }
+#part-2-content .part2-summary-skill-win.is-dim { filter: brightness(.94); }
+
+#part-2-content .part2-summary-skill-bar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 13px;
+  background: #2b2b2b;
+  border-bottom: 1px solid rgba(255, 255, 255, .06);
+}
+#part-2-content .part2-summary-skill-bar .dot { width: 9px; height: 9px; border-radius: 50%; }
+#part-2-content .part2-summary-skill-bar .dot.red { background: #ff5f57; }
+#part-2-content .part2-summary-skill-bar .dot.yellow { background: #febc2e; }
+#part-2-content .part2-summary-skill-bar .dot.green { background: #28c840; }
+#part-2-content .part2-summary-ttl {
+  margin-left: 8px;
+  color: rgba(255, 255, 255, .6);
+  font: 700 calc(10px * var(--font-scale))/1 var(--sans);
+  letter-spacing: .04em;
+}
+#part-2-content .part2-summary-done {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 5px;
+  color: #7bd88f;
+  font: 700 calc(10px * var(--font-scale))/1 var(--sans);
+  opacity: 0; transform: translateY(-3px);
+  transition: opacity .3s, transform .3s;
+}
+#part-2-content .part2-summary-skill-win.is-done .part2-summary-done { opacity: 1; transform: translateY(0); }
+
+#part-2-content .part2-summary-move {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px;
+  color: rgba(255, 255, 255, .55);
+  cursor: grab;
+  touch-action: none;
+}
+#part-2-content .part2-summary-move:active { cursor: grabbing; }
+#part-2-content .part2-summary-move svg { width: 15px; height: 15px; }
+#part-2-content .part2-summary-doc-window-controls .part2-summary-move { color: #a99d8b; width: 19px; height: 19px; }
+#part-2-content .part2-summary-doc-window-controls .part2-summary-move svg { width: 19px; height: 19px; }
+
+#part-2-content .part2-summary-tabs {
+  flex: 0 0 auto;
+  display: flex;
+  background: #252526;
+  border-bottom: 1px solid rgba(255, 255, 255, .06);
+}
+#part-2-content .part2-summary-tab {
+  padding: 8px 14px;
+  color: rgba(255, 255, 255, .4);
+  background: transparent;
+  border-right: 1px solid rgba(255, 255, 255, .06);
+  font: 600 calc(10.5px * var(--font-scale))/1.2 var(--sans);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color .25s, background-color .25s;
+}
+#part-2-content .part2-summary-tab.is-active { color: rgba(255, 255, 255, .92); background: #1e1e1e; }
+#part-2-content .part2-summary-tab-dot {
+  display: inline-block; width: 6px; height: 6px; margin-right: 6px; border-radius: 50%;
+  background: rgba(255, 255, 255, .2);
+}
+#part-2-content .part2-summary-tab.is-active .part2-summary-tab-dot { background: var(--accent); }
+#part-2-content .part2-summary-tab.is-typed .part2-summary-tab-dot { background: #7bd88f; }
+
+#part-2-content .part2-summary-skill-body {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto;
+  padding: 16px 18px;
+  color: #d4d4d4; white-space: pre-wrap; word-break: break-word;
+  font: calc(12.5px * var(--font-scale))/1.9 "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+#part-2-content .part2-summary-skill-body .cmt { color: #6a9955; }
+#part-2-content .part2-summary-skill-body .kw { color: #c586c0; }
+#part-2-content .part2-summary-skill-body .str { color: #ce9178; }
+#part-2-content .part2-summary-skill-body .hd { color: #4fc1ff; }
+#part-2-content .part2-summary-caret {
+  display: inline-block; width: 6px; height: 13px; margin-left: 1px;
+  background: #d4d4d4; vertical-align: -2px;
+  animation: part2-summary-caret-blink 1s step-end infinite;
+}
+@keyframes part2-summary-caret-blink { 50% { opacity: 0; } }
+
+/* -------- 文書面板（沿用平台原始史料區配色與版式） -------- */
+#part-2-content .part2-summary-doc-win {
+  position: absolute;
+  top: 96px;
+  left: 220px;
+  width: 560px;
+  height: 560px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fffdf8;
+  border: 1px solid #d7ccba;
+  border-radius: 6px;
+  box-shadow: 0 14px 30px rgba(47, 57, 52, .22);
+  z-index: 2;
+  cursor: pointer;
+  transition: box-shadow .3s;
+}
+#part-2-content .part2-summary-doc-win.is-top { z-index: 5; }
+
+#part-2-content .part2-summary-doc-head {
+  position: relative; flex: 0 0 auto;
+  padding: 20px 22px 16px;
+  background: #fffdf8;
+  border-bottom: 1px solid #e1d8c9;
+}
+#part-2-content .part2-summary-doc-window-controls {
+  position: absolute; top: 20px; right: 20px;
+  display: flex; align-items: center; gap: 14px;
+  color: #a99d8b;
+}
+#part-2-content .part2-summary-doc-window-controls svg { width: 19px; height: 19px; }
+#part-2-content .part2-summary-doc-title { margin: 0 0 10px; font: 700 calc(24px * var(--font-scale))/1.35 var(--serif); color: var(--ink); }
+#part-2-content .part2-summary-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; margin-right: 9px;
+  color: #fffaf2; background: var(--p2sv-sample-orange);
+  border-radius: 8px; vertical-align: -9px;
+  font: 800 calc(17px * var(--font-scale))/1 var(--serif);
+}
+#part-2-content .part2-summary-doc-meta { margin: 0; color: #4a4234; font: 500 calc(15px * var(--font-scale))/1.65 var(--sans); }
+
+#part-2-content .part2-summary-doc-filterdock {
+  flex: 0 0 auto;
+  display: flex; align-items: center; gap: 14px;
+  min-height: 40px; padding: 9px 20px;
+  background: #f5eee1; border-bottom: 1px solid #e1d8c9;
+}
+#part-2-content .part2-summary-doc-filterdock svg { width: 20px; height: 20px; color: #a39785; }
+#part-2-content .part2-summary-fgear { margin-left: auto; }
+
+#part-2-content .part2-summary-doc-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 20px 22px 30px; }
+
+#part-2-content .part2-summary-doc-summary {
+  display: none;
+  margin: 0 0 18px; padding: 14px 16px;
+  color: #2e261d; background: #fffdf8;
+  border: 1px solid #e4d7c5; border-radius: 9px;
+  opacity: 0; transform: translateY(8px) scaleY(.85);
+  transform-origin: top;
+  max-height: 0; overflow: hidden;
+  transition: opacity .3s ease, transform .4s cubic-bezier(.22, 1, .36, 1), max-height .45s cubic-bezier(.22, 1, .36, 1);
+}
+#part-2-content .part2-summary-doc-win.is-applied .part2-summary-doc-summary { display: block; }
+#part-2-content .part2-summary-doc-summary.is-revealed { opacity: 1; transform: none; max-height: 600px; }
+#part-2-content .part2-summary-doc-summary h3 { margin: 0 0 9px; color: #8d6a28; font: 700 calc(17px * var(--font-scale))/1.2 var(--serif); }
+#part-2-content .part2-summary-doc-summary p { margin: 0; color: var(--text); font: 500 calc(15.5px * var(--font-scale))/1.85 var(--serif); }
+
+#part-2-content .part2-summary-section-label {
+  margin: 0 0 10px; color: #91702d;
+  font: 700 calc(13px * var(--font-scale))/1.2 var(--serif); letter-spacing: .04em;
+}
+
+#part-2-content .part2-summary-doc-body {
+  margin: 0; color: var(--text);
+  font: 500 calc(15.5px * var(--font-scale))/2 var(--serif); text-align: left;
+  opacity: 1;
+  transition: opacity .3s ease;
+}
+#part-2-content .part2-summary-doc-body.is-fading { opacity: 0; }
+#part-2-content .part2-summary-doc-win.is-applied .part2-summary-doc-body { display: none; }
+
+#part-2-content .part2-summary-doc-divisions { display: none; }
+#part-2-content .part2-summary-doc-win.is-applied .part2-summary-doc-divisions { display: block; }
+#part-2-content .part2-summary-doc-part {
+  margin: 0 0 10px; padding: 0 14px 12px;
+  background: #fffdf8; border: 1px solid #e2d7c7; border-radius: 8px;
+  overflow: hidden;
+  opacity: 0; transform: translateY(8px) scaleY(.85);
+  transform-origin: top;
+  max-height: 0;
+  transition: opacity .3s ease, transform .4s cubic-bezier(.22, 1, .36, 1), max-height .45s cubic-bezier(.22, 1, .36, 1);
+}
+#part-2-content .part2-summary-doc-part.is-revealed { opacity: 1; transform: none; max-height: 600px; }
+#part-2-content .part2-summary-doc-part h4 { margin: 0 -14px 8px; padding: 9px 14px; color: #2e261d; background: #f5efe4; font: 700 calc(16px * var(--font-scale))/1.3 var(--serif); }
+#part-2-content .part2-summary-doc-part h4 span {
+  display: inline-block; margin-right: 5px; padding: 2px 6px;
+  color: #786d61; background: #eee6d8; border-radius: 4px;
+  font: 700 calc(12px * var(--font-scale))/1.5 var(--sans);
+}
+#part-2-content .part2-summary-doc-part-summary { margin: 0 0 8px; color: #9d8e7a; font: 600 calc(13px * var(--font-scale))/1.6 var(--serif); }
+#part-2-content .part2-summary-doc-part-excerpt { margin: 0; color: var(--text); font: 500 calc(15px * var(--font-scale))/2 var(--serif); }
+#part-2-content .part2-summary-doc-caret {
+  display: inline-block; width: 2px; height: calc(13px * var(--font-scale));
+  margin-left: 1px; background: var(--accent);
+  vertical-align: -2px;
+  animation: part2-summary-caret-blink 1s step-end infinite;
+}
+
+/* -------- 提示泡泡：RPG 風格 NPC 驚嘆號，依序引導點擊 -------- */
+#part-2-content .part2-summary-bubble {
+  position: absolute;
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  color: #4a2c12; background: var(--yellow);
+  border: 2px solid #fffaf2; border-radius: 50%;
+  font: 800 calc(16px * var(--font-scale))/1 var(--sans);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, .3);
+  cursor: pointer;
+  z-index: 20;
+  opacity: 0; transform: translate(-50%, -50%) scale(.4);
+  pointer-events: none;
+  transition: opacity .25s, transform .25s;
+}
+#part-2-content .part2-summary-bubble.is-shown {
+  opacity: 1; pointer-events: auto;
+  animation: part2-summary-bubble-bounce 1.1s ease-in-out infinite;
+}
+#part-2-content .part2-summary-bubble-num { position: relative; z-index: 1; }
+#part-2-content .part2-summary-bubble-ring {
+  position: absolute; inset: -8px; border-radius: 50%;
+  border: 2px solid var(--yellow);
+  opacity: 0;
+}
+#part-2-content .part2-summary-bubble.is-shown .part2-summary-bubble-ring {
+  animation: part2-summary-bubble-ping 1.6s ease-out infinite;
+}
+@keyframes part2-summary-bubble-bounce {
+  0%, 100% { transform: translate(-50%, -50%) scale(1) translateY(0); }
+  50% { transform: translate(-50%, -50%) scale(1) translateY(-7px); }
+}
+@keyframes part2-summary-bubble-ping {
+  0% { opacity: .65; transform: scale(.75); }
+  100% { opacity: 0; transform: scale(1.55); }
+}
+
+/* -------- 縮放把手 -------- */
+#part-2-content .part2-summary-resize-handle {
+  position: absolute; right: 4px; bottom: 4px;
+  display: flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px;
+  color: rgba(255, 255, 255, .35);
+  cursor: nwse-resize;
+  touch-action: none;
+  z-index: 3;
+}
+#part-2-content .part2-summary-resize-handle svg { width: 15px; height: 15px; }
+#part-2-content .part2-summary-doc-win .part2-summary-resize-handle { color: #c9bca4; }
+
+@media (max-width: 900px) {
+  #part-2-content .part2-summary-layout { grid-template-columns: 1fr; }
+  #part-2-content .part2-summary-stage {
+    min-height: 0;
+    display: flex; flex-direction: column; gap: 40px;
+    padding: 0;
+  }
+  #part-2-content .part2-summary-skill-win,
+  #part-2-content .part2-summary-doc-win {
+    position: static;
+    width: 100%; max-width: 100%;
+  }
+  #part-2-content .part2-summary-doc-win { height: auto; max-height: 640px; }
+  #part-2-content .part2-summary-bubble,
+  #part-2-content .part2-summary-resize-handle { display: none; }
+  #part-2-content .part2-summary-move { cursor: default; touch-action: auto; }
 }
 
 /* Part 3.0.2 — Shared chart, workflow, and question-gallery layer */
