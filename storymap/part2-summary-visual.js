@@ -17,7 +17,7 @@
    - 打字完成後，直接點擊分頁籤（quick-summary.md／divide-into-parts.md）
      可即時切換顯示完整內容，不會重播打字動畫。
 
-   行為（手機／窄螢幕，<=900px）：
+   行為（手機／窄螢幕，<=1040px）：
    - 兩個視窗改為直向堆疊，VS Code 視窗在上，泡泡隱藏。捲動到 VS Code
      視窗時自動依序打出兩個 Skill 並套用摘要／分段，不需分次點擊。
      不支援拖曳與縮放（版面已固定為全寬堆疊）。
@@ -78,7 +78,7 @@
   /* phase: idle-0 -> typing-0 -> ready-1 -> typing-1 -> ready-doc -> applied */
   let phase = 'idle-0';
   let typedCount = 0;
-  const isMobile = window.matchMedia('(max-width: 900px)').matches;
+  const isMobile = window.matchMedia('(max-width: 1040px)').matches;
   let bubbleFollowTarget = null;
   let bubbleRaf = null;
 
